@@ -1,0 +1,3 @@
+--title 'Stanford-Mods Documentation'
+lib/**/*.rb -
+README.rdoc LICENSE 
