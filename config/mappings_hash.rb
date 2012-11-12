@@ -18,7 +18,7 @@ name_to_xpath = {
 # titleInfo
   'title' => '//mods/titleInfo[not(@type="alternative")]', # .first, extract_title_from_title_info(node)
   'subtitle' => '//mods/titleInfo/subTitle' #.first.text
-  'full_title' => '//mods/titleInfo', # .first, extract_title_from_title_info(node)
+  'full_title' => '//mods/titleInfo', # .first, extract_full_title_from_title_info(node)
   'title_variant' => '//mods/titleInfo[@type="alternative"]', # .first, extract_title_from_title_info(node)
 
 # language
@@ -27,6 +27,8 @@ name_to_xpath = {
 
 # physicalDescription
   'physical_description_extent' => '//physicalDescription/extent/text()', # .to_s
+  'physical_description_form' => '//physicalDescription/form/text()', # .to_s
+  'physical_description_media_type' => '//physicalDescription/internetMediaType/text()', # .to_s
 
 # location
   'physical_location' => '//location/physicalLocation/text()', # .to_s
@@ -42,6 +44,7 @@ name_to_xpath = {
   'date_issued' => '//originInfo/dateIssued/text()', #.to_s  - comes from passed node, not root
   'place_terms' => '//originInfo/place/placeTerm/text()', # .to_s  put in array, then .flatten.uniq
   'publishers' => '//originInfo/publisher/text()', # .to_s  put in array, then .flatten.uniq
+  # pub_date / pub_year
 
 # subject
   'subject_names' => '//subject/name', # .ea .xpath('namePart/text().to_a.join(' ')  then .uniq
@@ -62,10 +65,15 @@ name_to_xpath = {
   
   'fulltext' => '//text()', #  .collect { |n| n.to_s }.join(' ')
   
+  # TODO:  simple element variants:
+  # 
+  # genre authority
+  # accessCondition type
+  # note displayLabel
+  # MISSING:
+  #   date_created
+  
+  # TODO:  collections
   
 }
 
-# MISSING:
-#   language
-#   date_created
- 

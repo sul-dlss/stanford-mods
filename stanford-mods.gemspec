@@ -6,8 +6,8 @@ Gem::Specification.new do |gem|
   gem.version       = Stanford::Mods::VERSION
   gem.authors       = ["Naomi Dushay", "Bess Sadler"]
   gem.email         = ["ndushay AT stanford.edu", "bess AT stanford.edu"]
-  gem.description   = "Stanford specific parsings of MODS metadata from DOR, the Stanford Digital Object Repository"
-  gem.summary       = "Stanford specific parsings of MODS metadata"
+  gem.description   = "Stanford specific wrangling of MODS metadata from DOR, the Stanford Digital Object Repository"
+  gem.summary       = "Stanford specific wrangling of MODS metadata"
   gem.homepage      = "https://github.com/sul-dlss/stanford-mods"
 
   gem.extra_rdoc_files = ["LICENSE", "README.rdoc"]
