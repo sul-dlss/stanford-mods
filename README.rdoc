@@ -24,7 +24,20 @@ Or install it yourself as:
 
 == Usage
 
-TODO: Write usage instructions here
+1. add stanford-mods to your gemfile
+2. require 'stanford-mods'
+3. (I don't think you will also need to require 'mods', but you might)
+
+  > m = Stanford::Mods::Record.new
+  > m.from_str('<mods><genre>ape</genre></mods>')
+  > m.genre
+	=> [#<Nokogiri::XML::Element:0x3fe07b48bb24 name="genre" children=[#<Nokogiri::XML::Text:0x3fe07a09a7dc "ape">]>] 
+	> m.genre.text
+	=> "ape" 
+
+  > m.to_be_removed        <-- method I wrote in stanford-mods for proof of concept
+  in foo!
+  => nil 
 
 ## Contributing
 
@@ -37,4 +50,4 @@ TODO: Write usage instructions here
 
 == Releases
 
-0.0.1 
+0.0.1 Initial commit - grab name
