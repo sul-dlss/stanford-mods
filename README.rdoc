@@ -39,6 +39,16 @@ Or install it yourself as:
   in foo!
   => nil 
 
+Example Using SearchWorks Mixins:
+
+  > require 'stanford-mods/searchworks'
+	> m = Stanford::Mods::Record.new
+	> m.from_str('<mods><language><languageTerm authority="iso639-2b" type="code">dut</languageTerm></language></mods>')
+	> m.language_facet    <-- from Searchworks mixin
+	=> ['Dutch'] 
+	> m.languages         <-- from mods gem
+	=> ['Dutch; Flemish']
+
 ## Contributing
 
 1. Fork it
@@ -50,5 +60,6 @@ Or install it yourself as:
 
 == Releases
 
+0.0.3 began SearchWorks mixins
 0.0.2 add usage instructions to readme
 0.0.1 Initial commit - grab name

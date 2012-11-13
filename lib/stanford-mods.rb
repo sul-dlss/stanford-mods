@@ -7,12 +7,7 @@ module Stanford
   module Mods
 
     class Record < ::Mods::Record
-      
-      # proof of concept method
-      def to_be_removed
-        puts "in to_be_removed!"
-      end
-      
+            
     end
   end
 end
