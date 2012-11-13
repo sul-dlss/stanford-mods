@@ -60,6 +60,7 @@ Example Using SearchWorks Mixins:
 
 == Releases
 
-0.0.3 began SearchWorks mixins
+0.0.4 KolbRecord started
+0.0.3 began SearchWorks mixins with sw_access_facet and sw_language_facet
 0.0.2 add usage instructions to readme
 0.0.1 Initial commit - grab name

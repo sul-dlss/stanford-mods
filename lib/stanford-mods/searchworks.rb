@@ -7,12 +7,12 @@ module Stanford
     class Record < ::Mods::Record
       
       # if it's coming from DOR, then it is available online
-      def access_facet
+      def sw_access_facet
         ['Online']
       end
       
       # include langagues known to SearchWorks; try to error correct when possible (e.g. when ISO-639 disagrees with MARC standard)
-      def language_facet
+      def sw_language_facet
         result = []
         @mods_ng_xml.language.each { |n| 
           # get languageTerm codes and add their translations to the result
@@ -48,8 +48,8 @@ module Stanford
           end
         }
         result.uniq
-      end
+      end # language_facet
       
-    end
-  end
-end
+    end # class Record
+  end # Module Mods
+end # Module Stanford
