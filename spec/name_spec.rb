@@ -119,7 +119,7 @@ describe "name/author concepts" do
     it "should take first name with marcrelator role of 'Creator' or 'Author'" do
       @smods_rec.from_str(@mods_start + @personal_author_text + @corp_creator_text + @mods_end)
       @smods_rec.main_author.should == 'personal_author_text'
-      @smods_rec.from_str(@mods_start + @corp_creator_text + @personal_author_code + @mods_end)
+      @smods_rec.from_str(@mods_start + @corp_creator_text + @personal_creator_code + @mods_end)
       @smods_rec.main_author.should == 'corp_creator_text'
     end
     
@@ -134,7 +134,7 @@ describe "name/author concepts" do
     end
 
     it "should use the dislay name if it is present" do
-      m = "<mods><name type='personal'>
+      m = "<mods #{@ns_decl}><name type='personal'>
         <namePart type='given'>John</namePart>
         <namePart type='family'>Huston</namePart>
         <displayForm>q</displayForm>
