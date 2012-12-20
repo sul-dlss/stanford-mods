@@ -13,34 +13,21 @@ module Stanford
       # if no name without a role, then nil
       def main_author
         result = nil
-        first_no_role = nil
+        first_wo_role = nil
         @mods_ng_xml.plain_name.each { |n|
           if n.role.size == 0
-            first_no_role ||= n
+            first_wo_role ||= n
           end
-          n.role.each { |r|              
+          n.role.each { |r|
             if r.authority.include?('marcrelator') && 
                   (r.value.include?('Creator') || r.value.include?('Author'))
-              if n.displayForm.size > 0
-                result ||= n.displayForm.text
-              elsif n.type_at == 'personal' && n.family_name.size > 0
-                result ||= n.given_name.size > 0 ? n.family_name.text + ', ' + n.given_name.text : n.family_name.text
-              else
-                result ||= n.namePart.text
-              end
+              result ||= n.display_value
             end          
           }
         }
-        if !result && first_no_role
-          if first_no_role.displayForm.size > 0
-            result = first_no_role.displayForm.text
-          elsif first_no_role.type_at == 'personal' && first_no_role.family_name.size > 0
-            result = first_no_role.given_name.size > 0 ? first_no_role.family_name.text + ', ' + first_no_role.given_name.text : first_no_role.family_name.text
-          else
-            result = first_no_role.namePart.text
-          end
+        if !result && first_wo_role
+          result = first_wo_role.display_value
         end
-# FIXME:  need method to create display name from name node        
         result
       end # main_author
       

@@ -133,7 +133,7 @@ describe "name/author concepts" do
       @smods_rec.main_author.should == nil
     end
 
-    it "should use the dislay name if it is present" do
+    it "should use the display name if it is present" do
       m = "<mods #{@ns_decl}><name type='personal'>
         <namePart type='given'>John</namePart>
         <namePart type='family'>Huston</namePart>
