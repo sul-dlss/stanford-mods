@@ -1,11 +1,12 @@
 require 'spec_helper'
 
 describe "name/author concepts" do
-  
+  before(:all) do
+    @smods_rec = Stanford::Mods::Record.new
+    @ns_decl = "xmlns='#{Mods::MODS_NS}'"
+  end
   context "main_author" do
     before(:all) do
-      @smods_rec = Stanford::Mods::Record.new
-      @ns_decl = "xmlns='#{Mods::MODS_NS}'"
       @mods_start = "<mods #{@ns_decl}>"
       @mods_end = "</mods>"
       @plain_no_role = "<name><namePart>plain_no_role</namePart></name>"
@@ -149,11 +150,57 @@ describe "name/author concepts" do
       @smods_rec.from_str(m)
       @smods_rec.main_author.should == 'q'
     end
+    it "should include dates, when available, for personal name" do
+      pending "to be implemented"
+    end
+    it "should not include dates, even when available, for corporate or other non-personal name" do
+      pending "to be implemented"
+    end
   end # main_author
 
-  it "additional_authors" do
-    pending "to be implemented"
-  end
+  context "additional_authors" do
+    before(:all) do
+      m = "<mods #{@ns_decl}><name type='personal'>
+        <namePart type='given'>John</namePart>
+        <namePart type='family'>Huston</namePart>
+        <displayForm>q</displayForm>
+      </name>
+      <name type='personal'>
+        <namePart>Crusty The Clown</namePart>
+        <namePart type='date'>1990-</namePart>
+      </name>
+      <name type='corporate'>
+        <namePart>Watchful Eye</namePart>
+        <namePart type='date'>1850-</namePart>
+      </name>
+      <name type='corporate'>
+        <namePart>Exciting Prints</namePart>
+        <role><roleTerm type='text'>lithographer</roleTerm></role>
+      </name>
+      </mods>"
+      @smods_rec.from_str(m)
+    end
+    it "should not include main author" do
+      @smods_rec.additional_authors.should_not include(@smods_rec.main_author)
+    end
+    it "should include personal authors that are not main author" do
+      @smods_rec.additional_authors.should include('Crusty The Clown, 1990-')
+    end
+    it "should include corporate (and other) authors that are not main author" do
+      @smods_rec.additional_authors.should include('Watchful Eye')
+      @smods_rec.additional_authors.should include('Exciting Prints')
+    end
+    it "should include dates, when available, for personal names" do
+      @smods_rec.additional_authors.should include('Crusty The Clown, 1990-')
+    end
+    it "should not include dates, even when available, for corporate or other non-personal names" do
+      @smods_rec.additional_authors.find { |a| a =~ Regexp.new('1850-') }.should == nil
+    end
+    it "should not include roles" do
+      @smods_rec.additional_authors.find { |a| a =~ Regexp.new('lithographer') }.should == nil
+    end
+  end # additional_authors
+
   context "author_sort" do
     it "should be a single value" do
       pending "to be implemented"

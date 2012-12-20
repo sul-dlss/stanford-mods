@@ -31,7 +31,15 @@ module Stanford
         result
       end # main_author
       
-      
+      # all names except the main_author
+      #  personal names will be the display_value_w_date form, other types of names will be the display_value form.
+      #  see Mods::Record.name  in nom_terminology for details on the display_value algorithm
+      # FIXME:  only currently does personal and corporate names
+      def additional_authors
+        results = [] + personal_names_w_dates + corporate_names
+        results.delete(main_author)
+        results
+      end
             
     end # Record class
   end # Mods module
