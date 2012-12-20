@@ -1,3 +1,4 @@
+# encoding: UTF-8
 require 'stanford-mods/searchworks_languages'
 
 # SearchWorks specific wranglings of MODS metadata as a mixin to the Stanford::Mods::Record object
@@ -50,6 +51,9 @@ module Stanford
         result.uniq
       end # language_facet
       
+      
+      # ---- AUTHOR ----
+      
       # @return [String] value for author_1xx_search field
       def sw_main_author
         main_author_w_date
@@ -86,7 +90,9 @@ module Stanford
     	# which is the mods approximation of the value created for a marc record
       # @return [String] value for author_sort field
       def sw_sort_author
-        
+        #  substitute java Character.MAX_CODE_POINT for nil main_author so missing main authors sort last
+        val = '' + (main_author_w_date ? main_author_w_date : "\u{FFFF} ") + ( sort_title ? sort_title : '')
+        val.gsub(/[[:punct:]]*/, '')
       end
       
       

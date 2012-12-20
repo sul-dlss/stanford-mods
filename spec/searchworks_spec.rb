@@ -1,3 +1,4 @@
+# encoding: UTF-8
 require 'spec_helper'
 require 'stanford-mods/searchworks'
 
@@ -59,6 +60,7 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
       <name type='family'>
         <namePart>family</namePart>
       </name>
+      <titleInfo><title>Jerk</title><nonSort>The   </nonSort></titleInfo>
       </mods>"
       @smods_rec.from_str(m)
     end
@@ -84,16 +86,31 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
       @smods_rec.sw_meeting_authors.should == ['conference']
     end    
     context "author sort" do
-      context "author_sort" do
-        it "should be a single value" do
-          pending "to be implemented"
-        end
-        it "should be last name first if its a personal name" do
-          pending "to be implemented"
-        end
-        it "should ignore non-sorting characters" do
-          pending "to be implemented"
-        end
+      it "should be a String" do
+        @smods_rec.sw_sort_author.should == 'qJerk'
+      end
+      it "should include the main author, as retrieved by :main_author_w_date" do
+        @smods_rec.should_receive(:main_author_w_date) # in stanford-mods.rb
+        @smods_rec.sw_sort_author
+      end
+      it "should append the sort title, as retrieved by :sort_title" do
+        @smods_rec.should_receive(:sort_title) # in Mods gem
+        @smods_rec.sw_sort_author
+      end
+      it "should not begin or end with whitespace" do
+        @smods_rec.sw_sort_author.should == @smods_rec.sw_sort_author.strip
+      end
+      it "should substitute the java Character.MAX_CODE_POINT for nil main_author so missing main authors sort last" do
+        r = Stanford::Mods::Record.new
+        r.from_str "<mods #{@ns_decl}><titleInfo><title>Jerk</title></titleInfo></mods>"
+        r.sw_sort_author.should =~ / Jerk$/
+        r.sw_sort_author.should match("\u{FFFF}")
+        r.sw_sort_author.should match("\xEF\xBF\xBF")
+      end
+      it "should not have any ascii punctuation marks" do
+        r = Stanford::Mods::Record.new
+        r.from_str "<mods #{@ns_decl}><titleInfo><title>J,e.r;;;k</title></titleInfo></mods>"
+        r.sw_sort_author.should =~ / Jerk$/
       end
     end
   end
