@@ -42,6 +42,7 @@ describe "Values for SearchWorks Solr" do
     it "access_facet" do
       Stanford::Mods::Record.new.sw_access_facet.should == ['Online']
     end
+    # title convenience methods are implemented in the Mods gem; no special work here
     context "title fields" do
       context "for display" do
         it "short title" do
