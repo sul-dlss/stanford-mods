@@ -1,6 +1,6 @@
 require 'stanford-mods/searchworks_languages'
 
-# # SearchWorks specific wranglings of MODS metadata as an extension of the Mods::Record object
+# SearchWorks specific wranglings of MODS metadata as a mixin to the Stanford::Mods::Record object
 module Stanford
   module Mods
 
@@ -49,6 +49,46 @@ module Stanford
         }
         result.uniq
       end # language_facet
+      
+      # @return [String] value for author_1xx_search field
+      def sw_main_author
+        main_author_w_date
+      end
+      
+      # @return [Array<String>] values for author_7xx_search field
+      def sw_addl_authors
+        additional_authors_w_dates
+      end
+      
+      # @return [Array<String>] values for author_person_facet, author_person_display
+      def sw_person_authors
+        personal_names_w_dates
+      end
+      
+      # return the display_value_w_date for all <mods><name> elements that do not have type='personal'
+      # @return [Array<String>] values for author_other_facet
+      def sw_impersonal_authors
+        @mods_ng_xml.plain_name.select {|n| n.type_at != 'personal'}.map { |n| n.display_value_w_date }
+      end
+      
+      # @return [Array<String>] values for author_corp_display
+      def sw_corporate_authors
+        @mods_ng_xml.plain_name.select {|n| n.type_at == 'corporate'}.map { |n| n.display_value_w_date }
+      end
+      
+      # @return [Array<String>] values for author_meeting_display
+      def sw_meeting_authors
+        @mods_ng_xml.plain_name.select {|n| n.type_at == 'conference'}.map { |n| n.display_value_w_date }
+      end
+      
+      # Returns a sortable version of the main_author:
+    	#  main_author + sorting title
+    	# which is the mods approximation of the value created for a marc record
+      # @return [String] value for author_sort field
+      def sw_sort_author
+        
+      end
+      
       
     end # class Record
   end # Module Mods
