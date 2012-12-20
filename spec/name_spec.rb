@@ -117,6 +117,11 @@ describe "name/author concepts" do
       end
     end
     
+    it "should be a String" do
+      @smods_rec.from_str(@mods_start + @personal_author_text + @corp_creator_text + @mods_end)
+      @smods_rec.main_author_w_date.should be_an_instance_of(String)
+    end
+    
     it "should take first name with marcrelator role of 'Creator' or 'Author'" do
       @smods_rec.from_str(@mods_start + @personal_author_text + @corp_creator_text + @mods_end)
       @smods_rec.main_author_w_date.should == 'personal_author_text'
