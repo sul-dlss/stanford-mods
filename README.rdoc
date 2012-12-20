@@ -60,7 +60,8 @@ Example Using SearchWorks Mixins:
 
 == Releases
 
-0.0.4 KolbRecord started
-0.0.3 began SearchWorks mixins with sw_access_facet and sw_language_facet
-0.0.2 add usage instructions to readme
-0.0.1 Initial commit - grab name
+* <b>0.0.5</b> main_author_w_date, additional_authors_w_dates added to Stanford::Mods::Record; various author methods added to searchworks mixin
+* <b>0.0.4</b> KolbRecord started
+* <b>0.0.3</b> began SearchWorks mixins with sw_access_facet and sw_language_facet
+* <b>0.0.2</b> add usage instructions to readme
+* <b>0.0.1</b> Initial commit - grab name
