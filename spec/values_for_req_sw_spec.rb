@@ -3,6 +3,9 @@ require 'stanford-mods/searchworks'
 
 describe "Values for SearchWorks Solr" do
   # from  https://consul.stanford.edu/display/NGDE/Required+and+Recommended+Solr+Fields+for+SearchWorks+documents
+  before(:all) do
+    @ns_decl = "xmlns='#{Mods::MODS_NS}'"
+  end
 
   context "required fields" do
     context "DOR specific" do
@@ -76,8 +79,8 @@ describe "Values for SearchWorks Solr" do
     end
     context "language" do
       it "should use the SearchWorks controlled vocabulary" do
-        m = '<mods><language><languageTerm authority="iso639-2b" type="code">per ara, dut</languageTerm></language></mods>'
-        r = Stanford::Mods::Record.new
+        m = "<mods #{@ns_decl}><language><languageTerm authority='iso639-2b' type='code'>per ara, dut</languageTerm></language></mods>"
+        r = Stanford::Mods::Record.new()
         r.from_str(m)
         langs = r.sw_language_facet
         langs.size.should == 3
@@ -87,7 +90,7 @@ describe "Values for SearchWorks Solr" do
         langs.should_not include("Dutch; Flemish")
       end
       it "should not have duplicates" do
-        m = '<mods><language><languageTerm type="code" authority="iso639-2b">eng</languageTerm><languageTerm type="text">English</languageTerm></language></mods>'
+        m = "<mods #{@ns_decl}><language><languageTerm type='code' authority='iso639-2b'>eng</languageTerm><languageTerm type='text'>English</languageTerm></language></mods>"
         r = Stanford::Mods::Record.new
         r.from_str(m)
         langs = r.sw_language_facet
