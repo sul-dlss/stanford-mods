@@ -11,7 +11,9 @@ module Stanford
       # the first encountered <mods><name> element with marcrelator flavor role of 'Creator' or 'Author'.
       # if no marcrelator 'Creator' or 'Author', the first name without a role.
       # if no name without a role, then nil
-      def main_author
+      # @return [String] a name in the display_value_w_date form 
+      # see Mods::Record.name  in nom_terminology for details on the display_value algorithm
+      def main_author_w_date
         result = nil
         first_wo_role = nil
         @mods_ng_xml.plain_name.each { |n|
@@ -21,23 +23,25 @@ module Stanford
           n.role.each { |r|
             if r.authority.include?('marcrelator') && 
                   (r.value.include?('Creator') || r.value.include?('Author'))
-              result ||= n.display_value
+              result ||= n.display_value_w_date
             end          
           }
         }
         if !result && first_wo_role
-          result = first_wo_role.display_value
+          result = first_wo_role.display_value_w_date
         end
         result
       end # main_author
       
-      # all names except the main_author
-      #  personal names will be the display_value_w_date form, other types of names will be the display_value form.
+      # all names, in display form, except the main_author
+      #  names will be the display_value_w_date form
       #  see Mods::Record.name  in nom_terminology for details on the display_value algorithm
-      # FIXME:  only currently does personal and corporate names
-      def additional_authors
-        results = [] + personal_names_w_dates + corporate_names
-        results.delete(main_author)
+      def additional_authors_w_dates
+        results = []
+        @mods_ng_xml.plain_name.each { |n|  
+          results << n.display_value_w_date
+        }
+        results.delete(main_author_w_date)
         results
       end
             
