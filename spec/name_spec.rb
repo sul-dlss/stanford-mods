@@ -204,6 +204,10 @@ describe "name/author concepts" do
       @smods_rec.from_str(m)
       @addl_authors = @smods_rec.additional_authors_w_dates
     end
+    it "should be an Array of Strings" do
+      @addl_authors.should be_an_instance_of(Array)
+      @addl_authors.first.should be_an_instance_of(String)
+    end
     it "should not include main author" do
       @addl_authors.should_not include(@smods_rec.main_author_w_date)
     end
