@@ -92,10 +92,34 @@ module Stanford
       def sw_sort_author
         #  substitute java Character.MAX_CODE_POINT for nil main_author so missing main authors sort last
         val = '' + (main_author_w_date ? main_author_w_date : "\u{FFFF} ") + ( sort_title ? sort_title : '')
-        val.gsub(/[[:punct:]]*/, '')
+        val.gsub(/[[:punct:]]*/, '').strip
       end
       
+      # ---- TITLE ----
+
+      # @return [String] value for title_245a_search field
+      def sw_short_title
+        short_titles ? short_titles.first : nil
+      end
       
+      # @return [String] value for title_245_search, title_display, title_full_display
+      def sw_full_title
+        full_titles ? full_titles.find { |s| s =~ Regexp.new(sw_short_title) } : nil
+      end
+      
+      # this includes all titles except 
+      # @return [Array<String>] values for title_variant_search
+      def sw_addl_titles
+        full_titles.select { |s| s !~ Regexp.new(sw_short_title) }
+      end
+      
+      # Returns a sortable version of the main title
+      # @return [String] value for title_sort field
+      def sw_sort_title
+        val = '' + ( sort_title ? sort_title : '')
+        val.gsub(/[[:punct:]]*/, '').strip
+      end
+            
     end # class Record
   end # Module Mods
 end # Module Stanford
