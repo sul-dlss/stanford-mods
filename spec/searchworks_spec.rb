@@ -9,10 +9,6 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
     @ns_decl = "xmlns='#{Mods::MODS_NS}'"
   end
 
-  it "sw_access_facet" do
-    @smods_rec.sw_access_facet.should == ['Online']
-  end
-  
   context "languages" do
     it "should use the SearchWorks controlled vocabulary" do
       m = "<mods #{@ns_decl}><language><languageTerm authority='iso639-2b' type='code'>per ara, dut</languageTerm></language></mods>"

@@ -94,9 +94,7 @@ describe "Kolb Collection Mods Record" do
     end
   
     context "strongly recommended" do
-      it "access_facet" do
-        @krec.sw_access_facet.should == ['Online']
-      end
+      # access_facet has nothing to do with mods
       context "title" do
         context "for display and searching" do
           it "short title" do

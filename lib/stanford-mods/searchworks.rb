@@ -7,11 +7,6 @@ module Stanford
 
     class Record < ::Mods::Record
       
-      # if it's coming from DOR, then it is available online
-      def sw_access_facet
-        ['Online']
-      end
-      
       # include langagues known to SearchWorks; try to error correct when possible (e.g. when ISO-639 disagrees with MARC standard)
       def sw_language_facet
         result = []
