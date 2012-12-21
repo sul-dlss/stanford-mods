@@ -1,3 +1,5 @@
+# This file is for reference as I implement the searchworks.rb mixin file
+#  it is a bunch of methods from the old dor-sw-ingest code 
 module Stanford
   module Mods
 

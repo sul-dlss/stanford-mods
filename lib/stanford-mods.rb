@@ -1,4 +1,3 @@
-require "stanford-mods/mappings"
 require "stanford-mods/version"
 require 'mods'
 
