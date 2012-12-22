@@ -1,6 +1,6 @@
 = Stanford::Mods
 
-{<img src="https://secure.travis-ci.org/sul-dlss/stanford-mods.png?branch=master" alt="Build Status" />}[http://travis-ci.org/sul-dlss/stanford-mods]
+{<img src="https://secure.travis-ci.org/sul-dlss/stanford-mods.png?branch=master" alt="Build Status" />}[http://travis-ci.org/sul-dlss/stanford-mods] {<img src="https://gemnasium.com/sul-dlss/stanford-mods.png" alt="Dependency Status" />}[https://gemnasium.com/sul-dlss/stanford-mods]
 
 A Gem with Stanford specific wranglings of MODS (Metadata Object Description Schema) metadata from DOR, the Stanford Digital Object Repository.
 
