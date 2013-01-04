@@ -1,6 +1,5 @@
 # encoding: UTF-8
 require 'spec_helper'
-require 'stanford-mods/searchworks'
 
 describe "Searchworks mixin for Stanford::Mods::Record" do
 

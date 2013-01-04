@@ -60,6 +60,7 @@ Example Using SearchWorks Mixins:
 
 == Releases
 
+* <b>0.0.8</b> require stanford-mods/searchworks in stanford-mods (top level)
 * <b>0.0.7</b> added sw_geographic_search to searchworks mixin
 * <b>0.0.6</b> various title methods added to searchworks mixin
 * <b>0.0.5</b> main_author_w_date, additional_authors_w_dates added to Stanford::Mods::Record; various author methods added to searchworks mixin

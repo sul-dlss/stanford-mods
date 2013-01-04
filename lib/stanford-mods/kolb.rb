@@ -4,8 +4,6 @@ module Stanford
 
     class KolbRecord < Record
       
-      require 'stanford-mods/searchworks'
-      
       # NAOMI_MUST_COMMENT_THIS_METHOD
       def publish_date
         

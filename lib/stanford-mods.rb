@@ -1,5 +1,6 @@
-require "stanford-mods/version"
+require 'stanford-mods/version'
 require 'mods'
+require 'stanford-mods/searchworks'
 
 # Stanford specific wranglings of MODS metadata as an extension of the Mods::Record object
 module Stanford

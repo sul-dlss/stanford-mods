@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'stanford-mods/searchworks'
 
 describe "Values for SearchWorks Solr" do
   # from  https://consul.stanford.edu/display/NGDE/Required+and+Recommended+Solr+Fields+for+SearchWorks+documents
