@@ -114,6 +114,37 @@ module Stanford
         val = '' + ( sort_title ? sort_title : '')
         val.gsub(/[[:punct:]]*/, '').strip
       end
+      
+      # ---- SUBJECT ----
+      
+      # Values are the contents of:
+      #   subject/geographic
+      #   subject/hierarchicalGeographic
+      #   subject/geographicCode  (only include the translated value if it isn't already present from other mods geo fields)
+      # @param [String] sep - the separator string for joining hierarchicalGeographic sub elements
+      # @return [Array<String>] values for geographic_search Solr field for this document or nil if none
+      def sw_geographic_search(sep = ' ')
+        result = term_values([:subject, :geographic]) || []
+        
+        # hierarchicalGeographic has sub elements
+        @mods_ng_xml.subject.hierarchicalGeographic.each { |hg_node|  
+          hg_vals = []
+          hg_node.element_children.each { |e| 
+            hg_vals << e.text unless e.text.empty?
+          }
+          result << hg_vals.join(sep) unless hg_vals.empty?
+        }
+
+        trans_code_vals = @mods_ng_xml.subject.geographicCode.translated_value
+        if trans_code_vals
+          trans_code_vals.each { |val|  
+            result << val if !result.include?(val)
+          }
+        end
+
+        return nil if result.empty?
+        result    
+      end
             
     end # class Record
   end # Module Mods
