@@ -25,6 +25,7 @@ module Stanford
                   end
                 end
               rescue => e
+                # TODO:  this should be written to a logger
                 p "Couldn't find english name for #{ct.text}"
                 result << SEARCHWORKS_LANGUAGES[v.strip]
               end
