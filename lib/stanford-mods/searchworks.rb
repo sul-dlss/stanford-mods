@@ -158,6 +158,19 @@ module Stanford
         }
         result
       end
+      
+      # Values are the contents of:
+      #   subject/titleInfo/(subelements)
+      # @param [String] sep - the separator string for joining titleInfo sub elements
+      # @return [Array<String>] values for titles inside subject elements or [] if none
+      def sw_subject_titles(sep = ' ')
+        result = []
+        @mods_ng_xml.subject.titleInfo.each { |ti_el|
+          parts = ti_el.element_children.map { |el| el.text unless el.text.empty? }.compact
+          result << parts.join(sep).strip unless parts.empty?
+        }
+        result
+      end
             
     end # class Record
   end # Module Mods
