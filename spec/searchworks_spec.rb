@@ -207,6 +207,110 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
       @sw_geographic_search = @smods_rec.sw_geographic_search   
     end
     
+    context "sw_subject_names" do
+      before(:all) do
+        @sw_subject_names = @smods_rec.sw_subject_names
+      end
+      it "should contain <subject><name><namePart> values" do
+        @sw_subject_names.should include(@s_name)
+      end
+      it "should not contain non-name subject subelements" do
+        @sw_subject_names.should_not include(@genre)
+        @sw_subject_names.should_not include(@geo)
+        @sw_subject_names.should_not include(@geo_code)
+        @sw_subject_names.should_not include(@hier_geo_country)
+        @sw_subject_names.should_not include(@cart_coord)
+        @sw_subject_names.should_not include(@s_genre)
+        @sw_subject_names.should_not include(@occupation)
+        @sw_subject_names.should_not include(@temporal)
+        @sw_subject_names.should_not include(@topic)
+        @sw_subject_names.should_not include(@s_title)
+      end
+      it "should not contain subject/name/role" do
+        m = "<mods #{@ns_decl}>
+              <subject><name type='personal'>
+              	<namePart>Alterman, Eric</namePart>
+              	<displayForm>Eric Alterman</displayForm>
+              	<role>
+              	  	<roleTerm type='text'>creator</roleTerm>
+              	  	<roleTerm type='code'>cre</roleTerm>
+              	</role>
+              </name></subject></mods>"
+        @smods_rec.from_str m
+        @smods_rec.sw_subject_names.find { |sn| sn =~ /cre/ }.should == nil
+      end
+      it "should not contain subject/name/affiliation" do
+        m = "<mods #{@ns_decl}>
+              <subject><name type='personal'>
+              	<namePart type='termsOfAddress'>Dr.</namePart>
+              	<namePart>Brown, B. F.</namePart>
+              	<affiliation>Chemistry Dept., American University</affiliation>
+              </name></subject></mods>"
+        @smods_rec.from_str m
+        @smods_rec.sw_subject_names.find { |sn| sn =~ /Chemistry/ }.should == nil
+      end
+      it "should not contain subject/name/description" do
+        m = "<mods #{@ns_decl}>
+              <subject><name type='personal'>
+              	<namePart>Abrams, Michael</namePart>
+              	<description>American artist, 20th c.</description>
+              </name></subject></mods>"
+        @smods_rec.from_str m
+        @smods_rec.sw_subject_names.find { |sn| sn =~ /artist/ }.should == nil
+      end
+      it "should not include top level name element" do
+        m = "<mods #{@ns_decl}>
+              <name type='personal'>
+              	<namePart>Abrams, Michael</namePart>
+              	<description>American artist, 20th c.</description>
+              </name></mods>"
+        @smods_rec.from_str m
+        @smods_rec.sw_subject_names.should == []
+      end
+      it "should have one value for each name element" do
+        m = "<mods #{@ns_decl}>
+              <subject>
+                <name><namePart>first</namePart></name>
+                <name><namePart>second</namePart></name>
+              </subject>
+              <subject>
+                <name><namePart>third</namePart></name>
+              </subject>
+              </mods>"
+        @smods_rec.from_str m
+        @smods_rec.sw_subject_names.should == ['first', 'second', 'third']
+      end
+      it "should be an empty Array if there are no values in the mods" do
+        m = "<mods #{@ns_decl}><note>notit</note></mods>"
+        @smods_rec.from_str m
+        @smods_rec.sw_subject_names.should == []
+      end
+      it "should be an empty Array if there are empty values in the mods" do
+        m = "<mods #{@ns_decl}><subject><name><namePart/></name></subject><note>notit</note></mods>"
+        @smods_rec.from_str m
+        @smods_rec.sw_subject_names.should == []
+      end
+      context "combining subelements" do
+        before(:all) do
+          m = "<mods #{@ns_decl}>
+                <subject>
+                  <name>
+                    <namePart>first</namePart>
+                    <namePart>second</namePart>
+                  </name>
+                </subject>
+              </mods>"
+          @smods_rec.from_str m
+        end
+        it "uses a ', ' as the separator by default" do
+          @smods_rec.sw_subject_names.should == ['first, second']
+        end          
+        it "honors any string value passed in for the separator" do
+          @smods_rec.sw_subject_names(' --').should == ['first --second']
+        end
+      end
+    end # sw_subject_names
+    
     context "sw_geographic_search" do
       it "should contain subject <geographic> subelement data" do
         @sw_geographic_search.should include(@geo)
@@ -229,22 +333,22 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
         @sw_geographic_search.should_not include(@topic)
         @sw_geographic_search.should_not include(@s_title)
       end
-      it "should be nil if there are no values in the MODS" do
+      it "should be [] if there are no values in the MODS" do
         m = "<mods #{@ns_decl}><note>notit</note></mods>"
         @smods_rec.from_str m
-        @smods_rec.sw_geographic_search.should == nil
+        @smods_rec.sw_geographic_search.should == []
       end
-      it "should not be nil if there are only subject/geographic elements" do
+      it "should not be empty Array if there are only subject/geographic elements" do
         m = "<mods #{@ns_decl}><subject><geographic>#{@geo}</geographic></subject></mods>"
         @smods_rec.from_str m
         @smods_rec.sw_geographic_search.should == [@geo]
       end
-      it "should not be nil if there are only subject/hierarchicalGeographic" do
+      it "should not be empty Array if there are only subject/hierarchicalGeographic" do
         m = "<mods #{@ns_decl}><subject><hierarchicalGeographic><country>#{@hier_geo_country}</country></hierarchicalGeographic></subject></mods>"
         @smods_rec.from_str m
         @smods_rec.sw_geographic_search.should == [@hier_geo_country]
       end
-      it "should not be nil if there are only subject/geographicCode elements" do
+      it "should not be empty Array if there are only subject/geographicCode elements" do
         m = "<mods #{@ns_decl}><subject><geographicCode authority='marcgac'>e-er</geographicCode></subject></mods>"
         @smods_rec.from_str m
         @smods_rec.sw_geographic_search.should == ['Estonia']
@@ -261,10 +365,10 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
           @smods_rec.from_str m
           @smods_rec.sw_geographic_search.should == ['Mississippi', 'Tippah County', 'Washington (D.C.)']
         end
-        it "should be nil if there are only empty values in the MODS" do
+        it "should be empty Array if there are only empty values in the MODS" do
           m = "<mods #{@ns_decl}><subject><geographic/></subject><note>notit</note></mods>"
           @smods_rec.from_str m
-          @smods_rec.sw_geographic_search.should == nil
+          @smods_rec.sw_geographic_search.should == []
         end
       end
       context "hierarchicalGeographic subelement" do
@@ -279,10 +383,10 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
           @smods_rec.from_str m
           @smods_rec.sw_geographic_search.should == ['first', 'second', 'third']
         end
-        it "should be nil if there are only empty values in the MODS" do
+        it "should be empty Array if there are only empty values in the MODS" do
           m = "<mods #{@ns_decl}><subject><hierarchicalGeographic/></subject><note>notit</note></mods>"
           @smods_rec.from_str m
-          @smods_rec.sw_geographic_search.should == nil
+          @smods_rec.sw_geographic_search.should == []
         end
         context "combining subelements" do
           before(:all) do
@@ -341,10 +445,10 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
           @smods_rec.from_str m
           @smods_rec.sw_geographic_search.should == ['Estonia', 'Madagascar', 'Maryland']
         end
-        it "should be nil if there are only empty values in the MODS" do
+        it "should be empty Array if there are only empty values in the MODS" do
           m = "<mods #{@ns_decl}><subject><geographicCode/></subject><note>notit</note></mods>"
           @smods_rec.from_str m
-          @smods_rec.sw_geographic_search.should == nil
+          @smods_rec.sw_geographic_search.should == []
         end
         it "should add the translated value if it wasn't present already" do
           m = "<mods #{@ns_decl}>

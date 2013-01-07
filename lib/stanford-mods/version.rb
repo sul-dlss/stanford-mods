@@ -1,5 +1,6 @@
 module Stanford
   module Mods
-    VERSION = "0.0.8"
+    # this is the Ruby Gem version
+    VERSION = "0.0.9"
   end
 end
