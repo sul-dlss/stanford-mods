@@ -132,6 +132,13 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
       it "should be a String" do
         @smods_rec.sw_full_title.should == 'The Jerk A Tale of Tourettes'
       end
+      it 'should escape regex characters in the sw_short_title' do
+        m = "<mods #{@ns_decl}><titleInfo>
+            <title>Pius V. Saint, [Michaele Gisleri),</title>
+          </titleInfo></mods>"
+        @smods_rec.from_str m
+        @smods_rec.sw_full_title.should == 'Pius V. Saint, [Michaele Gisleri),'     
+      end
     end
     context "additional titles (for title_variant_search)" do
       before(:all) do
@@ -152,6 +159,15 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
       end
       it "should include all alternative titles" do
         @addl_titles.should include('Alternative')
+      end
+      it 'shold escape the short title in the regexp' do
+         m = "<mods #{@ns_decl}>
+            <titleInfo type='alternative'><title>Alternative</title></titleInfo>
+            <titleInfo><title>[Jerk)</title><nonSort>The</nonSort></titleInfo>
+            <titleInfo><title>Joke]</title></titleInfo>
+            </mods>"
+          @smods_rec.from_str(m)
+          @addl_titles = @smods_rec.sw_addl_titles
       end
     end    
     context "sort title" do

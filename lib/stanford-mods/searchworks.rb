@@ -100,13 +100,13 @@ module Stanford
       
       # @return [String] value for title_245_search, title_display, title_full_display
       def sw_full_title
-        full_titles ? full_titles.find { |s| s =~ Regexp.new(sw_short_title) } : nil
+        full_titles ? full_titles.find { |s| s =~ Regexp.new(Regexp.escape(sw_short_title)) } : nil
       end
       
       # this includes all titles except 
       # @return [Array<String>] values for title_variant_search
       def sw_addl_titles
-        full_titles.select { |s| s !~ Regexp.new(sw_short_title) }
+        full_titles.select { |s| s !~ Regexp.new(Regexp.escape(sw_short_title)) }
       end
       
       # Returns a sortable version of the main title
