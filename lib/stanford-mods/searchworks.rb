@@ -73,7 +73,9 @@ module Stanford
       
       # @return [Array<String>] values for author_corp_display
       def sw_corporate_authors
-        @mods_ng_xml.plain_name.select {|n| n.type_at == 'corporate'}.map { |n| n.display_value_w_date }
+        val=@mods_ng_xml.plain_name.select {|n| n.type_at == 'corporate'}.map { |n| n.display_value_w_date }
+        puts val.to_s
+        val
       end
       
       # @return [Array<String>] values for author_meeting_display
