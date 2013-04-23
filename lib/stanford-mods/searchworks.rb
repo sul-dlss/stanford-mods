@@ -30,7 +30,10 @@ module Stanford
                 result << SEARCHWORKS_LANGUAGES[v.strip]
               end
             else
-              result << SEARCHWORKS_LANGUAGES[v.strip]
+              vals = ct.text.split(/[,|\ ]/).reject {|x| x.strip.length == 0 } 
+              vals.each do |v|
+                result << SEARCHWORKS_LANGUAGES[v.strip]
+              end
             end
           }
           # add languageTerm text values
@@ -84,8 +87,8 @@ module Stanford
       end
       
       # Returns a sortable version of the main_author:
-    	#  main_author + sorting title
-    	# which is the mods approximation of the value created for a marc record
+      #  main_author + sorting title
+      # which is the mods approximation of the value created for a marc record
       # @return [String] value for author_sort field
       def sw_sort_author
         #  substitute java Character.MAX_CODE_POINT for nil main_author so missing main authors sort last
@@ -102,7 +105,11 @@ module Stanford
       
       # @return [String] value for title_245_search, title_display, title_full_display
       def sw_full_title
-        full_titles ? full_titles.find { |s| s =~ Regexp.new(Regexp.escape(sw_short_title)) } : nil
+        toret = full_titles ? full_titles.find { |s| s =~ Regexp.new(Regexp.escape(sw_short_title)) } : nil
+        if toret
+          toret = toret.gsub(/,$/, '')
+        end
+        toret
       end
       
       # this includes all titles except 
