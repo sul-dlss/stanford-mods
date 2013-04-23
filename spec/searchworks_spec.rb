@@ -137,7 +137,7 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
             <title>Pius V. Saint, [Michaele Gisleri),</title>
           </titleInfo></mods>"
         @smods_rec.from_str m
-        @smods_rec.sw_full_title.should == 'Pius V. Saint, [Michaele Gisleri),'     
+        @smods_rec.sw_full_title.should == 'Pius V. Saint, [Michaele Gisleri)'     
       end
     end
     context "additional titles (for title_variant_search)" do
