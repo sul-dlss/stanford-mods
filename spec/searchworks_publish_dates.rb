@@ -158,7 +158,7 @@ m_no_subject = "<mods #{@ns_decl}><note>notit</note></mods>"
         m = "<mods #{@ns_decl}><subject><geographicCode authority='iso3166'>ca</geographicCode></subject></mods>"
             @smods_rec = Stanford::Mods::Record.new
 @smods_rec.from_str(m)
-        @smods_rec.logger.should_receive(:info).with(/#{@fake_druid} has subject geographicCode element with untranslated encoding \(iso3166\): <geographicCode authority=.*>ca<\/geographicCode>/)
+        @smods_rec.sw_logger.should_receive(:info).with(/#{@fake_druid} has subject geographicCode element with untranslated encoding \(iso3166\): <geographicCode authority=.*>ca<\/geographicCode>/)
         @smods_rec.geographic_search
       end
     end # geographic_search
@@ -174,6 +174,9 @@ m_no_subject = "<mods #{@ns_decl}><note>notit</note></mods>"
         @smods_rec.subject_other_search
       end
       it "should be nil if there are no values in the MODS" do
+        m = "<mods #{@ns_decl}></mods>"
+            @smods_rec = Stanford::Mods::Record.new
+@smods_rec.from_str(m)
         @smods_rec.subject_other_search.should == nil
       end
       it "should contain subject <name> SUBelement data" do
@@ -244,7 +247,7 @@ m_no_subject = "<mods #{@ns_decl}><note>notit</note></mods>"
     context "subject_other_subvy_search" do
       it "should be nil if there are no values in the MODS" do
             @smods_rec = Stanford::Mods::Record.new
-@smods_rec.from_str(m)
+@smods_rec.from_str(@ng_mods_no_subject.to_s)
         
         @smods_rec.  subject_other_subvy_search.should == nil
       end
@@ -300,8 +303,8 @@ m_no_subject = "<mods #{@ns_decl}><note>notit</note></mods>"
             @smods_rec = Stanford::Mods::Record.new
 @smods_rec.from_str(m)
           
-          @smods_rec.    logger.should_receive(:info).with(/#{@fake_druid} has subject temporal element with untranslated encoding: <temporal encoding=.*>197505<\/temporal>/)
-          @smods_rec.    subject_other_subvy_search
+          @smods_rec.sw_logger.should_receive(:info).with(/#{@fake_druid} has subject temporal element with untranslated encoding: <temporal encoding=.*>197505<\/temporal>/)
+          @smods_rec.subject_other_subvy_search
         end
         it "should be nil if there are only empty values in the MODS" do
           m = "<mods #{@ns_decl}><subject><temporal/></subject><note>notit</note></mods>"
@@ -396,7 +399,7 @@ m_no_subject = "<mods #{@ns_decl}><note>notit</note></mods>"
       end
       it "should be nil if there are no values" do
             @smods_rec = Stanford::Mods::Record.new
-@smods_rec.from_str(@ng_mods_no_subject)
+@smods_rec.from_str(@ng_mods_no_subject.to_s)
         @smods_rec.  topic_facet.should == nil
       end
     end
@@ -423,7 +426,7 @@ m_no_subject = "<mods #{@ns_decl}><note>notit</note></mods>"
       end
       it "should be nil if there are no values" do
                 @smods_rec = Stanford::Mods::Record.new
-@smods_rec.from_str(m)
+@smods_rec.from_str(@ng_mods_no_subject.to_s)
         @smods_rec.  geographic_facet.should == nil
       end
     end
@@ -596,22 +599,6 @@ end
 context "format" do
   it "should choose the format" do
     m = "<mods #{@ns_decl}><typeOfResource>still image</typeOfResouce></mods>"
-        @smods_rec = Stanford::Mods::Record.new
-@smods_rec.from_str(m)
-    @smods_rec.format.should == ['Image']
-  end
-  it "should add a format from a config file" do
-    m = "<mods #{@ns_decl}><typeOfResource>still image</typeOfResouce></mods>"
-    @hdor_client.stub(:mods).with(@fake_druid).and_return(Nokogiri::XML(m))
-    Indexer.stub(:config).and_return({:add_format => 'Map / Globe'})
-    sdb = SolrDocBuilder.new(@fake_druid, @hdor_client, Logger.new(STDOUT))
-    @smods_rec.format.should == ['Image', 'Map / Globe']
-  end
-  it 'should fetch collection formats from the hash of formats for the member objects' do
-    m = "<mods #{@ns_decl}><originInfo>
-    <dateCreated>1904</dateCreated>
-    </originInfo></mods>"
-    Indexer.stub(:format_hash).and_return({@fake_druid=>['Image']})
         @smods_rec = Stanford::Mods::Record.new
 @smods_rec.from_str(m)
     @smods_rec.format.should == ['Image']
