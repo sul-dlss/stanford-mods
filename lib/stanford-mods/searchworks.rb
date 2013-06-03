@@ -244,7 +244,7 @@ module Stanford
           if codes && codes.size > xvals.size
             self.subject.geographicCode.each { |n|
               if n.authority != 'marcgac' && n.authority != 'marccountry'
-                sw_logger.info("#{@druid} has subject geographicCode element with untranslated encoding (#{n.authority}): #{n.to_xml}")
+                sw_logger.info("#{druid} has subject geographicCode element with untranslated encoding (#{n.authority}): #{n.to_xml}")
               end
             }
           end
@@ -281,7 +281,7 @@ module Stanford
 
           # print a message for any temporal encodings
           self.subject.temporal.each { |n| 
-            sw_logger.info("#{@druid} has subject temporal element with untranslated encoding: #{n.to_xml}") if !n.encoding.empty?
+            sw_logger.info("#{druid} has subject temporal element with untranslated encoding: #{n.to_xml}") if !n.encoding.empty?
           }
 
           vals.empty? ? nil : vals
@@ -341,7 +341,7 @@ module Stanford
             when 'software, multimedia'
               val << 'Computer File'      
             else
-              sw_logger.warn "#{@druid} has an unknown typeOfResource #{form}"
+              sw_logger.warn "#{druid} has an unknown typeOfResource #{form}"
             end
           end
         end
@@ -349,7 +349,7 @@ module Stanford
           return val.uniq
         end
         if not self.typeOfResource or self.typeOfResource.length == 0
-          sw_logger.warn "#{@druid} has no valid typeOfResource"
+          sw_logger.warn "#{druid} has no valid typeOfResource"
           []
         end
       end
@@ -418,7 +418,7 @@ module Stanford
           return @pub_year if @pub_year
         end
         @pub_year=''
-        sw_logger.info("#{@druid} no valid pub date found in '#{dates.to_s}'")
+        sw_logger.info("#{druid} no valid pub date found in '#{dates.to_s}'")
         return nil
       end
       #creates a date suitable for sorting. Guarnteed to be 4 digits or nil
@@ -497,6 +497,12 @@ module Stanford
           return catkey.first.gsub('a','') #need to ensure catkey is numeric only
         end
         nil
+      end
+      def druid= new_druid
+        @druid=new_druid
+      end
+      def druid
+        @druid ? @druid : 'Unknown item'
       end
 
       # protected ----------------------------------------------------------
