@@ -217,7 +217,7 @@ module Stanford
         result
       end
       #remove trailing commas
-      def sw_full_title
+      def sw_full_title_without_commas
         toret = self.sw_full_title
         if toret
           toret = toret.gsub(/,$/, '')
