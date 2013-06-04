@@ -10,5 +10,3 @@ notifications:
     - jdeering@stanford.edu
 before_install:
   gem update --system 1.8.24
-  gem --version
-
