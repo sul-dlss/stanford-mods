@@ -320,10 +320,16 @@ module Stanford
       # @return [String] value in the SearchWorks controlled vocabulary
       def format
         val=[]
-        formats=self.term_values(:typeOfResource)
+        formats = self.term_values(:typeOfResource)
+        genres = self.term_values(:genre)
+        issuance = self.term_values([:origin_info,:issuance])
         if formats
           formats.each do |form|
             case form
+            when 'text'
+              val << 'Thesis' if genres and genres.include? 'thesis'
+              val << 'Book' if issuance and issuance.include? 'monographic'
+              val << 'Journal / Periodical' if issuance and issuance.include? 'continuing'
             when 'still image'
               val << 'Image'
             when 'mixed material'

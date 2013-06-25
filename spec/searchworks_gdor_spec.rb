@@ -589,6 +589,25 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
   end
 
   context "format" do
+    it "should check genre as part of deciding format" do
+      m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResouce><genre>thesis</genre></mods>"
+      @smods_rec = Stanford::Mods::Record.new
+      @smods_rec.from_str(m)
+      @smods_rec.format.should == ['Thesis']
+    end
+    it 'should work for datasets' do
+      m = "<mods #{@ns_decl}><typeOfResource>software, multimedia</typeOfResouce></mods>"
+      @smods_rec = Stanford::Mods::Record.new
+      @smods_rec.from_str(m)
+      @smods_rec.format.should == ['Computer File']
+    end
+    it 'should work for books' do
+      m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResouce><originInfo><issuance>monographic</issueance></originInfo></mods>"
+      @smods_rec = Stanford::Mods::Record.new
+      @smods_rec.from_str(m)
+      @smods_rec.format.should == ['Book']
+    end
+    
     it "should choose the format" do
       m = "<mods #{@ns_decl}><typeOfResource>still image</typeOfResouce></mods>"
       @smods_rec = Stanford::Mods::Record.new
