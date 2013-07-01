@@ -77,7 +77,6 @@ module Stanford
       # @return [Array<String>] values for author_corp_display
       def sw_corporate_authors
         val=@mods_ng_xml.plain_name.select {|n| n.type_at == 'corporate'}.map { |n| n.display_value_w_date }
-        puts val.to_s
         val
       end
       
@@ -330,6 +329,7 @@ module Stanford
               val << 'Thesis' if genres and genres.include? 'thesis'
               val << 'Book' if issuance and issuance.include? 'monographic'
               val << 'Journal / Periodical' if issuance and issuance.include? 'continuing'
+              val << 'Journal / Periodical' if genres and genres.include? 'article'
             when 'still image'
               val << 'Image'
             when 'mixed material'
