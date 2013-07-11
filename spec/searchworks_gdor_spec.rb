@@ -611,7 +611,7 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
       m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResouce><genre>article</genre></mods>"
       @smods_rec = Stanford::Mods::Record.new
       @smods_rec.from_str(m)
-      @smods_rec.format.should == ['Journal / Periodical']
+      @smods_rec.format.should == ['Journal/Periodical']
     end
     it "should choose the format" do
       m = "<mods #{@ns_decl}><typeOfResource>still image</typeOfResouce></mods>"
