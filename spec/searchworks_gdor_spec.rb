@@ -514,6 +514,15 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
       @smods_rec.from_str(m)
       @smods_rec.pub_date.should == '1865'
     end
+    it 'should work on 3 digit BC dates' do
+      m = "<mods #{@ns_decl}><originInfo><dateCreated>300 B.C.</dateCreated></originInfo>"
+      @smods_rec = Stanford::Mods::Record.new
+      @smods_rec.from_str(m)
+       @smods_rec.pub_year.should == '-700'
+       @smods_rec.pub_date.should == '-700'
+       @smods_rec.pub_date_sort.should =='-700'
+       @smods_rec.pub_date_facet.should == '300 B.C.'
+    end
     it 'should handle century based dates' do
       m = "<mods #{@ns_decl}><originInfo><dateIssued>13th century AH / 19th CE</dateIssued><issuance>monographic</issuance></originInfo>"
       @smods_rec = Stanford::Mods::Record.new
