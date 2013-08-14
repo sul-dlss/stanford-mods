@@ -514,6 +514,12 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
       @smods_rec.from_str(m)
       @smods_rec.pub_date.should == '1865'
     end
+    it 'should work with multiple 4 digit dates' do
+      m = "<mods #{@ns_decl}><originInfo><dateCreated>Text dated June 4, 1594; miniatures added by 1596</dateCreated></originInfo>"
+      @smods_rec = Stanford::Mods::Record.new
+      @smods_rec.from_str(m)
+       @smods_rec.pub_date.should == '1594'
+    end
     it 'should work on 3 digit BC dates' do
       m = "<mods #{@ns_decl}><originInfo><dateCreated>300 B.C.</dateCreated></originInfo>"
       @smods_rec = Stanford::Mods::Record.new

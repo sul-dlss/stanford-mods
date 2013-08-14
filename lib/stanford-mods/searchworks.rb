@@ -559,9 +559,10 @@ module Stanford
               pos = pos ? pos.to_i : 0
               if f_date.include?(match+' CE') or pos > 0
                 @pub_year=match
-                return match
+                return match  
               end 
             end
+            return matches.first
           end
         end
         return nil
