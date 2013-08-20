@@ -634,6 +634,13 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
       @smods_rec.from_str(m)
       @smods_rec.format.should == ['Image']
     end
+    # Student Project Reports: spec via email from Vitus, August 16, 2013
+    it "should give a format of Other for <genre>student project report</genre> and <typeOfResource>text</typeOfResouce>" do
+      m = "<mods #{@ns_decl}><genre>student project report</genre><typeOfResource>text</typeOfResouce></mods>"
+      @smods_rec = Stanford::Mods::Record.new
+      @smods_rec.from_str(m)
+      @smods_rec.format.should == ['Other']
+    end
     it "should return nothing if there is no format info" do
       m = "<mods #{@ns_decl}><originInfo>
       <dateCreated>1904</dateCreated>

@@ -330,6 +330,7 @@ module Stanford
               val << 'Book' if issuance and issuance.include? 'monographic'
               val << 'Journal/Periodical' if issuance and issuance.include? 'continuing'
               val << 'Journal/Periodical' if genres and genres.include? 'article'
+              val << 'Other' if genres and genres.include? 'student project report'
             when 'still image'
               val << 'Image'
             when 'mixed material'
