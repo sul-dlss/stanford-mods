@@ -339,6 +339,8 @@ module Stanford
               val << 'Manuscript/Archive'
             when 'moving image'
               val << 'Video'
+            when 'notated music'
+              val << 'Music - Score'
             when 'three dimensional object'
               val <<'Other'
             when 'cartographic'

@@ -673,6 +673,12 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
       @smods_rec.format.should == ['Book']
     end
     # end Hydrus mappings
+    it "should give a format of Music - Score for <typeOfResource>notated music</typeOfResouce>" do
+      m = "<mods #{@ns_decl}><typeOfResource>notated music</typeOfResouce></mods>"
+      @smods_rec = Stanford::Mods::Record.new
+      @smods_rec.from_str(m)
+      @smods_rec.format.should == ['Music - Score']
+    end
     it "should return nothing if there is no format info" do
       m = "<mods #{@ns_decl}><originInfo>
       <dateCreated>1904</dateCreated>
