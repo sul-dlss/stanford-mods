@@ -60,6 +60,7 @@ Example Using SearchWorks Mixins:
 
 == Releases
 
+* <b>0.0.20</b> Added mapping for typeOfResource notated music
 * <b>0.0.19</b> Additional mappings, including Hydrus formats (GRYPHONDOR-207)
 * <b>0.0.11</b> escape regex special characters when using short title in a regex
 * <b>0.0.10</b> get rid of ignore_me files
