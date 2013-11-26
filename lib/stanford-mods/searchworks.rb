@@ -350,8 +350,6 @@ module Stanford
               val << 'Sound Recording'
             when 'software, multimedia'
               val << 'Computer File'      
-            else
-              sw_logger.warn "#{druid} has an unknown typeOfResource #{form}"
             end
           end
         end
@@ -359,7 +357,6 @@ module Stanford
           return val.uniq
         end
         if not self.typeOfResource or self.typeOfResource.length == 0
-          sw_logger.warn "#{druid} has no valid typeOfResource"
           []
         end
       end
@@ -430,7 +427,6 @@ module Stanford
           return @pub_year if @pub_year
         end
         @pub_year=''
-        sw_logger.info("#{druid} no valid pub date found in '#{dates.to_s}'")
         return nil
       end
       #creates a date suitable for sorting. Guarnteed to be 4 digits or nil
