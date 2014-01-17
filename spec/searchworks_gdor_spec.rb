@@ -571,6 +571,59 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
       @smods_rec.pub_date_facet.should == '9th century'
     end
     
+    context "dates with u notation (e.g., 198u)" do
+      context "single digit u notation (e.g., 198u)" do
+        before(:each) do
+          m = "<mods #{@ns_decl}>
+          <originInfo>
+            <dateIssued encoding=\"marc\" point=\"start\" keyDate=\"yes\">198u</dateIssued>
+            <dateIssued encoding=\"marc\" point=\"end\">9999</dateIssued>
+          </originInfo></mods>"
+          @smods_rec = Stanford::Mods::Record.new
+          @smods_rec.from_str(m)
+        end
+        it "recognizes single digit u notation" do
+          dates = ["198u", "9999"]
+          uDate = @smods_rec.get_u_year dates
+          uDate.should eql("1980")
+        end
+        it 'pub_date: 198u = 1980' do
+          @smods_rec.pub_date.should == '1980'
+        end
+        it "pub_date_sort: 198u = 1980" do
+          @smods_rec.pub_date_sort.should =='1980'
+        end
+        it "pub_date_facet: 198u = 1980" do
+          @smods_rec.pub_date_facet.should == '1980'
+        end
+      end
+      context "double digit u notation (e.g., 19uu)" do
+        before(:each) do
+          m = "<mods #{@ns_decl}>
+          <originInfo>
+            <dateIssued encoding=\"marc\" point=\"start\" keyDate=\"yes\">19uu</dateIssued>
+            <dateIssued encoding=\"marc\" point=\"end\">9999</dateIssued>
+          </originInfo></mods>"
+          @smods_rec = Stanford::Mods::Record.new
+          @smods_rec.from_str(m)
+        end
+        it "recognizes double digit u notation" do
+          dates = ["19uu", "9999"]
+          uDate = @smods_rec.get_u_year dates
+          uDate.should eql("19--")
+        end
+        it 'pub_date: 19uu = 19--' do
+          @smods_rec.pub_date.should == '19--'
+        end
+        it "pub_date_sort: 19uu = 1900" do
+          @smods_rec.pub_date_sort.should =='1900'
+        end
+        it "pub_date_facet: 19uu = 20th century" do
+          @smods_rec.pub_date_facet.should == '20th century'
+        end
+      end
+    end
+
     
     
     

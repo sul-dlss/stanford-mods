@@ -389,6 +389,7 @@ module Stanford
         end
         vals and vals.empty? ? nil : vals
       end
+      
       def is_number?(object)
         true if Integer(object) rescue false
       end
@@ -397,7 +398,7 @@ module Stanford
       end
   
       # Get the publish year from mods
-      #@return [String] 4 character year or nil if no valid date was found
+      # @return [String] 4 character year or nil if no valid date was found
       def pub_year
         #use the cached year if there is one
         if @pub_year
@@ -416,6 +417,9 @@ module Stanford
           end
           #try to find a date starting with the most normal date formats and progressing to more wonky ones
           @pub_year=get_plain_four_digit_year pruned_dates
+          return @pub_year if @pub_year
+          # Check for years in u notation, e.g., 198u
+          @pub_year=get_u_year pruned_dates
           return @pub_year if @pub_year
           @pub_year=get_double_digit_century pruned_dates
           return @pub_year if @pub_year
@@ -563,6 +567,25 @@ module Stanford
               end 
             end
             return matches.first
+          end
+        end
+        return nil
+      end
+      
+      # If a year has a "u" in it, replace instances of u with 0
+      # @param [String]
+      # @return String
+      def get_u_year dates
+        dates.each do |f_date|
+          # Single digit u notation
+          matches=f_date.scan(/\d{3}u/)
+          if matches.length == 1
+            return matches.first.gsub('u','0')
+          end
+          # Double digit u notation
+          matches=f_date.scan(/\d{2}u{2}/)
+          if matches.length == 1
+            return matches.first.gsub('u','-')
           end
         end
         return nil
