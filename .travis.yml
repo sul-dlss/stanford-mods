@@ -6,6 +6,6 @@ rvm:
 notifications:
   email:
     - ndushay@stanford.edu
-    - jdeering@stanford.edu
+    - bess@stanford.edu
 before_install:
   gem update --system 1.8.24
