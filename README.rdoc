@@ -59,7 +59,7 @@ Example Using SearchWorks Mixins:
 6. Create new Pull Request
 
 == Releases
-
+* <b>0.0.23</b> Added logic for dealing with "u-notation" approximate dates, e.g., 198u
 * <b>0.0.20</b> Added mapping for typeOfResource notated music
 * <b>0.0.19</b> Additional mappings, including Hydrus formats (GRYPHONDOR-207)
 * <b>0.0.11</b> escape regex special characters when using short title in a regex
