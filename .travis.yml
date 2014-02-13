@@ -1,11 +1,14 @@
 language: ruby
 script: rake rspec
 rvm:
+  - 2.1.0
   - 1.9.3
-  - jruby-19mode
+  - ruby-head
+  - jruby-head
+#  - jruby-19mode
 notifications:
   email:
     - ndushay@stanford.edu
     - bess@stanford.edu
-before_install:
-  gem update --system 1.8.24
+#before_install:
+#  gem update --system 1.8.24
