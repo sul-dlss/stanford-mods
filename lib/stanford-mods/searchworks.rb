@@ -335,6 +335,14 @@ module Stanford
         vals
       end
 
+      def pub_date_display
+        if pub_dates
+          pub_dates.first
+        else
+          nil
+        end
+      end
+
       # @return [Array<String>] values for the pub_date_group_facet
       # @deprecated
       def pub_date_groups year
@@ -360,14 +368,6 @@ module Stanford
               end
             end
           end
-        end
-      end
-
-      def pub_date_display
-        if pub_dates
-          pub_dates.first
-        else
-          nil
         end
       end
 
@@ -400,27 +400,27 @@ module Stanford
           end
           return @pub_year
         end
-        dates=pub_dates
+        dates = pub_dates
         if dates
-          year=[]
-          pruned_dates=[]
+          year = []
+          pruned_dates = []
           dates.each do |f_date|
             #remove ? and [] 
             pruned_dates << f_date.gsub('?','').gsub('[','').gsub(']','')
           end
           #try to find a date starting with the most normal date formats and progressing to more wonky ones
-          @pub_year=get_plain_four_digit_year pruned_dates
+          @pub_year = get_plain_four_digit_year pruned_dates
           return @pub_year if @pub_year
           # Check for years in u notation, e.g., 198u
-          @pub_year=get_u_year pruned_dates
+          @pub_year = get_u_year pruned_dates
           return @pub_year if @pub_year
-          @pub_year=get_double_digit_century pruned_dates
+          @pub_year = get_double_digit_century pruned_dates
           return @pub_year if @pub_year
-          @pub_year=get_bc_year pruned_dates
+          @pub_year = get_bc_year pruned_dates
           return @pub_year if @pub_year
-          @pub_year=get_three_digit_year pruned_dates
+          @pub_year = get_three_digit_year pruned_dates
           return @pub_year if @pub_year
-          @pub_year=get_single_digit_century pruned_dates
+          @pub_year = get_single_digit_century pruned_dates
           return @pub_year if @pub_year
         end
         @pub_year=''
