@@ -19,16 +19,7 @@ describe "Date methods in Searchworks mixin for Stanford::Mods::Record" do
       @smods_rec.from_str(m)
       @smods_rec.pub_dates.should == ['1906','1904','1904']
     end
-
-    it 'should choose a date ending with CE if there are multiple dates' do
-      m = "<mods #{@ns_decl}><originInfo><dateIssued>7192 AM (li-Adam) / 1684 CE</dateIssued><issuance>monographic</issuance></originInfo>"
-      @smods_rec = Stanford::Mods::Record.new
-      @smods_rec.from_str(m)
-      @smods_rec.pub_date.should == '1684'
-    end  
-
   end
-
 
   context "pub_date" do
     it "should choose the first date" do
@@ -130,71 +121,72 @@ describe "Date methods in Searchworks mixin for Stanford::Mods::Record" do
       @smods_rec.pub_date.should == '8--'
       @smods_rec.pub_date_sort.should =='0800'
       @smods_rec.pub_date_facet.should == '9th century'
-    end
-  
-    context "dates with u notation (e.g., 198u)" do
-      context "single digit u notation (e.g., 198u)" do
-        before(:each) do
-          m = "<mods #{@ns_decl}>
-          <originInfo>
-            <dateIssued encoding=\"marc\" point=\"start\" keyDate=\"yes\">198u</dateIssued>
-            <dateIssued encoding=\"marc\" point=\"end\">9999</dateIssued>
-          </originInfo></mods>"
-          @smods_rec = Stanford::Mods::Record.new
-          @smods_rec.from_str(m)
-        end
-        it "recognizes single digit u notation" do
-          dates = ["198u", "9999"]
-          uDate = @smods_rec.get_u_year dates
-          uDate.should eql("1980")
-        end
-        it 'pub_date: 198u = 1980' do
-          @smods_rec.pub_date.should == '1980'
-        end
-        it "pub_date_sort: 198u = 1980" do
-          @smods_rec.pub_date_sort.should =='1980'
-        end
-        it "pub_date_facet: 198u = 1980" do
-          @smods_rec.pub_date_facet.should == '1980'
-        end
+    end  
+  end # pub_date
+
+  context "dates with u notation (198u, 19uu)" do    
+    context "single digit u notation (198u)" do
+      before(:all) do
+        m = "<mods #{@ns_decl}>
+        <originInfo>
+          <dateIssued encoding=\"marc\" point=\"start\" keyDate=\"yes\">198u</dateIssued>
+          <dateIssued encoding=\"marc\" point=\"end\">9999</dateIssued>
+        </originInfo></mods>"
+        @smods_rec = Stanford::Mods::Record.new
+        @smods_rec.from_str(m)
       end
-      context "double digit u notation (e.g., 19uu)" do
-        before(:each) do
-          m = "<mods #{@ns_decl}>
-          <originInfo>
-            <dateIssued encoding=\"marc\" point=\"start\" keyDate=\"yes\">19uu</dateIssued>
-            <dateIssued encoding=\"marc\" point=\"end\">9999</dateIssued>
-          </originInfo></mods>"
-          @smods_rec = Stanford::Mods::Record.new
-          @smods_rec.from_str(m)
-        end
-        it "recognizes double digit u notation" do
-          dates = ["19uu", "9999"]
-          uDate = @smods_rec.get_u_year dates
-          uDate.should eql("19--")
-        end
-        it 'pub_date: 19uu = 19--' do
-          @smods_rec.pub_date.should == '19--'
-        end
-        it "pub_date_sort: 19uu = 1900" do
-          @smods_rec.pub_date_sort.should =='1900'
-        end
-        it "pub_date_facet: 19uu = 20th century" do
-          @smods_rec.pub_date_facet.should == '20th century'
-        end
+      it "get_u_year recognizes notation" do
+        dates = ["198u", "9999"]
+        uDate = @smods_rec.get_u_year dates
+        uDate.should eql("1980")
+      end
+      it 'pub_date: 198u = 1980' do
+        @smods_rec.pub_date.should == '1980'
+      end
+      it "pub_date_sort: 198u = 1980" do
+        @smods_rec.pub_date_sort.should =='1980'
+      end
+      it "pub_date_facet: 198u = 1980" do
+        @smods_rec.pub_date_facet.should == '1980'
       end
     end
-  
-  end #context pub_dates
+    context "double digit u notation (19uu)" do
+      before(:all) do
+        m = "<mods #{@ns_decl}>
+        <originInfo>
+          <dateIssued encoding=\"marc\" point=\"start\" keyDate=\"yes\">19uu</dateIssued>
+          <dateIssued encoding=\"marc\" point=\"end\">9999</dateIssued>
+        </originInfo></mods>"
+        @smods_rec = Stanford::Mods::Record.new
+        @smods_rec.from_str(m)
+      end
+      it "get_u_year recognizes notation" do
+        dates = ["19uu", "9999"]
+        uDate = @smods_rec.get_u_year dates
+        uDate.should eql("19--")
+      end
+      it 'pub_date: 19uu = 19--' do
+        @smods_rec.pub_date.should == '19--'
+      end
+      it "pub_date_sort: 19uu = 1900" do
+        @smods_rec.pub_date_sort.should =='1900'
+      end
+      it "pub_date_facet: 19uu = 20th century" do
+        @smods_rec.pub_date_facet.should == '20th century'
+      end
+    end
+  end # u notation
+
+
+
 
   context 'pub_date_sort' do
-    before :each do
+    before :all do
       m = "<mods #{@ns_decl}><originInfo>
       <dateCreated>Aug. 3rd, 1886</dateCreated>
       </originInfo></mods>"
       @smods_rec = Stanford::Mods::Record.new
       @smods_rec.from_str(m)
-  
     end
     it 'should work on normal dates' do
       @smods_rec.stub(:pub_date).and_return('1945')
@@ -214,7 +206,6 @@ describe "Date methods in Searchworks mixin for Stanford::Mods::Record" do
     end
   end
 
-
   context "pub_date_groups" do
     it 'should generate the groups' do
       m = "<mods #{@ns_decl}><originInfo>
@@ -222,7 +213,6 @@ describe "Date methods in Searchworks mixin for Stanford::Mods::Record" do
       </originInfo></mods>"
       @smods_rec = Stanford::Mods::Record.new
       @smods_rec.from_str(m)
-    
       @smods_rec.pub_date_groups(1904).should == ['More than 50 years ago']
     end
     it 'should work for a modern date too' do
@@ -241,6 +231,6 @@ describe "Date methods in Searchworks mixin for Stanford::Mods::Record" do
       @smods_rec.from_str(m)
       @smods_rec.pub_date_groups(nil).should == nil
     end
-  end#context pub date groups
+  end #context pub date groups
 
 end
