@@ -1,384 +1,395 @@
 # encoding: UTF-8
 require 'spec_helper'
 
-describe "Searchworks mixin for Stanford::Mods::Record" do
+describe "Searchworks Subject fields from Searchworks mixin for Stanford::Mods::Record" do
 
   before(:all) do
     @smods_rec = Stanford::Mods::Record.new
     @ns_decl = "xmlns='#{Mods::MODS_NS}'"
+    @genre = 'genre top level'
+    @cart_coord = '6 00 S, 71 30 E'
+    @s_genre = 'genre in subject'
+    @geo = 'Somewhere'
+    @geo_code = 'us'
+    @hier_geo_country = 'France'
+    @s_name = 'name in subject'
+    @occupation = 'worker bee'
+    @temporal = 'temporal'
+    @s_title = 'title in subject'
+    @topic = 'topic'
+    @subject_mods = "<mods #{@ns_decl}>
+          <genre>#{@genre}</genre>
+          <subject><cartographics><coordinates>#{@cart_coord}</coordinates></cartographics></subject>
+          <subject><genre>#{@s_genre}</genre></subject>
+          <subject><geographic>#{@geo}</geographic></subject>
+          <subject><geographicCode authority='iso3166'>#{@geo_code}</geographicCode></subject>
+          <subject><hierarchicalGeographic><country>#{@hier_geo_country}</country></hierarchicalGeographic></subject>
+          <subject><name><namePart>#{@s_name}</namePart></name></subject>
+          <subject><occupation>#{@occupation}</occupation></subject>
+          <subject><temporal>#{@temporal}</temporal></subject>
+          <subject><titleInfo><title>#{@s_title}</title></titleInfo></subject>
+          <subject><topic>#{@topic}</topic></subject>      
+        </mods>"
+    @smods_rec = Stanford::Mods::Record.new
+    @smods_rec.from_str(@subject_mods)
+    @ng_mods = Nokogiri::XML(@subject_mods)
+    m_no_subject = "<mods #{@ns_decl}><note>notit</note></mods>"
+    @ng_mods_no_subject = Nokogiri::XML(m_no_subject)
   end
 
-  context "sw subject raw methods" do
-    before(:all) do
-      @genre = 'genre top level'
-      @cart_coord = '6 00 S, 71 30 E'
-      @s_genre = 'genre in subject'
-      @geo = 'Somewhere'
-      @geo_code = 'us'
-      @hier_geo_country = 'France'
-      @s_name = 'name in subject'
-      @occupation = 'worker bee'
-      @temporal = 'temporal'
-      @s_title = 'title in subject'
-      @topic = 'topic'
-      m = "<mods #{@ns_decl}>
-        <genre>#{@genre}</genre>
-        <subject><cartographics><coordinates>#{@cart_coord}</coordinates></cartographics></subject>
-        <subject><genre>#{@s_genre}</genre></subject>
-        <subject><geographic>#{@geo}</geographic></subject>
-        <subject><geographicCode authority='iso3166'>#{@geo_code}</geographicCode></subject>
-        <subject><hierarchicalGeographic><country>#{@hier_geo_country}</country></hierarchicalGeographic></subject>
-        <subject><name><namePart>#{@s_name}</namePart></name></subject>
-        <subject><occupation>#{@occupation}</occupation></subject>
-        <subject><temporal>#{@temporal}</temporal></subject>
-        <subject><titleInfo><title>#{@s_title}</title></titleInfo></subject>
-        <subject><topic>#{@topic}</topic></subject>      
-      </mods>"
-      @smods_rec.from_str m
-      @sw_geographic_search = @smods_rec.sw_geographic_search 
-      @sw_subject_titles = @smods_rec.sw_subject_titles
-      @sw_subject_names = @smods_rec.sw_subject_names
-    end
-    
-    context "sw_subject_names" do
-      it "should contain <subject><name><namePart> values" do
-        @sw_subject_names.should include(@s_name)
+  context "search fields" do
+    context "topic_search" do
+      it "should be nil if there are no values in the MODS" do
+        m = "<mods #{@ns_decl}></mods>"
+        @smods_rec = Stanford::Mods::Record.new
+        @smods_rec.from_str(m)
+        @smods_rec.topic_search.should == nil
       end
-      it "should not contain non-name subject subelements" do
-        @sw_subject_names.should_not include(@cart_coord)
-        @sw_subject_names.should_not include(@s_genre)
-        @sw_subject_names.should_not include(@geo)
-        @sw_subject_names.should_not include(@geo_code)
-        @sw_subject_names.should_not include(@hier_geo_country)
-        @sw_subject_names.should_not include(@occupation)
-        @sw_subject_names.should_not include(@temporal)
-        @sw_subject_names.should_not include(@topic)
-        @sw_subject_names.should_not include(@s_title)
+      it "should contain subject <topic> subelement data" do
+        @smods_rec.topic_search.should include(@topic)
       end
-      it "should not contain subject/name/role" do
-        m = "<mods #{@ns_decl}>
-              <subject><name type='personal'>
-              	<namePart>Alterman, Eric</namePart>
-              	<displayForm>Eric Alterman</displayForm>
-              	<role>
-              	  	<roleTerm type='text'>creator</roleTerm>
-              	  	<roleTerm type='code'>cre</roleTerm>
-              	</role>
-              </name></subject></mods>"
-        @smods_rec.from_str m
-        @smods_rec.sw_subject_names.find { |sn| sn =~ /cre/ }.should == nil
-      end
-      it "should not contain subject/name/affiliation" do
-        m = "<mods #{@ns_decl}>
-              <subject><name type='personal'>
-              	<namePart type='termsOfAddress'>Dr.</namePart>
-              	<namePart>Brown, B. F.</namePart>
-              	<affiliation>Chemistry Dept., American University</affiliation>
-              </name></subject></mods>"
-        @smods_rec.from_str m
-        @smods_rec.sw_subject_names.find { |sn| sn =~ /Chemistry/ }.should == nil
-      end
-      it "should not contain subject/name/description" do
-        m = "<mods #{@ns_decl}>
-              <subject><name type='personal'>
-              	<namePart>Abrams, Michael</namePart>
-              	<description>American artist, 20th c.</description>
-              </name></subject></mods>"
-        @smods_rec.from_str m
-        @smods_rec.sw_subject_names.find { |sn| sn =~ /artist/ }.should == nil
-      end
-      it "should not include top level name element" do
-        m = "<mods #{@ns_decl}>
-              <name type='personal'>
-              	<namePart>Abrams, Michael</namePart>
-              	<description>American artist, 20th c.</description>
-              </name></mods>"
-        @smods_rec.from_str m
-        @smods_rec.sw_subject_names.should == []
-      end
-      it "should have one value for each name element" do
-        m = "<mods #{@ns_decl}>
-              <subject>
-                <name><namePart>first</namePart></name>
-                <name><namePart>second</namePart></name>
-              </subject>
-              <subject>
-                <name><namePart>third</namePart></name>
-              </subject>
-              </mods>"
-        @smods_rec.from_str m
-        @smods_rec.sw_subject_names.should == ['first', 'second', 'third']
-      end
-      it "should be an empty Array if there are no values in the mods" do
-        m = "<mods #{@ns_decl}><note>notit</note></mods>"
-        @smods_rec.from_str m
-        @smods_rec.sw_subject_names.should == []
-      end
-      it "should be an empty Array if there are empty values in the mods" do
-        m = "<mods #{@ns_decl}><subject><name><namePart/></name></subject><note>notit</note></mods>"
-        @smods_rec.from_str m
-        @smods_rec.sw_subject_names.should == []
-      end
-      context "combining subelements" do
-        before(:all) do
-          m = "<mods #{@ns_decl}>
-                <subject>
-                  <name>
-                    <namePart>first</namePart>
-                    <namePart>second</namePart>
-                  </name>
-                </subject>
-              </mods>"
-          @smods_rec.from_str m
-        end
-        it "uses a ', ' as the separator by default" do
-          @smods_rec.sw_subject_names.should == ['first, second']
-        end          
-        it "honors any string value passed in for the separator" do
-          @smods_rec.sw_subject_names(' --').should == ['first --second']
-        end
-      end
-    end # sw_subject_names
-    
-    context "sw_subject_titles" do
-      it "should contain <subject><titleInfo> subelement values" do
-        @sw_subject_titles.should include(@s_title)
-      end
-      it "should not contain non-name subject subelements" do
-        @sw_subject_titles.should_not include(@cart_coord)
-        @sw_subject_titles.should_not include(@s_genre)
-        @sw_subject_titles.should_not include(@geo)
-        @sw_subject_titles.should_not include(@geo_code)
-        @sw_subject_titles.should_not include(@hier_geo_country)
-        @sw_subject_titles.should_not include(@s_name)
-        @sw_subject_titles.should_not include(@occupation)
-        @sw_subject_titles.should_not include(@temporal)
-        @sw_subject_titles.should_not include(@topic)
-      end
-      it "should not include top level titleInfo element" do
-        m = "<mods #{@ns_decl}><titleInfo><title>Oklahoma</title></titleInfo></mods>"
-        @smods_rec.from_str m
-        @smods_rec.sw_subject_titles.should == []
-      end
-      it "should have one value for each titleInfo element" do
-        m = "<mods #{@ns_decl}>
-              <subject>
-                <titleInfo><title>first</title></titleInfo>
-                <titleInfo><title>second</title></titleInfo>
-              </subject>
-              <subject>
-                <titleInfo><title>third</title></titleInfo>
-              </subject>
-              </mods>"
-        @smods_rec.from_str m
-        @smods_rec.sw_subject_titles.should == ['first', 'second', 'third']
-      end
-      it "should be an empty Array if there are no values in the mods" do
-        m = "<mods #{@ns_decl}><note>notit</note></mods>"
-        @smods_rec.from_str m
-        @smods_rec.sw_subject_titles.should == []
-      end
-      it "should be an empty Array if there are empty values in the mods" do
-        m = "<mods #{@ns_decl}><subject><titleInfo><title/></titleInfo></subject><note>notit</note></mods>"
-        @smods_rec.from_str m
-        @smods_rec.sw_subject_titles.should == []
-      end
-      context "combining subelements" do
-        before(:all) do
-          m = "<mods #{@ns_decl}>
-                <subject>
-                  <titleInfo>
-                    <title>first</title>
-                    <subTitle>second</subTitle>
-                  </titleInfo>
-                </subject>
-              </mods>"
-          @smods_rec.from_str m
-        end
-        it "uses a ' ' as the separator by default" do
-          @smods_rec.sw_subject_titles.should == ['first second']
-        end          
-        it "honors any string value passed in for the separator" do
-          @smods_rec.sw_subject_titles(' --').should == ['first --second']
-        end
-        it "includes all subelements in the order of occurrence" do
-          m = "<mods #{@ns_decl}>
-                <subject>
-                  <titleInfo>
-                    <partName>1</partName>
-                    <nonSort>2</nonSort>
-                    <partNumber>3</partNumber>
-                    <title>4</title>
-                    <subTitle>5</subTitle>
-                  </titleInfo>
-                </subject>
-              </mods>"
-          @smods_rec.from_str m
-          @smods_rec.sw_subject_titles.should == ['1 2 3 4 5']
-        end
-      end
-    end # sw_subject_titles
-    
-    
-    context "sw_geographic_search" do
-      it "should contain subject <geographic> subelement data" do
-        @sw_geographic_search.should include(@geo)
-      end
-      it "should contain subject <hierarchicalGeographic> subelement data" do
-        @sw_geographic_search.should include(@hier_geo_country)
-      end
-      it "should contain translation of <geographicCode> subelement data with translated authorities" do
-        m = "<mods #{@ns_decl}><subject><geographicCode authority='marcgac'>e-er</geographicCode></subject></mods>"
-        @smods_rec.from_str m
-        @smods_rec.sw_geographic_search.should include('Estonia')
+      it "should contain top level <genre> element data" do
+        @smods_rec.topic_search.should include(@genre)
       end
       it "should not contain other subject element data" do
-        @sw_geographic_search.should_not include(@genre)
-        @sw_geographic_search.should_not include(@cart_coord)
-        @sw_geographic_search.should_not include(@s_genre)
-        @sw_geographic_search.should_not include(@s_name)
-        @sw_geographic_search.should_not include(@occupation)
-        @sw_geographic_search.should_not include(@temporal)
-        @sw_geographic_search.should_not include(@topic)
-        @sw_geographic_search.should_not include(@s_title)
+        @smods_rec.topic_search.should_not include(@cart_coord)
+        @smods_rec.topic_search.should_not include(@s_genre)
+        @smods_rec.topic_search.should_not include(@geo)
+        @smods_rec.topic_search.should_not include(@geo_code)
+        @smods_rec.topic_search.should_not include(@hier_geo_country)
+        @smods_rec.topic_search.should_not include(@s_name)
+        @smods_rec.topic_search.should_not include(@occupation)
+        @smods_rec.topic_search.should_not include(@temporal)
+        @smods_rec.topic_search.should_not include(@s_title)
       end
-      it "should be [] if there are no values in the MODS" do
-        m = "<mods #{@ns_decl}><note>notit</note></mods>"
-        @smods_rec.from_str m
-        @smods_rec.sw_geographic_search.should == []
+      it "should not be nil if there are only subject/topic elements (no <genre>)" do
+        m = "<mods #{@ns_decl}><subject><topic>#{@topic}</topic></subject></mods>"
+        @smods_rec = Stanford::Mods::Record.new
+        @smods_rec.from_str(m)
+        @smods_rec.topic_search.should == [@topic]
       end
-      it "should not be empty Array if there are only subject/geographic elements" do
+      it "should not be nil if there are only <genre> elements (no subject/topic elements)" do
+        m = "<mods #{@ns_decl}><genre>#{@genre}</genre></mods>"
+        @smods_rec = Stanford::Mods::Record.new
+        @smods_rec.from_str(m)
+        @smods_rec.topic_search.should == [@genre]
+      end
+      context "topic subelement" do
+        it "should have a separate value for each topic element" do
+          m = "<mods #{@ns_decl}>
+          <subject>
+          <topic>first</topic>
+          <topic>second</topic>
+          </subject>
+          <subject><topic>third</topic></subject>
+          </mods>"
+          @smods_rec = Stanford::Mods::Record.new
+          @smods_rec.from_str(m)
+          @smods_rec.topic_search.should == ['first', 'second', 'third']
+        end
+        it "should be nil if there are only empty values in the MODS" do
+          m = "<mods #{@ns_decl}><subject><topic/></subject><note>notit</note></mods>"
+          @smods_rec = Stanford::Mods::Record.new
+          @smods_rec.from_str(m)
+          @smods_rec.topic_search.should == nil
+        end
+      end
+    end # topic_search
+
+    context "geographic_search" do
+      it "should call sw_geographic_search (from stanford-mods gem)" do
         m = "<mods #{@ns_decl}><subject><geographic>#{@geo}</geographic></subject></mods>"
-        @smods_rec.from_str m
-        @smods_rec.sw_geographic_search.should == [@geo]
+        @smods_rec = Stanford::Mods::Record.new
+        @smods_rec.from_str(m)
+        @smods_rec.should_receive(:sw_geographic_search)
+        @smods_rec.geographic_search
       end
-      it "should not be empty Array if there are only subject/hierarchicalGeographic" do
-        m = "<mods #{@ns_decl}><subject><hierarchicalGeographic><country>#{@hier_geo_country}</country></hierarchicalGeographic></subject></mods>"
-        @smods_rec.from_str m
-        @smods_rec.sw_geographic_search.should == [@hier_geo_country]
+      it "should log an info message when it encounters a geographicCode encoding it doesn't translate" do
+        m = "<mods #{@ns_decl}><subject><geographicCode authority='iso3166'>ca</geographicCode></subject></mods>"
+        @smods_rec = Stanford::Mods::Record.new
+        @smods_rec.from_str(m)
+        @smods_rec.sw_logger.should_receive(:info).with(/#{@fake_druid} has subject geographicCode element with untranslated encoding \(iso3166\): <geographicCode authority=.*>ca<\/geographicCode>/)
+        @smods_rec.geographic_search
       end
-      it "should not be empty Array if there are only subject/geographicCode elements" do
-        m = "<mods #{@ns_decl}><subject><geographicCode authority='marcgac'>e-er</geographicCode></subject></mods>"
-        @smods_rec.from_str m
-        @smods_rec.sw_geographic_search.should == ['Estonia']
+    end # geographic_search
+
+    context "subject_other_search" do
+      it "should call sw_subject_names (from stanford-mods gem)" do
+        smods_rec = Stanford::Mods::Record.new
+        smods_rec.from_str(@subject_mods)
+        smods_rec.should_receive(:sw_subject_names)
+        smods_rec.subject_other_search
       end
-      context "geographic subelement" do
-        it "should have a separate value for each geographic element" do
+      it "should call sw_subject_titles (from stanford-mods gem)" do
+        @smods_rec.should_receive(:sw_subject_titles)
+        @smods_rec.subject_other_search
+      end
+      it "should be nil if there are no values in the MODS" do
+        m = "<mods #{@ns_decl}></mods>"
+        @smods_rec = Stanford::Mods::Record.new
+        @smods_rec.from_str(m)
+        @smods_rec.subject_other_search.should == nil
+      end
+      it "should contain subject <name> SUBelement data" do
+        @smods_rec.subject_other_search.should include(@s_name)
+      end
+      it "should contain subject <occupation> subelement data" do
+        @smods_rec.subject_other_search.should include(@occupation)
+      end
+      it "should contain subject <titleInfo> SUBelement data" do
+        @smods_rec = Stanford::Mods::Record.new
+        @smods_rec.from_str(@subject_mods)
+        @smods_rec.subject_other_search.should include(@s_title)
+      end
+      it "should not contain other subject element data" do
+        @smods_rec.subject_other_search.should_not include(@genre)
+        @smods_rec.subject_other_search.should_not include(@cart_coord)
+        @smods_rec.subject_other_search.should_not include(@s_genre)
+        @smods_rec.subject_other_search.should_not include(@geo)
+        @smods_rec.subject_other_search.should_not include(@geo_code)
+        @smods_rec.subject_other_search.should_not include(@hier_geo_country)
+        @smods_rec.subject_other_search.should_not include(@temporal)
+        @smods_rec.subject_other_search.should_not include(@topic)
+      end
+      it "should not be nil if there are only subject/name elements" do
+        m = "<mods #{@ns_decl}><subject><name><namePart>#{@s_name}</namePart></name></subject></mods>"
+        @smods_rec = Stanford::Mods::Record.new
+        @smods_rec.from_str(m)
+        @smods_rec.subject_other_search.should == [@s_name]
+      end
+      it "should not be nil if there are only subject/occupation elements" do
+        m = "<mods #{@ns_decl}><subject><occupation>#{@occupation}</occupation></subject></mods>"
+        @smods_rec = Stanford::Mods::Record.new
+        @smods_rec.from_str(m)
+        @smods_rec.subject_other_search.should == [@occupation]
+      end
+      it "should not be nil if there are only subject/titleInfo elements" do
+        m = "<mods #{@ns_decl}><subject><titleInfo><title>#{@s_title}</title></titleInfo></subject></mods>"
+        @smods_rec = Stanford::Mods::Record.new
+        @smods_rec.from_str(m)
+        @smods_rec.subject_other_search.should == [@s_title]
+      end
+      context "occupation subelement" do
+        it "should have a separate value for each occupation element" do
           m = "<mods #{@ns_decl}>
-                <subject>
-                <geographic>Mississippi</geographic>
-                <geographic>Tippah County</geographic>
-                </subject>
-                <subject><geographic>Washington (D.C.)</geographic></subject>
-              </mods>"
-          @smods_rec.from_str m
-          @smods_rec.sw_geographic_search.should == ['Mississippi', 'Tippah County', 'Washington (D.C.)']
+          <subject>
+          <occupation>first</occupation>
+          <occupation>second</occupation>
+          </subject>
+          <subject><occupation>third</occupation></subject>
+          </mods>"
+          @smods_rec = Stanford::Mods::Record.new
+          @smods_rec.from_str(m)
+          @smods_rec.subject_other_search.should == ['first', 'second', 'third']
         end
-        it "should be empty Array if there are only empty values in the MODS" do
-          m = "<mods #{@ns_decl}><subject><geographic/></subject><note>notit</note></mods>"
-          @smods_rec.from_str m
-          @smods_rec.sw_geographic_search.should == []
+        it "should be nil if there are only empty values in the MODS" do
+          m = "<mods #{@ns_decl}><subject><occupation/></subject><note>notit</note></mods>"
+          @smods_rec = Stanford::Mods::Record.new
+          @smods_rec.from_str(m)
+          @smods_rec.subject_other_search.should == nil
         end
       end
-      context "hierarchicalGeographic subelement" do
-        it "should have a separate value for each hierarchicalGeographic element" do
+    end # subject_other_search
+
+    context "subject_other_subvy_search" do
+      it "should be nil if there are no values in the MODS" do
+        @smods_rec = Stanford::Mods::Record.new
+        @smods_rec.from_str(@ng_mods_no_subject.to_s)
+        @smods_rec.subject_other_subvy_search.should == nil
+      end
+      it "should contain subject <temporal> subelement data" do
+        @smods_rec.subject_other_subvy_search.should include(@temporal)
+      end
+      it "should contain subject <genre> SUBelement data" do
+        @smods_rec.subject_other_subvy_search.should include(@s_genre)
+      end
+      it "should not contain other subject element data" do
+        @smods_rec.subject_other_subvy_search.should_not include(@genre)
+        @smods_rec.subject_other_subvy_search.should_not include(@cart_coord)
+        @smods_rec.subject_other_subvy_search.should_not include(@geo)
+        @smods_rec.subject_other_subvy_search.should_not include(@geo_code)
+        @smods_rec.subject_other_subvy_search.should_not include(@hier_geo_country)
+        @smods_rec.subject_other_subvy_search.should_not include(@s_name)
+        @smods_rec.subject_other_subvy_search.should_not include(@occupation)
+        @smods_rec.subject_other_subvy_search.should_not include(@topic)
+        @smods_rec.subject_other_subvy_search.should_not include(@s_title)
+      end
+      it "should not be nil if there are only subject/temporal elements (no subject/genre)" do
+        m = "<mods #{@ns_decl}><subject><temporal>#{@temporal}</temporal></subject></mods>"
+        @smods_rec = Stanford::Mods::Record.new
+        @smods_rec.from_str(m)
+        @smods_rec.subject_other_subvy_search.should == [@temporal]
+      end
+      it "should not be nil if there are only subject/genre elements (no subject/temporal)" do
+        m = "<mods #{@ns_decl}><subject><genre>#{@s_genre}</genre></subject></mods>"
+        @smods_rec = Stanford::Mods::Record.new
+        @smods_rec.from_str(m)
+        @smods_rec.subject_other_subvy_search.should == [@s_genre]
+      end
+      context "temporal subelement" do
+        it "should have a separate value for each temporal element" do
           m = "<mods #{@ns_decl}>
-                <subject>
-                  <hierarchicalGeographic><area>first</area></hierarchicalGeographic>
-                  <hierarchicalGeographic><area>second</area></hierarchicalGeographic>
-                </subject>
-                <subject><hierarchicalGeographic><area>third</area></hierarchicalGeographic></subject>
-              </mods>"
-          @smods_rec.from_str m
-          @smods_rec.sw_geographic_search.should == ['first', 'second', 'third']
+          <subject>
+          <temporal>1890-1910</temporal>
+          <temporal>20th century</temporal>
+          </subject>
+          <subject><temporal>another</temporal></subject>
+          </mods>"
+          @smods_rec = Stanford::Mods::Record.new
+          @smods_rec.from_str(m)
+          @smods_rec.subject_other_subvy_search.should == ['1890-1910', '20th century', 'another']
         end
-        it "should be empty Array if there are only empty values in the MODS" do
-          m = "<mods #{@ns_decl}><subject><hierarchicalGeographic/></subject><note>notit</note></mods>"
-          @smods_rec.from_str m
-          @smods_rec.sw_geographic_search.should == []
+        it "should log an info message when it encounters an encoding it doesn't translate" do
+          m = "<mods #{@ns_decl}><subject><temporal encoding='iso8601'>197505</temporal></subject></mods>"
+          @smods_rec = Stanford::Mods::Record.new
+          @smods_rec.from_str(m)
+          @smods_rec.sw_logger.should_receive(:info).with(/#{@fake_druid} has subject temporal element with untranslated encoding: <temporal encoding=.*>197505<\/temporal>/)
+          @smods_rec.subject_other_subvy_search
         end
-        context "combining subelements" do
-          before(:all) do
-            m = "<mods #{@ns_decl}>
-            <subject>
-              <hierarchicalGeographic>
-              	<country>Canada</country>
-              	<province>British Columbia</province>
-              	<city>Vancouver</city>
-              </hierarchicalGeographic>
+        it "should be nil if there are only empty values in the MODS" do
+          m = "<mods #{@ns_decl}><subject><temporal/></subject><note>notit</note></mods>"
+          @smods_rec = Stanford::Mods::Record.new
+          @smods_rec.from_str(m)
+          @smods_rec.subject_other_subvy_search.should == nil
+        end
+      end
+      context "genre subelement" do
+        it "should have a separate value for each genre element" do
+          m = "<mods #{@ns_decl}>
+          <subject>
+          <genre>first</genre>
+          <genre>second</genre>
+          </subject>
+          <subject><genre>third</genre></subject>
+          </mods>"
+          @smods_rec = Stanford::Mods::Record.new
+          @smods_rec.from_str(m)
+          @smods_rec.subject_other_subvy_search.should == ['first', 'second', 'third']
+        end
+        it "should be nil if there are only empty values in the MODS" do
+          m = "<mods #{@ns_decl}><subject><genre/></subject><note>notit</note></mods>"
+          @smods_rec = Stanford::Mods::Record.new
+          @smods_rec.from_str(m)
+          @smods_rec.subject_other_subvy_search.should == nil
+        end
+      end
+    end # subject_other_subvy_search
+
+    context "subject_all_search" do
+      it "should be nil if there are no values in the MODS" do
+        @smods_rec = Stanford::Mods::Record.new
+        @smods_rec.from_str(@ng_mods_no_subject.to_s)
+        @smods_rec.subject_all_search.should == nil
+      end
+      it "should contain top level <genre> element data" do
+        @smods_rec.subject_all_search.should include(@genre)
+      end
+      it "should not contain cartographic sub element" do
+        @smods_rec.subject_all_search.should_not include(@cart_coord)
+      end
+      it "should not include codes from hierarchicalGeographic sub element" do
+        @smods_rec.subject_all_search.should_not include(@geo_code)
+      end
+      it "should contain all other subject subelement data" do
+        @smods_rec = Stanford::Mods::Record.new
+        @smods_rec.from_str(@subject_mods)
+        @smods_rec.subject_all_search.should include(@s_genre)
+        @smods_rec.subject_all_search.should include(@geo)
+        @smods_rec.subject_all_search.should include(@hier_geo_country)
+        @smods_rec.subject_all_search.should include(@s_name)
+        @smods_rec.subject_all_search.should include(@occupation)
+        @smods_rec.subject_all_search.should include(@temporal)
+        @smods_rec.subject_all_search.should include(@s_title)
+        @smods_rec.subject_all_search.should include(@topic)
+      end
+    end # subject_all_search
+    
+  end  # search fields
+
+  context "facet fields" do
+
+    context "topic_facet" do
+      it "should include topic subelement" do
+        @smods_rec.topic_facet.should include(@topic)
+      end
+      it "should include sw_subject_names" do
+        @smods_rec.topic_facet.should include(@s_name)
+      end
+      it "should include sw_subject_titles" do
+        @smods_rec.topic_facet.should include(@s_title)
+      end
+      it "should include occupation subelement" do
+        @smods_rec.topic_facet.should include(@occupation)
+      end
+      it "should have the trailing punctuation removed" do
+        m = "<mods #{@ns_decl}><subject>
+        <topic>comma,</topic>
+        <occupation>semicolon;</occupation>
+        <titleInfo><title>backslash \\</title></titleInfo>
+        <name><namePart>internal, punct;uation</namePart></name>
+        </subject></mods>"
+        @smods_rec = Stanford::Mods::Record.new
+        @smods_rec.from_str(m)
+        @smods_rec.topic_facet.should include('comma')
+        @smods_rec.topic_facet.should include('semicolon')
+        @smods_rec.topic_facet.should include('backslash')
+        @smods_rec.topic_facet.should include('internal, punct;uation')
+      end
+      it "should be nil if there are no values" do
+        @smods_rec = Stanford::Mods::Record.new
+        @smods_rec.from_str(@ng_mods_no_subject.to_s)
+        @smods_rec.topic_facet.should == nil
+      end
+    end
+
+    context "geographic_facet" do
+      it "should call geographic_search" do
+        @smods_rec.should_receive(:geographic_search)
+        @smods_rec.geographic_facet
+      end
+      it "should be like geographic_search with the trailing punctuation (and preceding spaces) removed" do
+        m = "<mods #{@ns_decl}><subject>
+        <geographic>comma,</geographic>
+        <geographic>semicolon;</geographic>
+        <geographic>backslash \\</geographic>
+        <geographic>internal, punct;uation</geographic>
+        </subject></mods>"
+        @smods_rec = Stanford::Mods::Record.new
+        @smods_rec.from_str(m)
+        @smods_rec.geographic_facet.should include('comma')
+        @smods_rec.geographic_facet.should include('semicolon')
+        @smods_rec.geographic_facet.should include('backslash')
+        @smods_rec.geographic_facet.should include('internal, punct;uation')
+      end
+      it "should be nil if there are no values" do
+        @smods_rec = Stanford::Mods::Record.new
+        @smods_rec.from_str(@ng_mods_no_subject.to_s)
+        @smods_rec.  geographic_facet.should == nil
+      end
+    end
+
+    context "era_facet" do      
+      it "should be temporal subelement with the trailing punctuation removed" do
+        m = "<mods #{@ns_decl}><subject>
+              <temporal>comma,</temporal>
+              <temporal>semicolon;</temporal>
+              <temporal>backslash \\</temporal>
+              <temporal>internal, punct;uation</temporal>
             </subject></mods>"
-            @smods_rec.from_str m
-          end
-          it "uses a space as the separator by default" do
-            @smods_rec.sw_geographic_search.should == ['Canada British Columbia Vancouver']
-          end          
-          it "honors any string value passed in for the separator" do
-            @smods_rec.sw_geographic_search(' --').should == ['Canada --British Columbia --Vancouver']
-          end
-        end
-      end # hierarchicalGeographic
-      context "geographicCode subelement" do
-        before(:all) do
-          m = "<mods #{@ns_decl}>
-            <subject><geographicCode authority='marcgac'>n-us-md</geographicCode></subject>
-            <subject><geographicCode authority='marcgac'>e-er</geographicCode></subject>
-            <subject><geographicCode authority='marccountry'>mg</geographicCode></subject>
-            <subject><geographicCode authority='iso3166'>us</geographicCode></subject>
-          </mods>"
-          @smods_rec.from_str m
-          @geo_search_from_codes = @smods_rec.sw_geographic_search   
-        end
-        it "should not add untranslated values" do
-          @geo_search_from_codes.should_not include('n-us-md')
-          @geo_search_from_codes.should_not include('e-er')
-          @geo_search_from_codes.should_not include('mg')
-          @geo_search_from_codes.should_not include('us')
-        end
-        it "should translate marcgac codes" do
-          @geo_search_from_codes.should include('Estonia')
-        end
-        it "should translate marccountry codes" do
-          @geo_search_from_codes.should include('Madagascar')
-        end
-        it "should not translate other codes" do
-          @geo_search_from_codes.should_not include('United States')
-        end
-        it "should have a separate value for each geographicCode element" do
-          m = "<mods #{@ns_decl}>
-                <subject>
-                  <geographicCode authority='marcgac'>e-er</geographicCode>
-                	<geographicCode authority='marccountry'>mg</geographicCode>
-                </subject>
-                <subject><geographicCode authority='marcgac'>n-us-md</geographicCode></subject>
-              </mods>"
-          @smods_rec.from_str m
-          @smods_rec.sw_geographic_search.should == ['Estonia', 'Madagascar', 'Maryland']
-        end
-        it "should be empty Array if there are only empty values in the MODS" do
-          m = "<mods #{@ns_decl}><subject><geographicCode/></subject><note>notit</note></mods>"
-          @smods_rec.from_str m
-          @smods_rec.sw_geographic_search.should == []
-        end
-        it "should add the translated value if it wasn't present already" do
-          m = "<mods #{@ns_decl}>
-            <subject><geographic>Somewhere</geographic></subject>
-            <subject><geographicCode authority='marcgac'>e-er</geographicCode></subject>
-          </mods>"
-          @smods_rec.from_str m
-          @smods_rec.sw_geographic_search.size.should == 2
-          @smods_rec.sw_geographic_search.should include('Estonia')
-        end
-        it "should not add the translated value if it was already present" do
-          m = "<mods #{@ns_decl}>
-            <subject><geographic>Estonia</geographic></subject>
-            <subject><geographicCode authority='marcgac'>e-er</geographicCode></subject>
-          </mods>"
-          @smods_rec.from_str m
-          @smods_rec.sw_geographic_search.size.should == 1
-          @smods_rec.sw_geographic_search.should == ['Estonia']
-        end
+        @smods_rec = Stanford::Mods::Record.new
+        @smods_rec.from_str(m)
+        @smods_rec.era_facet.should include('comma')
+        @smods_rec.era_facet.should include('semicolon')
+        @smods_rec.era_facet.should include('backslash')
+        @smods_rec.era_facet.should include('internal, punct;uation')
       end
-    end # sw_geographic_search
-  end # context sw subject methods
+      it "should be nil if there are no values" do
+        @smods_rec = Stanford::Mods::Record.new
+        @smods_rec.from_str(@ng_mods_no_subject.to_s)
+        @smods_rec.era_facet.should == nil
+      end
+    end
+
+  end # facet fields
 
 end

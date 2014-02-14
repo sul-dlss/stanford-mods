@@ -19,6 +19,14 @@ describe "Date methods in Searchworks mixin for Stanford::Mods::Record" do
       @smods_rec.from_str(m)
       @smods_rec.pub_dates.should == ['1906','1904','1904']
     end
+
+    it 'should choose a date ending with CE if there are multiple dates' do
+      m = "<mods #{@ns_decl}><originInfo><dateIssued>7192 AM (li-Adam) / 1684 CE</dateIssued><issuance>monographic</issuance></originInfo>"
+      @smods_rec = Stanford::Mods::Record.new
+      @smods_rec.from_str(m)
+      @smods_rec.pub_date.should == '1684'
+    end  
+
   end
 
 
