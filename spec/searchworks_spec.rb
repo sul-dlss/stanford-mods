@@ -115,6 +115,7 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
       m = "<mods #{@ns_decl}><titleInfo><title>Jerk</title><subTitle>A Tale of Tourettes</subTitle><nonSort>The</nonSort></titleInfo></mods>"
       @smods_rec.from_str m      
     end
+    
     context "short title (for title_245a_search, title_245a_display) " do
       it "should call :short_titles" do
         @smods_rec.should_receive(:short_titles) # in Mods gem
@@ -124,6 +125,7 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
         @smods_rec.sw_short_title.should == 'The Jerk'
       end
     end
+    
     context "full title (for title_245_search, title_display, title_full_display)" do
       it "should call :full_titles" do
         @smods_rec.should_receive(:full_titles) # in Mods gem
@@ -140,6 +142,7 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
         @smods_rec.sw_full_title.should == 'Pius V. Saint, [Michaele Gisleri)'     
       end
     end
+    
     context "additional titles (for title_variant_search)" do
       before(:all) do
         m = "<mods #{@ns_decl}>
@@ -170,6 +173,7 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
           @addl_titles = @smods_rec.sw_addl_titles
       end
     end    
+    
     context "sort title" do
       it "should be a String" do
         @smods_rec.sw_sort_title.should be_an_instance_of(String)
