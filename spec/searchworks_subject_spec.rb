@@ -8,7 +8,7 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
     @ns_decl = "xmlns='#{Mods::MODS_NS}'"
   end
 
-  context "sw subject methods" do
+  context "sw subject raw methods" do
     before(:all) do
       @genre = 'genre top level'
       @cart_coord = '6 00 S, 71 30 E'
