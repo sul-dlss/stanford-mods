@@ -573,7 +573,7 @@ module Stanford
       end
       
       # If a year has a "u" in it, replace instances of u with 0
-      # @param [String]
+      # @param [String] dates
       # @return String
       def get_u_year dates
         dates.each do |f_date|
