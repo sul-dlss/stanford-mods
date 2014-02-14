@@ -94,6 +94,28 @@ module Stanford
         val.gsub(/[[:punct:]]*/, '').strip
       end
       
+      def main_author_w_date_test
+        result = nil
+        first_wo_role = nil
+        self.plain_name.each { |n|
+          if n.role.size == 0
+            first_wo_role ||= n
+          end
+          n.role.each { |r|
+            if r.authority.include?('marcrelator') && 
+              (r.value.include?('Creator') || r.value.include?('Author'))
+              result ||= n.display_value_w_date
+            end          
+          }
+        }
+        if !result && first_wo_role
+          result = first_wo_role.display_value_w_date
+        end
+        result
+      end
+
+      # ---- end AUTHOR ----
+      
       # ---- TITLE ----
 
       # @return [String] value for title_245a_search field
@@ -123,6 +145,17 @@ module Stanford
         val.gsub(/[[:punct:]]*/, '').strip
       end
       
+      #remove trailing commas
+      def sw_full_title_without_commas
+        toret = self.sw_full_title
+        if toret
+          toret = toret.gsub(/,$/, '')
+        end
+        toret
+      end
+    
+      # ---- end TITLE ----
+
       # ---- SUBJECT ----
       
       # Values are the contents of:
@@ -191,41 +224,38 @@ module Stanford
           vals.empty? ? nil : vals
         end
       end
-      def place
-        vals = self.term_values([:origin_info,:place,:placeTerm])
-        vals
-      end
-      def main_author_w_date_test
-        result = nil
-        first_wo_role = nil
-        self.plain_name.each { |n|
-          if n.role.size == 0
-            first_wo_role ||= n
-          end
-          n.role.each { |r|
-            if r.authority.include?('marcrelator') && 
-              (r.value.include?('Creator') || r.value.include?('Author'))
-              result ||= n.display_value_w_date
-            end          
-          }
+
+      # Values are the contents of:
+      #   subject/topic
+      #   subject/name
+      #   subject/title
+      #   subject/occupation
+      #  with trailing comma, semicolon, and backslash (and any preceding spaces) removed
+      # @return [Array<String>] values for the topic_facet Solr field for this document or nil if none 
+      def topic_facet
+        vals = subject_topics ? Array.new(subject_topics) : []
+        vals.concat(subject_names) if subject_names
+        vals.concat(subject_titles) if subject_titles
+        vals.concat(subject_occupations) if subject_occupations
+        vals.map! { |val| 
+          v = val.sub(/[\\,;]$/, '')
+          v.strip
         }
-        if !result && first_wo_role
-          result = first_wo_role.display_value_w_date
-        end
-        result
-      end
-      #remove trailing commas
-      def sw_full_title_without_commas
-        toret = self.sw_full_title
-        if toret
-          toret = toret.gsub(/,$/, '')
-        end
-        toret
+        vals.empty? ? nil : vals
       end
 
-      def sw_logger
-        @logger ||= Logger.new(STDOUT)
+      # geographic_search values with trailing comma, semicolon, and backslash (and any preceding spaces) removed
+      # @return [Array<String>] values for the geographic_facet Solr field for this document or nil if none 
+      def geographic_facet
+        geographic_search.map { |val| val.sub(/[\\,;]$/, '').strip } unless !geographic_search
       end
+
+      # subject/temporal values with trailing comma, semicolon, and backslash (and any preceding spaces) removed
+      # @return [Array<String>] values for the era_facet Solr field for this document or nil if none 
+      def era_facet
+        subject_temporal.map { |val| val.sub(/[\\,;]$/, '').strip } unless !subject_temporal
+      end
+
       # Values are the contents of:
       #   subject/geographic
       #   subject/hierarchicalGeographic
@@ -285,7 +315,28 @@ module Stanford
           vals.empty? ? nil : vals
         end
       end
+      
+      # Values are the contents of:
+      #  all subject subelements except subject/cartographic plus  genre top level element
+      # @return [Array<String>] values for the subject_all_search Solr field for this document or nil if none
+      def subject_all_search
+        vals = topic_search ? Array.new(topic_search) : []
+        vals.concat(geographic_search) if geographic_search
+        vals.concat(subject_other_search) if subject_other_search
+        vals.concat(subject_other_subvy_search) if subject_other_subvy_search
+        vals.empty? ? nil : vals
+      end
+
+      # ---- end SUBJECT ----
+
+      # ---- PUBLICATION (place, year) ----
+      def place
+        vals = self.term_values([:origin_info,:place,:placeTerm])
+        vals
+      end
+
       # @return [Array<String>] values for the pub_date_group_facet
+      # @deprecated
       def pub_date_groups year
         if not year
           return nil
@@ -312,65 +363,6 @@ module Stanford
         end
       end
 
-      # select one or more format values from the controlled vocabulary here:
-      #   http://searchworks-solr-lb.stanford.edu:8983/solr/select?facet.field=format&rows=0&facet.sort=index
-      # based on the dor_content_type
-      # @return [String] value in the SearchWorks controlled vocabulary
-      def format
-        val=[]
-        formats = self.term_values(:typeOfResource)
-        genres = self.term_values(:genre)
-        issuance = self.term_values([:origin_info,:issuance])
-        if formats
-          formats.each do |form|
-            case form
-            when 'text'
-              val << 'Thesis' if genres and genres.include? 'thesis'
-              val << 'Book' if issuance and issuance.include? 'monographic'
-              val << 'Journal/Periodical' if issuance and issuance.include? 'continuing'
-              val << 'Journal/Periodical' if genres and genres.include? 'article'
-              val << 'Conference Proceedings' if genres and genres.include? 'conference publication'
-              val << 'Other' if genres and genres.include? 'student project report'
-              val << 'Book' if genres and genres.include? 'technical report'
-            when 'still image'
-              val << 'Image'
-            when 'mixed material'
-              val << 'Manuscript/Archive'
-            when 'moving image'
-              val << 'Video'
-            when 'notated music'
-              val << 'Music - Score'
-            when 'three dimensional object'
-              val <<'Other'
-            when 'cartographic'
-              val << 'Map/Globe'
-            when 'sound recording-musical'
-              val << 'Music-Recording'
-            when 'sound recording-nonmusical'
-              val << 'Sound Recording'
-            when 'software, multimedia'
-              val << 'Computer File'      
-            end
-          end
-        end
-        if val.length>0
-          return val.uniq
-        end
-        if not self.typeOfResource or self.typeOfResource.length == 0
-          []
-        end
-      end
-
-      # Values are the contents of:
-      #  all subject subelements except subject/cartographic plus  genre top level element
-      # @return [Array<String>] values for the subject_all_search Solr field for this document or nil if none
-      def subject_all_search
-        vals = topic_search ? Array.new(topic_search) : []
-        vals.concat(geographic_search) if geographic_search
-        vals.concat(subject_other_search) if subject_other_search
-        vals.concat(subject_other_subvy_search) if subject_other_subvy_search
-        vals.empty? ? nil : vals
-      end
       def pub_date_display
         if pub_dates
           pub_dates.first
@@ -378,6 +370,7 @@ module Stanford
           nil
         end
       end
+
       #get the dates from dateIssued, and dateCreated merged into 1 array.
       # @return [Array<String>] values for the issue_date_display Solr field for this document or nil if none
       def pub_dates
@@ -433,6 +426,7 @@ module Stanford
         @pub_year=''
         return nil
       end
+      
       #creates a date suitable for sorting. Guarnteed to be 4 digits or nil
       def pub_date_sort
         pd=nil
@@ -446,6 +440,7 @@ module Stanford
         raise "pub_date_sort was about to return a non 4 digit value #{pd}!" if pd and pd.length !=4 
         pd
       end
+      
       #The year the object was published, , filtered based on max_pub_date and min_pub_date from the config file
       #@return [String] 4 character year or nil
       def pub_date
@@ -455,6 +450,7 @@ module Stanford
         end
         nil
       end
+      
       #Values for the pub date facet. This is less strict than the 4 year date requirements for pub_date
       #@return <Array[String]> with values for the pub date facet
       def pub_date_facet
@@ -475,37 +471,61 @@ module Stanford
         end
       end
       
+      # ---- end PUBLICATION (place, year) ----
 
-      # Values are the contents of:
-      #   subject/topic
-      #   subject/name
-      #   subject/title
-      #   subject/occupation
-      #  with trailing comma, semicolon, and backslash (and any preceding spaces) removed
-      # @return [Array<String>] values for the topic_facet Solr field for this document or nil if none 
-      def topic_facet
-        vals = subject_topics ? Array.new(subject_topics) : []
-        vals.concat(subject_names) if subject_names
-        vals.concat(subject_titles) if subject_titles
-        vals.concat(subject_occupations) if subject_occupations
-        vals.map! { |val| 
-          v = val.sub(/[\\,;]$/, '')
-          v.strip
-        }
-        vals.empty? ? nil : vals
+      def sw_logger
+        @logger ||= Logger.new(STDOUT)
+      end
+      
+      # select one or more format values from the controlled vocabulary here:
+      #   http://searchworks-solr-lb.stanford.edu:8983/solr/select?facet.field=format&rows=0&facet.sort=index
+      # based on the dor_content_type
+      # @return [String] value in the SearchWorks controlled vocabulary
+      def format
+        val=[]
+        formats = self.term_values(:typeOfResource)
+        genres = self.term_values(:genre)
+        issuance = self.term_values([:origin_info,:issuance])
+        if formats
+          formats.each do |form|
+            case form
+            when 'text'
+              val << 'Thesis' if genres and genres.include? 'thesis'
+              val << 'Book' if issuance and issuance.include? 'monographic'
+              val << 'Journal/Periodical' if issuance and issuance.include? 'continuing'
+              val << 'Journal/Periodical' if genres and genres.include? 'article'
+              val << 'Conference Proceedings' if genres and genres.include? 'conference publication'
+              val << 'Other' if genres and genres.include? 'student project report'
+              val << 'Book' if genres and genres.include? 'technical report'
+            when 'still image'
+              val << 'Image'
+            when 'mixed material'
+              val << 'Manuscript/Archive'
+            when 'moving image'
+              val << 'Video'
+            when 'notated music'
+              val << 'Music - Score'
+            when 'three dimensional object'
+              val <<'Other'
+            when 'cartographic'
+              val << 'Map/Globe'
+            when 'sound recording-musical'
+              val << 'Music-Recording'
+            when 'sound recording-nonmusical'
+              val << 'Sound Recording'
+            when 'software, multimedia'
+              val << 'Computer File'      
+            end
+          end
+        end
+        if val.length>0
+          return val.uniq
+        end
+        if not self.typeOfResource or self.typeOfResource.length == 0
+          []
+        end
       end
 
-      # geographic_search values with trailing comma, semicolon, and backslash (and any preceding spaces) removed
-      # @return [Array<String>] values for the geographic_facet Solr field for this document or nil if none 
-      def geographic_facet
-        geographic_search.map { |val| val.sub(/[\\,;]$/, '').strip } unless !geographic_search
-      end
-
-      # subject/temporal values with trailing comma, semicolon, and backslash (and any preceding spaces) removed
-      # @return [Array<String>] values for the era_facet Solr field for this document or nil if none 
-      def era_facet
-        subject_temporal.map { |val| val.sub(/[\\,;]$/, '').strip } unless !subject_temporal
-      end
       # @return [String] value with the numeric catkey in it, or nil if none exists
       def catkey
         catkey=self.term_values([:record_info,:recordIdentifier])
@@ -521,7 +541,7 @@ module Stanford
         @druid ? @druid : 'Unknown item'
       end
 
-      # protected ----------------------------------------------------------
+# protected ----------------------------------------------------------
 
       # convenience method for subject/name/namePart values (to avoid parsing the mods for the same thing multiple times)
       def subject_names
@@ -578,12 +598,12 @@ module Stanford
       def get_u_year dates
         dates.each do |f_date|
           # Single digit u notation
-          matches=f_date.scan(/\d{3}u/)
+          matches = f_date.scan(/\d{3}u/)
           if matches.length == 1
             return matches.first.gsub('u','0')
           end
           # Double digit u notation
-          matches=f_date.scan(/\d{2}u{2}/)
+          matches = f_date.scan(/\d{2}u{2}/)
           if matches.length == 1
             return matches.first.gsub('u','-')
           end
