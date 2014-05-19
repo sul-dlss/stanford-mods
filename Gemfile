@@ -4,3 +4,8 @@ source 'https://rubygems.org'
 gemspec
 
 #gem 'mods', :path => '../mods'
+
+group :test do
+  gem 'coveralls', require: false
+end
+
