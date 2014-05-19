@@ -74,6 +74,12 @@ describe "Format field from Searchworks mixin for Stanford::Mods::Record" do
       @smods_rec.from_str(m)
       @smods_rec.format.should == ['Book']
     end    
+    it "should give a format of Book for <genre>report</genre> and <typeOfResource>text</typeOfResouce>", :jira => 'GRYP-170', :github => 'gdor-indexer/#7' do
+      m = "<mods #{@ns_decl}><genre>report</genre><typeOfResource>text</typeOfResouce></mods>"
+      @smods_rec = Stanford::Mods::Record.new
+      @smods_rec.from_str(m)
+      @smods_rec.format.should == ['Book']
+    end    
   end
 
   # Student Project Reports: spec via email from Vitus, August 16, 2013

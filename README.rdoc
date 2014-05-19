@@ -59,6 +59,7 @@ Example Using SearchWorks Mixins:
 6. Create new Pull Request
 
 == Releases
+* <b>0.0.25</b> map typeOfResource 'text' and genre 'report' to searchworks format 'Book'
 * <b>0.0.24</b> Largely cosmetic refactoring for easier maintenance.
 * <b>0.0.23</b> Added logic for dealing with "u-notation" approximate dates, e.g., 198u
 * <b>0.0.20</b> Added mapping for typeOfResource notated music
