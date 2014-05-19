@@ -30,8 +30,9 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "yard"
   # tests
 	gem.add_development_dependency 'rspec'
-	gem.add_development_dependency 'simplecov'
-	gem.add_development_dependency 'simplecov-rcov'
+	# using coveralls now
+	# gem.add_development_dependency 'simplecov'
+	# gem.add_development_dependency 'simplecov-rcov'
 	# gem.add_development_dependency 'ruby-debug19'
 
 end
