@@ -497,6 +497,7 @@ module Stanford
               val << 'Conference Proceedings' if genres and genres.include? 'conference publication'
               val << 'Other' if genres and genres.include? 'student project report'
               val << 'Book' if genres and genres.include? 'technical report'
+              val << 'Book' if genres and genres.include? 'report'
             when 'still image'
               val << 'Image'
             when 'mixed material'
