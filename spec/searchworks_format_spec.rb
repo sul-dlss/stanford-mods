@@ -9,7 +9,7 @@ describe "Format field from Searchworks mixin for Stanford::Mods::Record" do
   end
 
   it "should check genre as part of deciding format" do
-    m = "<mods #{@ns_decl}><genre>thesis</genre><typeOfResource>text</typeOfResource></mods>"
+    m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre>thesis</genre></mods>"
     @smods_rec.from_str(m)
     @smods_rec.format.should == ['Thesis']
   end
@@ -21,13 +21,13 @@ describe "Format field from Searchworks mixin for Stanford::Mods::Record" do
   end
 
   it 'should work for books' do
-    m = "<mods #{@ns_decl}><originInfo><issuance>monographic</issuance></originInfo><typeOfResource>text</typeOfResource></mods>"
+    m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><originInfo><issuance>monographic</issuance></originInfo></mods>"
     @smods_rec.from_str(m)
     @smods_rec.format.should == ['Book']
   end
 
   it "should work for a hydrus journal article" do
-    m = "<mods #{@ns_decl}><genre>article</genre><typeOfResource>text</typeOfResource></mods>"
+    m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre>article</genre></mods>"
     @smods_rec.from_str(m)
     @smods_rec.format.should == ['Journal/Periodical']
   end
