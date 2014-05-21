@@ -511,7 +511,7 @@ module Stanford
             when 'cartographic'
               val << 'Map/Globe'
             when 'sound recording-musical'
-              val << 'Music-Recording'
+              val << 'Music - Recording'
             when 'sound recording-nonmusical'
               val << 'Sound Recording'
             when 'software, multimedia'
