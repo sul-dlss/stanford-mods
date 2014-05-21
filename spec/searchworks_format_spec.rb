@@ -54,6 +54,11 @@ describe "Format field from Searchworks mixin for Stanford::Mods::Record" do
       @smods_rec.from_str(m)
       @smods_rec.format.should == ['Sound Recording']
     end
+    it "should give a format of Music - Recording for <typeOfResource>sound recording-musical</typeOfResource>" do
+      m = "<mods #{@ns_decl}><typeOfResource>sound recording-musical</typeOfResource></mods>"
+      @smods_rec.from_str(m)
+      @smods_rec.format.should == ['Music - Recording']
+    end
     it "should give a format of Conference Proceedings for <genre>conference publication</genre> and <typeOfResource>text</typeOfResource>" do
       m = "<mods #{@ns_decl}><genre>conference publication</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
