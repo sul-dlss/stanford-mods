@@ -8,7 +8,7 @@ describe "Format field from Searchworks mixin for Stanford::Mods::Record" do
     @ns_decl = "xmlns='#{Mods::MODS_NS}'"
   end
 
-  context "SW format Book:" do
+  context "Book:" do
     context "typeOfResource text," do
       it 'originInfo/issuance monographic' do
         m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><originInfo><issuance>monographic</issuance></originInfo></mods>"
@@ -48,69 +48,77 @@ describe "Format field from Searchworks mixin for Stanford::Mods::Record" do
         end
       end
     end
+  end # 'Book'
+  
+  context "Computer File: typeOfResource 'software, multimedia'" do
+    it "no genre (e.g. Dataset)" do
+      m = "<mods #{@ns_decl}><typeOfResource>software, multimedia</typeOfResource></mods>"
+      @smods_rec.from_str(m)
+      @smods_rec.format.should == ['Computer File']
+    end
+    it "genre 'game'", :jira => 'GRYPHONDOR-207' do
+      m = "<mods #{@ns_decl}><genre>game</genre><typeOfResource>software, multimedia</typeOfResource></mods>"
+      @smods_rec.from_str(m)
+      @smods_rec.format.should == ['Computer File']
+    end
+  end
+
+  it "Conference Proceedings: typeOfResource 'text', genre 'conference publication'", :jira => 'GRYPHONDOR-207' do
+    m = "<mods #{@ns_decl}><genre>conference publication</genre><typeOfResource>text</typeOfResource></mods>"
+    @smods_rec.from_str(m)
+    @smods_rec.format.should == ['Conference Proceedings']
   end
   
-  it 'should work for datasets' do
-    m = "<mods #{@ns_decl}><typeOfResource>software, multimedia</typeOfResource></mods>"
-    @smods_rec.from_str(m)
-    @smods_rec.format.should == ['Computer File']
-  end
-
-
-  it "should work for a hydrus journal article" do
+  it "Journal/Periodical: typeOfResource 'text', genre 'article'" do
     m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre>article</genre></mods>"
     @smods_rec.from_str(m)
     @smods_rec.format.should == ['Journal/Periodical']
   end
 
-  it "should work for image" do
+  it "Image: typeOfResource 'still image'" do
     m = "<mods #{@ns_decl}><typeOfResource>still image</typeOfResource></mods>"
     @smods_rec.from_str(m)
     @smods_rec.format.should == ['Image']
   end
-
-  context "Hydrus mappings per GRYPHONDOR-207" do
-    it "should give a format of Computer File for <genre>game</genre> and <typeOfResource>software, multimedia</typeOfResource>", :jira => 'GRYPHONDOR-207' do
-      m = "<mods #{@ns_decl}><genre>game</genre><typeOfResource>software, multimedia</typeOfResource></mods>"
-      @smods_rec.from_str(m)
-      @smods_rec.format.should == ['Computer File']
-    end
-    it "should give a format of Video for <genre>motion picture</genre> and <typeOfResource>moving image</typeOfResource>", :jira => 'GRYPHONDOR-207' do
-      m = "<mods #{@ns_decl}><genre>motion picture</genre><typeOfResource>moving image</typeOfResource></mods>"
-      @smods_rec.from_str(m)
-      @smods_rec.format.should == ['Video']
-    end
-    it "should give a format of Sound Recording for <genre>sound</genre> and <typeOfResource>sound recording-nonmusical</typeOfResource>", :jira => 'GRYPHONDOR-207' do
-      m = "<mods #{@ns_decl}><genre>sound</genre><typeOfResource>sound recording-nonmusical</typeOfResource></mods>"
-      @smods_rec.from_str(m)
-      @smods_rec.format.should == ['Sound Recording']
-    end
-    it "should give a format of Music - Recording for <typeOfResource>sound recording-musical</typeOfResource>", :jira => 'GRYPHONDOR-207' do
-      m = "<mods #{@ns_decl}><typeOfResource>sound recording-musical</typeOfResource></mods>"
-      @smods_rec.from_str(m)
-      @smods_rec.format.should == ['Music - Recording']
-    end
-    it "should give a format of Conference Proceedings for <genre>conference publication</genre> and <typeOfResource>text</typeOfResource>", :jira => 'GRYPHONDOR-207' do
-      m = "<mods #{@ns_decl}><genre>conference publication</genre><typeOfResource>text</typeOfResource></mods>"
-      @smods_rec.from_str(m)
-      @smods_rec.format.should == ['Conference Proceedings']
-    end
+  
+  it "Music - Recording: typeOfResource 'sound recording-musical'", :jira => 'GRYPHONDOR-207' do
+    m = "<mods #{@ns_decl}><typeOfResource>sound recording-musical</typeOfResource></mods>"
+    @smods_rec.from_str(m)
+    @smods_rec.format.should == ['Music - Recording']
   end
 
-  # Student Project Reports: spec via email from Vitus, August 16, 2013
-  it "should give a format of Other for <genre>student project report</genre> and <typeOfResource>text</typeOfResource>" do
+  it "Music - Score: typeOfResource 'notated music'" do
+    m = "<mods #{@ns_decl}><typeOfResource>notated music</typeOfResource></mods>"
+    @smods_rec.from_str(m)
+    @smods_rec.format.should == ['Music - Score']
+  end
+
+  it "Other: typeOfResource 'text', genre 'student project report'", :email => 'from Vitus, August 16, 2013' do
     m = "<mods #{@ns_decl}><genre>student project report</genre><typeOfResource>text</typeOfResource></mods>"
     @smods_rec.from_str(m)
     @smods_rec.format.should == ['Other']
   end
   
-  it "should give a format of Music - Score for <typeOfResource>notated music</typeOfResource>" do
-    m = "<mods #{@ns_decl}><typeOfResource>notated music</typeOfResource></mods>"
+  it "Sound Recording: typeOfResource 'sound recording-nonmusical', genre 'sound", :jira => 'GRYPHONDOR-207' do
+    m = "<mods #{@ns_decl}><genre>sound</genre><typeOfResource>sound recording-nonmusical</typeOfResource></mods>"
     @smods_rec.from_str(m)
-    @smods_rec.format.should == ['Music - Score']
+    @smods_rec.format.should == ['Sound Recording']
   end
-  
-  it "should return nothing if there is no typeOfResource field" do
+
+  context "Video: typeOfResource 'moving image'" do
+    it "no genre" do
+      m = "<mods #{@ns_decl}><typeOfResource>moving image</typeOfResource></mods>"
+      @smods_rec.from_str(m)
+      @smods_rec.format.should == ['Video']
+    end
+    it "genre 'motion picture'", :jira => 'GRYPHONDOR-207' do
+      m = "<mods #{@ns_decl}><genre>motion picture</genre><typeOfResource>moving image</typeOfResource></mods>"
+      @smods_rec.from_str(m)
+      @smods_rec.format.should == ['Video']
+    end
+  end
+
+  it "empty Array if no typeOfResource field" do
     m = "<mods #{@ns_decl}><originInfo>
     <dateCreated>1904</dateCreated>
     </originInfo></mods>"
@@ -118,7 +126,7 @@ describe "Format field from Searchworks mixin for Stanford::Mods::Record" do
     @smods_rec.format.should == []
   end
 
-  it "should return nothing if there is a weird typeOfResource field" do
+  it "empty Array if weird typeOfResource value" do
     m = "<mods #{@ns_decl}><originInfo>
     <typeOfResource>foo</typeOfResource>
     </originInfo></mods>"
