@@ -59,6 +59,7 @@ Example Using SearchWorks Mixins:
 6. Create new Pull Request
 
 == Releases
+* <b>0.0.27</b> add genres 'Issue brief', 'Book chapter' and 'Working paper' to map to searchworks format 'Book'
 * <b>0.0.26</b> map typeOfResource 'sound recording-musical' to searchworks format 'Music - Recording' with spaces
 * <b>0.0.25</b> map typeOfResource 'text' and genre 'report' to searchworks format 'Book'
 * <b>0.0.24</b> Largely cosmetic refactoring for easier maintenance.
