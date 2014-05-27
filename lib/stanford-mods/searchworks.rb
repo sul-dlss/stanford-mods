@@ -482,22 +482,26 @@ module Stanford
       # based on the dor_content_type
       # @return [String] value in the SearchWorks controlled vocabulary
       def format
-        val=[]
-        formats = self.term_values(:typeOfResource)
-        genres = self.term_values(:genre)
-        issuance = self.term_values([:origin_info,:issuance])
-        if formats
-          formats.each do |form|
-            case form
+        val = []
+        types = self.term_values(:typeOfResource)
+        if types
+          genres = self.term_values(:genre)
+          issuance = self.term_values([:origin_info,:issuance])
+          types.each do |type|
+            case type
             when 'text'
-              val << 'Thesis' if genres and genres.include? 'thesis'
               val << 'Book' if issuance and issuance.include? 'monographic'
+              val << 'Book' if genres and genres.include? 'book chapter'
+              val << 'Book' if genres and genres.include? 'issue brief'
+              val << 'Book' if genres and genres.include? 'libretto'
+              val << 'Book' if genres and genres.include? 'report'
+              val << 'Book' if genres and genres.include? 'technical report'
+              val << 'Book' if genres and genres.include? 'working paper'
+              val << 'Conference Proceedings' if genres and genres.include? 'conference publication'
               val << 'Journal/Periodical' if issuance and issuance.include? 'continuing'
               val << 'Journal/Periodical' if genres and genres.include? 'article'
-              val << 'Conference Proceedings' if genres and genres.include? 'conference publication'
               val << 'Other' if genres and genres.include? 'student project report'
-              val << 'Book' if genres and genres.include? 'technical report'
-              val << 'Book' if genres and genres.include? 'report'
+              val << 'Thesis' if genres and genres.include? 'thesis'
             when 'still image'
               val << 'Image'
             when 'mixed material'
@@ -507,7 +511,7 @@ module Stanford
             when 'notated music'
               val << 'Music - Score'
             when 'three dimensional object'
-              val <<'Other'
+              val << 'Other'
             when 'cartographic'
               val << 'Map/Globe'
             when 'sound recording-musical'
@@ -519,12 +523,7 @@ module Stanford
             end
           end
         end
-        if val.length>0
-          return val.uniq
-        end
-        if not self.typeOfResource or self.typeOfResource.length == 0
-          []
-        end
+        val.uniq
       end
 
       # @return [String] value with the numeric catkey in it, or nil if none exists
