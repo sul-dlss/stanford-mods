@@ -130,6 +130,29 @@ describe "Format field from Searchworks mixin for Stanford::Mods::Record" do
     end
   end
 
+  context "multiple format values", :jira => 'INDEX-32' do
+    it "multiple typeOfResource elements" do
+      m = "<mods #{@ns_decl}><typeOfResource>moving image</typeOfResource><typeOfResource>sound recording</typeOfResource></mods>"
+      @smods_rec.from_str(m)
+      @smods_rec.format.should == ['Video', 'Sound Recording']
+    end
+    it "multiple genre elements, single typeOfResource" do
+      m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre>librettos</genre><genre>article</genre></mods>"
+      @smods_rec.from_str(m)
+      @smods_rec.format.should == ['Book', 'Journal/Periodical']
+    end
+    it "mish mash" do
+      m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><typeOfResource>still image</typeOfResource><genre>librettos</genre><genre>article</genre></mods>"
+      @smods_rec.from_str(m)
+      @smods_rec.format.should == ['Book', 'Journal/Periodical', 'Image']
+    end
+    it "doesn't give duplicate values" do
+      m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre>librettos</genre><genre>issue brief</genre></mods>"
+      @smods_rec.from_str(m)
+      @smods_rec.format.should == ['Book']
+    end
+  end
+
   it "empty Array if no typeOfResource field" do
     m = "<mods #{@ns_decl}><originInfo>
     <dateCreated>1904</dateCreated>
