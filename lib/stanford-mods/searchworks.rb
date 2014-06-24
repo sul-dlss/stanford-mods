@@ -501,7 +501,7 @@ module Stanford
                 val << 'Computer File'
               when 'sound recording-musical'
                 val << 'Music - Recording'
-              when 'sound recording-nonmusical'
+              when 'sound recording-nonmusical', 'sound recording'
                 val << 'Sound Recording'
               when 'still image'
                 val << 'Image'

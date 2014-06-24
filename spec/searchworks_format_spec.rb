@@ -104,10 +104,17 @@ describe "Format field from Searchworks mixin for Stanford::Mods::Record" do
     @smods_rec.format.should == ['Other']
   end
   
-  it "Sound Recording: typeOfResource 'sound recording-nonmusical', genre 'sound", :jira => 'GRYPHONDOR-207' do
-    m = "<mods #{@ns_decl}><genre>sound</genre><typeOfResource>sound recording-nonmusical</typeOfResource></mods>"
-    @smods_rec.from_str(m)
-    @smods_rec.format.should == ['Sound Recording']
+  context "Sound Recording:" do
+    it "typeOfResource 'sound recording-nonmusical', genre 'sound", :jira => 'GRYPHONDOR-207' do
+      m = "<mods #{@ns_decl}><genre>sound</genre><typeOfResource>sound recording-nonmusical</typeOfResource></mods>"
+      @smods_rec.from_str(m)
+      @smods_rec.format.should == ['Sound Recording']
+    end
+    it "typeOfResource 'sound recording', genre 'sound", :jira => 'INDEX-94' do
+      m = "<mods #{@ns_decl}><genre>sound</genre><typeOfResource>sound recording</typeOfResource></mods>"
+      @smods_rec.from_str(m)
+      @smods_rec.format.should == ['Sound Recording']
+    end
   end
 
   context "Video: typeOfResource 'moving image'" do
