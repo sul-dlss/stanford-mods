@@ -509,7 +509,7 @@ module Stanford
                 val << 'Book' if issuance and issuance.include? 'monographic'
                 val << 'Book' if genres and genres.include? 'book chapter'
                 val << 'Book' if genres and genres.include? 'issue brief'
-                val << 'Book' if genres and genres.include? 'libretto'
+                val << 'Book' if genres and genres.include? 'librettos'
                 val << 'Book' if genres and genres.include? 'report'
                 val << 'Book' if genres and genres.include? 'technical report'
                 val << 'Book' if genres and genres.include? 'working paper'

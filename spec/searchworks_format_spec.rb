@@ -26,10 +26,15 @@ describe "Format field from Searchworks mixin for Stanford::Mods::Record" do
           @smods_rec.from_str(m)
           @smods_rec.format.should == ['Book']
         end
-        it "'libretto'", :email => 'mods-squad 2014-05-22, Laura Wilsey' do
-          m = "<mods #{@ns_decl}><genre>libretto</genre><typeOfResource>text</typeOfResource></mods>"
+        it "'librettos'", :jira => 'INDEX-98' do
+          m = "<mods #{@ns_decl}><genre>librettos</genre><typeOfResource>text</typeOfResource></mods>"
           @smods_rec.from_str(m)
           @smods_rec.format.should == ['Book']
+        end
+        it "'libretto' isn't valid", :jira => 'INDEX-98' do
+          m = "<mods #{@ns_decl}><genre>libretto</genre><typeOfResource>text</typeOfResource></mods>"
+          @smods_rec.from_str(m)
+          @smods_rec.format.should == []
         end
         it "'report'", :jira => 'GRYP-170', :github => 'gdor-indexer/#7' do
           m = "<mods #{@ns_decl}><genre>report</genre><typeOfResource>text</typeOfResource></mods>"
