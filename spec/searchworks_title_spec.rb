@@ -15,20 +15,20 @@ describe "title fields from Searchworks mixin for Stanford::Mods::Record" do
       @smods_rec.sw_short_title
     end
     it "should be a String" do
-      @smods_rec.sw_short_title.should == 'The Jerk'
+      expect(@smods_rec.sw_short_title).to eq 'The Jerk'
     end
   end
   
   context "full title (for title_245_search, title_full_display)" do
     it "should be a String" do
-      @smods_rec.sw_full_title.should == 'The Jerk : A Tale of Tourettes.'
+      expect(@smods_rec.sw_full_title).to eq 'The Jerk : A Tale of Tourettes.'
     end
     it 'should cope with regex chars' do
       m = "<mods #{@ns_decl}><titleInfo>
           <title>Pius V. Saint, [Michaele Gisleri),</title>
         </titleInfo></mods>"
       @smods_rec.from_str m
-      @smods_rec.sw_full_title.should == 'Pius V. Saint, [Michaele Gisleri),'
+      expect(@smods_rec.sw_full_title).to eq 'Pius V. Saint, [Michaele Gisleri),'
     end
 
     context "punctuation" do
@@ -469,29 +469,29 @@ describe "title fields from Searchworks mixin for Stanford::Mods::Record" do
       @addl_titles = @smods_rec.sw_addl_titles
     end
     it "should not include the main title" do
-      @addl_titles.size.should == 2
-      @addl_titles.should_not include(@smods_rec.sw_full_title)
+      expect(@addl_titles.size).to eq 2
+      expect(@addl_titles).not_to include(@smods_rec.sw_full_title)
     end
     it "should include any extra main titles" do
-      @addl_titles.should include('Joke')
+      expect(@addl_titles).to include('Joke')
     end
     it "should include all alternative titles" do
-      @addl_titles.should include('Alternative')
+      expect(@addl_titles).to include('Alternative')
     end
     it 'should cope with regexp chars in the short title when determining addl titles' do
-       m = "<mods #{@ns_decl}>
+      m = "<mods #{@ns_decl}>
           <titleInfo type='alternative'><title>Alternative</title></titleInfo>
           <titleInfo><title>[Jerk)</title><nonSort>The</nonSort></titleInfo>
           <titleInfo><title>Joke]</title></titleInfo>
           </mods>"
-        @smods_rec.from_str(m)
-        @smods_rec.sw_addl_titles.should == ['Alternative', 'Joke]']
+      @smods_rec.from_str(m)
+      expect(@smods_rec.sw_addl_titles).to eq ['Alternative', 'Joke]']
     end
   end    
   
   context "sort title" do
     it "should be a String" do
-      @smods_rec.sw_sort_title.should be_an_instance_of(String)
+      expect(@smods_rec.sw_sort_title).to be_an_instance_of(String)
     end
     it "should use the sw_full_title as a starting point" do
       @smods_rec.should_receive(:sw_full_title)
