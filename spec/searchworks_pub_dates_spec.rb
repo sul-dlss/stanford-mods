@@ -178,8 +178,6 @@ describe "Date methods in Searchworks mixin for Stanford::Mods::Record" do
   end # u notation
 
 
-
-
   context 'pub_date_sort' do
     before :all do
       m = "<mods #{@ns_decl}><originInfo>
