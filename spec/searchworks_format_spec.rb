@@ -20,14 +20,29 @@ describe "Format field from Searchworks mixin for Stanford::Mods::Record" do
           m = "<mods #{@ns_decl}><genre>book chapter</genre><typeOfResource>text</typeOfResource></mods>"
           @smods_rec.from_str(m)
           @smods_rec.format.should == ['Book']
+          m = "<mods #{@ns_decl}><genre>Book chapter</genre><typeOfResource>text</typeOfResource></mods>"
+          @smods_rec.from_str(m)
+          @smods_rec.format.should == ['Book']
+          m = "<mods #{@ns_decl}><genre>Book Chapter</genre><typeOfResource>text</typeOfResource></mods>"
+          @smods_rec.from_str(m)
+          @smods_rec.format.should == ['Book']
         end
         it "'issue brief'", :email => 'mods-squad 2014-05-22, Joanna Dyla' do
           m = "<mods #{@ns_decl}><genre>issue brief</genre><typeOfResource>text</typeOfResource></mods>"
           @smods_rec.from_str(m)
           @smods_rec.format.should == ['Book']
+          m = "<mods #{@ns_decl}><genre>Issue brief</genre><typeOfResource>text</typeOfResource></mods>"
+          @smods_rec.from_str(m)
+          @smods_rec.format.should == ['Book']
+          m = "<mods #{@ns_decl}><genre>Issue Brief</genre><typeOfResource>text</typeOfResource></mods>"
+          @smods_rec.from_str(m)
+          @smods_rec.format.should == ['Book']
         end
         it "'librettos'", :jira => 'INDEX-98' do
           m = "<mods #{@ns_decl}><genre>librettos</genre><typeOfResource>text</typeOfResource></mods>"
+          @smods_rec.from_str(m)
+          @smods_rec.format.should == ['Book']
+          m = "<mods #{@ns_decl}><genre>Librettos</genre><typeOfResource>text</typeOfResource></mods>"
           @smods_rec.from_str(m)
           @smods_rec.format.should == ['Book']
         end
@@ -36,18 +51,41 @@ describe "Format field from Searchworks mixin for Stanford::Mods::Record" do
           @smods_rec.from_str(m)
           @smods_rec.format.should == []
         end
-        it "'report'", :jira => 'GRYP-170', :github => 'gdor-indexer/#7' do
-          m = "<mods #{@ns_decl}><genre>report</genre><typeOfResource>text</typeOfResource></mods>"
+        it "'project report'", :jira => 'GRYP-170', :github => 'gdor-indexer/#7' do
+          m = "<mods #{@ns_decl}><genre>project report</genre><typeOfResource>text</typeOfResource></mods>"
           @smods_rec.from_str(m)
           @smods_rec.format.should == ['Book']
+          m = "<mods #{@ns_decl}><genre>Project report</genre><typeOfResource>text</typeOfResource></mods>"
+          @smods_rec.from_str(m)
+          @smods_rec.format.should == ['Book']
+          m = "<mods #{@ns_decl}><genre>Project Report</genre><typeOfResource>text</typeOfResource></mods>"
+          @smods_rec.from_str(m)
+          @smods_rec.format.should == ['Book']
+        end
+        it "'report' isn't valid", :jira => 'GRYP-170', :github => 'gdor-indexer/#7' do
+          m = "<mods #{@ns_decl}><genre>report</genre><typeOfResource>text</typeOfResource></mods>"
+          @smods_rec.from_str(m)
+          @smods_rec.format.should == []
         end
         it "'technical report'", :jira => 'GRYPHONDOR-207' do
           m = "<mods #{@ns_decl}><genre>technical report</genre><typeOfResource>text</typeOfResource></mods>"
           @smods_rec.from_str(m)
           @smods_rec.format.should == ['Book']
+          m = "<mods #{@ns_decl}><genre>Technical report</genre><typeOfResource>text</typeOfResource></mods>"
+          @smods_rec.from_str(m)
+          @smods_rec.format.should == ['Book']
+          m = "<mods #{@ns_decl}><genre>Technical Report</genre><typeOfResource>text</typeOfResource></mods>"
+          @smods_rec.from_str(m)
+          @smods_rec.format.should == ['Book']
         end
         it "'working paper'", :email => 'mods-squad 2014-05-22, Joanna Dyla' do
           m = "<mods #{@ns_decl}><genre>working paper</genre><typeOfResource>text</typeOfResource></mods>"
+          @smods_rec.from_str(m)
+          @smods_rec.format.should == ['Book']
+          m = "<mods #{@ns_decl}><genre>Working paper</genre><typeOfResource>text</typeOfResource></mods>"
+          @smods_rec.from_str(m)
+          @smods_rec.format.should == ['Book']
+          m = "<mods #{@ns_decl}><genre>Working Paper</genre><typeOfResource>text</typeOfResource></mods>"
           @smods_rec.from_str(m)
           @smods_rec.format.should == ['Book']
         end
@@ -65,6 +103,9 @@ describe "Format field from Searchworks mixin for Stanford::Mods::Record" do
       m = "<mods #{@ns_decl}><genre>game</genre><typeOfResource>software, multimedia</typeOfResource></mods>"
       @smods_rec.from_str(m)
       @smods_rec.format.should == ['Computer File']
+      m = "<mods #{@ns_decl}><genre>Game</genre><typeOfResource>software, multimedia</typeOfResource></mods>"
+      @smods_rec.from_str(m)
+      @smods_rec.format.should == ['Computer File']
     end
   end
 
@@ -72,10 +113,19 @@ describe "Format field from Searchworks mixin for Stanford::Mods::Record" do
     m = "<mods #{@ns_decl}><genre>conference publication</genre><typeOfResource>text</typeOfResource></mods>"
     @smods_rec.from_str(m)
     @smods_rec.format.should == ['Conference Proceedings']
+    m = "<mods #{@ns_decl}><genre>Conference publication</genre><typeOfResource>text</typeOfResource></mods>"
+    @smods_rec.from_str(m)
+    @smods_rec.format.should == ['Conference Proceedings']
+    m = "<mods #{@ns_decl}><genre>Conference Publication</genre><typeOfResource>text</typeOfResource></mods>"
+    @smods_rec.from_str(m)
+    @smods_rec.format.should == ['Conference Proceedings']
   end
   
   it "Journal/Periodical: typeOfResource 'text', genre 'article'" do
     m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre>article</genre></mods>"
+    @smods_rec.from_str(m)
+    @smods_rec.format.should == ['Journal/Periodical']
+    m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre>Article</genre></mods>"
     @smods_rec.from_str(m)
     @smods_rec.format.should == ['Journal/Periodical']
   end
@@ -102,6 +152,15 @@ describe "Format field from Searchworks mixin for Stanford::Mods::Record" do
     m = "<mods #{@ns_decl}><genre>student project report</genre><typeOfResource>text</typeOfResource></mods>"
     @smods_rec.from_str(m)
     @smods_rec.format.should == ['Other']
+    m = "<mods #{@ns_decl}><genre>Student project report</genre><typeOfResource>text</typeOfResource></mods>"
+    @smods_rec.from_str(m)
+    @smods_rec.format.should == ['Other']
+    m = "<mods #{@ns_decl}><genre>Student Project report</genre><typeOfResource>text</typeOfResource></mods>"
+    @smods_rec.from_str(m)
+    @smods_rec.format.should == ['Other']
+    m = "<mods #{@ns_decl}><genre>Student Project Report</genre><typeOfResource>text</typeOfResource></mods>"
+    @smods_rec.from_str(m)
+    @smods_rec.format.should == ['Other']
   end
   
   context "Sound Recording:" do
@@ -109,12 +168,27 @@ describe "Format field from Searchworks mixin for Stanford::Mods::Record" do
       m = "<mods #{@ns_decl}><genre>sound</genre><typeOfResource>sound recording-nonmusical</typeOfResource></mods>"
       @smods_rec.from_str(m)
       @smods_rec.format.should == ['Sound Recording']
+      m = "<mods #{@ns_decl}><genre>Sound</genre><typeOfResource>sound recording-nonmusical</typeOfResource></mods>"
+      @smods_rec.from_str(m)
+      @smods_rec.format.should == ['Sound Recording']
     end
     it "typeOfResource 'sound recording', genre 'sound", :jira => 'INDEX-94' do
       m = "<mods #{@ns_decl}><genre>sound</genre><typeOfResource>sound recording</typeOfResource></mods>"
       @smods_rec.from_str(m)
       @smods_rec.format.should == ['Sound Recording']
+      m = "<mods #{@ns_decl}><genre>Sound</genre><typeOfResource>sound recording</typeOfResource></mods>"
+      @smods_rec.from_str(m)
+      @smods_rec.format.should == ['Sound Recording']
     end
+  end
+
+  it "Thesis: typeOfResource 'text', genre 'thesis'" do
+    m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre>thesis</genre></mods>"
+    @smods_rec.from_str(m)
+    @smods_rec.format.should == ['Thesis']
+    m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre>Thesis</genre></mods>"
+    @smods_rec.from_str(m)
+    @smods_rec.format.should == ['Thesis']
   end
 
   context "Video: typeOfResource 'moving image'" do
@@ -125,6 +199,12 @@ describe "Format field from Searchworks mixin for Stanford::Mods::Record" do
     end
     it "genre 'motion picture'", :jira => 'GRYPHONDOR-207' do
       m = "<mods #{@ns_decl}><genre>motion picture</genre><typeOfResource>moving image</typeOfResource></mods>"
+      @smods_rec.from_str(m)
+      @smods_rec.format.should == ['Video']
+      m = "<mods #{@ns_decl}><genre>Motion Picture</genre><typeOfResource>moving image</typeOfResource></mods>"
+      @smods_rec.from_str(m)
+      @smods_rec.format.should == ['Video']
+      m = "<mods #{@ns_decl}><genre>Motion Picture</genre><typeOfResource>moving image</typeOfResource></mods>"
       @smods_rec.from_str(m)
       @smods_rec.format.should == ['Video']
     end

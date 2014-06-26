@@ -548,17 +548,22 @@ module Stanford
                 val << 'Image'
               when 'text'
                 val << 'Book' if issuance and issuance.include? 'monographic'
-                val << 'Book' if genres and genres.include? 'book chapter'
-                val << 'Book' if genres and genres.include? 'issue brief'
-                val << 'Book' if genres and genres.include? 'librettos'
-                val << 'Book' if genres and genres.include? 'report'
-                val << 'Book' if genres and genres.include? 'technical report'
-                val << 'Book' if genres and genres.include? 'working paper'
-                val << 'Conference Proceedings' if genres and genres.include? 'conference publication'
+                book_genres = ['book chapter', 'Book chapter', 'Book Chapter',
+                  'issue brief', 'Issue brief', 'Issue Brief', 
+                  'librettos', 'Librettos', 
+                  'project report', 'Project report', 'Project Report',
+                  'technical report', 'Technical report', 'Technical Report',
+                  'working paper', 'Working paper', 'Working Paper']
+                val << 'Book' if genres and !(genres & book_genres).empty?
+                conf_pub = ['conference publication', 'Conference publication', 'Conference Publication']
+                val << 'Conference Proceedings' if genres and !(genres & conf_pub).empty?
                 val << 'Journal/Periodical' if issuance and issuance.include? 'continuing'
-                val << 'Journal/Periodical' if genres and genres.include? 'article'
-                val << 'Other' if genres and genres.include? 'student project report'
-                val << 'Thesis' if genres and genres.include? 'thesis'
+                article = ['article', 'Article']
+                val << 'Journal/Periodical' if genres and !(genres & article).empty?
+                stu_proj_rpt = ['student project report', 'Student project report', 'Student Project report', 'Student Project Report']
+                val << 'Other' if genres and !(genres & stu_proj_rpt).empty?
+                thesis = ['thesis', 'Thesis']
+                val << 'Thesis' if genres and !(genres & thesis).empty?
               when 'three dimensional object'
                 val << 'Other'
             end
