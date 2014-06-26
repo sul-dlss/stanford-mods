@@ -75,7 +75,7 @@ module Stanford
       
       # @return [Array<String>] values for author_corp_display
       def sw_corporate_authors
-        val=@mods_ng_xml.plain_name.select {|n| n.type_at == 'corporate'}.map { |n| n.display_value_w_date }
+        val = @mods_ng_xml.plain_name.select {|n| n.type_at == 'corporate'}.map { |n| n.display_value_w_date }
         val
       end
       
@@ -123,13 +123,46 @@ module Stanford
         short_titles ? short_titles.first : nil
       end
       
-      # @return [String] value for title_245_search, title_display, title_full_display
+      # @return [String] value for title_245_search, title_full_display
       def sw_full_title
-        toret = full_titles ? full_titles.find { |s| s =~ Regexp.new(Regexp.escape(sw_short_title)) } : nil
-        if toret
-          toret = toret.gsub(/,$/, '')
+        outer_nodes = @mods_ng_xml.title_info
+        outer_node = outer_nodes ? outer_nodes.first : nil
+        if outer_node
+          nonSort = outer_node.nonSort.text.strip.empty? ? nil : outer_node.nonSort.text.strip
+          title = outer_node.title.text.strip.empty? ? nil: outer_node.title.text.strip
+          preSubTitle = nonSort ? [nonSort, title].compact.join(" ") : title
+          preSubTitle.sub!(/:$/, '') if preSubTitle # remove trailing colon
+
+          subTitle = outer_node.subTitle.text.strip
+          preParts = subTitle.empty? ? preSubTitle : preSubTitle + " : " + subTitle
+          preParts.sub!(/\.$/, '') if preParts # remove trailing period
+          
+          partName = outer_node.partName.text.strip unless outer_node.partName.text.strip.empty?
+          partNumber = outer_node.partNumber.text.strip unless outer_node.partNumber.text.strip.empty?
+          partNumber.sub!(/,$/, '') if partNumber # remove trailing comma
+          if partNumber && partName
+            parts = partNumber + ", " + partName
+          elsif partNumber
+            parts = partNumber
+          elsif partName
+            parts = partName
+          end
+          parts.sub!(/\.$/, '') if parts
+
+          result = parts ? preParts + ". " + parts : preParts
+          result += "." if !result.match(/[[:punct:]]$/)
+          result = nil if result.empty?
+          result
+        else
+          nil
         end
-        toret
+      end
+      
+      # @return [String] value for title_display (like title_full_display without trailing punctuation)
+      def sw_title_display
+        result = sw_full_title ? sw_full_title : nil
+        result.sub!(/[[:punct:]]$/, '') if result
+        result
       end
       
       # this includes all titles except 
@@ -141,17 +174,25 @@ module Stanford
       # Returns a sortable version of the main title
       # @return [String] value for title_sort field
       def sw_sort_title
-        val = '' + ( sort_title ? sort_title : '')
-        val.gsub(/[[:punct:]]*/, '').strip
+        # get nonSort piece
+        outer_nodes = @mods_ng_xml.title_info
+        outer_node = outer_nodes ? outer_nodes.first : nil
+        if outer_node
+          nonSort = outer_node.nonSort.text.strip.empty? ? nil : outer_node.nonSort.text.strip
+        end
+        
+        val = '' + ( sw_full_title ? sw_full_title : '')
+        val.sub!(Regexp.new("^" + nonSort), '') if nonSort
+        val.gsub!(/[[:punct:]]*/, '').strip
+        val.squeeze(" ").strip
       end
       
       #remove trailing commas
+      # @deprecated in favor of sw_title_display
       def sw_full_title_without_commas
-        toret = self.sw_full_title
-        if toret
-          toret = toret.gsub(/,$/, '')
-        end
-        toret
+        result = self.sw_full_title
+        result.sub!(/,$/, '') if result
+        result
       end
     
       # ---- end TITLE ----
