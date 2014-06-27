@@ -527,7 +527,7 @@ module Stanford
       
       # select one or more format values from the controlled vocabulary here:
       #   http://searchworks-solr-lb.stanford.edu:8983/solr/select?facet.field=format&rows=0&facet.sort=index
-      # @return [String] value in the SearchWorks controlled vocabulary
+      # @return <Array[String]> value in the SearchWorks controlled vocabulary
       # @deprecated - kept for backwards compatibility but not part of SW UI redesign work Summer 2014
       def format
         val = []
@@ -630,6 +630,30 @@ module Stanford
                 val << 'Journal/Periodical' if issuance and issuance.include? 'continuing'
               when 'three dimensional object'
                 val << '3D object'
+            end
+          end
+        end
+        val.uniq
+      end
+
+      # return values for the genre facet in SearchWorks
+      # @return <Array[String]>
+      def sw_genre
+        val = []
+        genres = self.term_values(:genre)
+        if genres
+          val << genres.map(&:capitalize)
+          val.flatten! if !val.empty?
+          if genres.include?('thesis') || genres.include?('Thesis')
+            val << 'Thesis/Dissertation'
+            val.delete 'Thesis'
+          end
+          conf_pub = ['conference publication', 'Conference publication', 'Conference Publication']
+          if !(genres & conf_pub).empty?
+            types = self.term_values(:typeOfResource)
+            if types && types.include?('text')
+              val << 'Conference proceedings'
+              val.delete 'Conference publication'
             end
           end
         end
