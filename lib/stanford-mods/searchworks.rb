@@ -527,8 +527,8 @@ module Stanford
       
       # select one or more format values from the controlled vocabulary here:
       #   http://searchworks-solr-lb.stanford.edu:8983/solr/select?facet.field=format&rows=0&facet.sort=index
-      # based on the dor_content_type
       # @return [String] value in the SearchWorks controlled vocabulary
+      # @deprecated - kept for backwards compatibility but not part of SW UI redesign work Summer 2014
       def format
         val = []
         types = self.term_values(:typeOfResource)
@@ -573,6 +573,63 @@ module Stanford
                 val << 'Thesis' if genres and !(genres & thesis).empty?
               when 'three dimensional object'
                 val << 'Other'
+            end
+          end
+        end
+        val.uniq
+      end
+
+      # select one or more format values from the controlled vocabulary per JVine Summer 2014
+      #   http://searchworks-solr-lb.stanford.edu:8983/solr/select?facet.field=format_main_ssim&rows=0&facet.sort=index
+      # @return <Array[String]> value in the SearchWorks controlled vocabulary
+      def format_main
+        val = []
+        types = self.term_values(:typeOfResource)
+        if types
+          genres = self.term_values(:genre)
+          issuance = self.term_values([:origin_info,:issuance])
+          types.each do |type|
+            case type
+              when 'cartographic'
+                val << 'Map'
+              when 'mixed material'
+                val << 'Archive/Manuscript'
+              when 'moving image'
+                val << 'Video'
+              when 'notated music'
+                val << 'Music score'
+              when 'software, multimedia'
+                if genres and (genres.include?('dataset') || genres.include?('Dataset'))
+                  val << 'Dataset'
+                else
+                  val << 'Software/Multimedia'
+                end
+              when 'sound recording-musical'
+                val << 'Music recording'
+              when 'sound recording-nonmusical', 'sound recording'
+                val << 'Sound recording'
+              when 'still image'
+                val << 'Image'
+              when 'text'
+                article_genres = ['article', 'Article',
+                  'book chapter', 'Book chapter', 'Book Chapter',
+                  'issue brief', 'Issue brief', 'Issue Brief',
+                  'project report', 'Project report', 'Project Report',
+                  'student project report', 'Student project report', 'Student Project report', 'Student Project Report',
+                  'technical report', 'Technical report', 'Technical Report',
+                  'working paper', 'Working paper', 'Working Paper'
+                  ]
+                val << 'Article' if genres and !(genres & article_genres).empty?
+                val << 'Book' if issuance and issuance.include? 'monographic'
+                book_genres = ['conference publication', 'Conference publication', 'Conference Publication',
+                  'instruction', 'Instruction',
+                  'librettos', 'Librettos',
+                  'thesis', 'Thesis'
+                  ]
+                val << 'Book' if genres and !(genres & book_genres).empty?
+                val << 'Journal/Periodical' if issuance and issuance.include? 'continuing'
+              when 'three dimensional object'
+                val << '3D object'
             end
           end
         end
