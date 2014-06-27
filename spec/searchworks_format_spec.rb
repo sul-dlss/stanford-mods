@@ -544,5 +544,65 @@ describe "Format fields (searchworks.rb)" do
     end
   end #format_main
 
-  
+    context "sw_genre" do
+      it "Conference proceedings: typeOfResource 'text', genre 'conference publication'" do
+        m = "<mods #{@ns_decl}><genre authority=\"marcgt\">conference publication</genre><typeOfResource>text</typeOfResource></mods>"
+        @smods_rec.from_str(m)
+        @smods_rec.sw_genre.should == ['Conference proceedings']
+        m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Conference publication</genre><typeOfResource>text</typeOfResource></mods>"
+        @smods_rec.from_str(m)
+        @smods_rec.sw_genre.should == ['Conference proceedings']
+        m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Conference Publication</genre><typeOfResource>text</typeOfResource></mods>"
+        @smods_rec.from_str(m)
+        @smods_rec.sw_genre.should == ['Conference proceedings']
+      end
+      it "Thesis/Dissertation: typeOfResource 'text', genre 'thesis'" do
+        m = "<mods #{@ns_decl}><genre authority=\"marcgt\">thesis</genre><typeOfResource>text</typeOfResource></mods>"
+        @smods_rec.from_str(m)
+        @smods_rec.sw_genre.should == ['Thesis/Dissertation']
+        m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Thesis</genre><typeOfResource>text</typeOfResource></mods>"
+        @smods_rec.from_str(m)
+        @smods_rec.sw_genre.should == ['Thesis/Dissertation']
+      end
+      it "capitalizes the first letter of a genre value" do
+        m = "<mods #{@ns_decl}><genre authority=\"marcgt\">student project report</genre></mods>"
+        @smods_rec.from_str(m)
+        @smods_rec.sw_genre.should == ['Student project report']
+        m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Student project report</genre></mods>"
+        @smods_rec.from_str(m)
+        @smods_rec.sw_genre.should == ['Student project report']
+        m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Student Project report</genre></mods>"
+        @smods_rec.from_str(m)
+        @smods_rec.sw_genre.should == ['Student project report']
+        m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Student Project Report</genre></mods>"
+        @smods_rec.from_str(m)
+        @smods_rec.sw_genre.should == ['Student project report']
+      end
+      # NOTE: may need to remove plurals and/or trailing punctuation in future
+      it "returns all genre values" do
+        m = "<mods #{@ns_decl}>
+              <genre>game</genre>
+              <genre>foo</genre>
+              <genre>technical report</genre>
+            </mods>"
+        @smods_rec.from_str(m)
+        @smods_rec.sw_genre.should == ['Game', 'Foo', 'Technical report']
+      end
+      it "doesn't have duplicates" do
+        m = "<mods #{@ns_decl}>
+              <genre>game</genre>
+              <genre>technical report</genre>
+              <genre>Game</genre>
+            </mods>"
+        @smods_rec.from_str(m)
+        @smods_rec.sw_genre.should == ['Game', 'Technical report']
+      end
+      it "empty Array if no genre values" do
+        m = "<mods #{@ns_decl}>
+              <typeOfResource>text</typeOfResource>
+            </mods>"
+        @smods_rec.from_str(m)
+        @smods_rec.sw_genre.should == []
+      end
+    end # sw_genre
 end
