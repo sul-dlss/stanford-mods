@@ -1,7 +1,7 @@
 # encoding: UTF-8
 require 'spec_helper'
 
-describe "Searchworks Subject fields from Searchworks mixin for Stanford::Mods::Record" do
+describe "Subject fields (searchworks.rb)" do
 
   before(:all) do
     @smods_rec = Stanford::Mods::Record.new

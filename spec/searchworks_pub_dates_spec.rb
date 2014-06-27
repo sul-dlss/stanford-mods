@@ -1,7 +1,7 @@
 # encoding: UTF-8
 require 'spec_helper'
 
-describe "Date methods in Searchworks mixin for Stanford::Mods::Record" do
+describe "Date methods (searchworks.rb)" do
 
   before(:all) do
     @smods_rec = Stanford::Mods::Record.new
