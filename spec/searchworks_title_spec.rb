@@ -246,6 +246,64 @@ describe "title fields (searchworks.rb)" do
   end # sw_full_title
   
   context "sw_title_display removes end punctuation of sw_full_title_display" do
+
+    # title_display = custom, removeTrailingPunct(245abdefghijklmnopqrstuvwxyz, [\\\\,/;:], ([A-Za-z]{4}|[0-9]{3}|\\)|\\,))
+    context "should remove trailing \,/;:." do
+      it "retains other trailing chars" do
+        m = "<mods #{@ns_decl}><titleInfo>
+              <title>The Jerk?</title>
+            </titleInfo></mods>"
+        @smods_rec.from_str(m)
+        expect(@smods_rec.sw_title_display).to eq 'The Jerk?'
+        m = "<mods #{@ns_decl}><titleInfo>
+              <title>The Jerk!</title>
+            </titleInfo></mods>"
+        @smods_rec.from_str(m)
+        expect(@smods_rec.sw_title_display).to eq 'The Jerk!'
+      end
+      it "removes trailing comma" do
+        m = "<mods #{@ns_decl}><titleInfo>
+              <title>The Jerk,</title>
+            </titleInfo></mods>"
+        @smods_rec.from_str(m)
+        expect(@smods_rec.sw_title_display).to eq 'The Jerk'
+      end
+      it "removes trailing semicolon" do
+        m = "<mods #{@ns_decl}><titleInfo>
+              <title>The Jerk;</title>
+            </titleInfo></mods>"
+        @smods_rec.from_str(m)
+        expect(@smods_rec.sw_title_display).to eq 'The Jerk'
+      end
+      it "removes trailing colon" do
+        m = "<mods #{@ns_decl}><titleInfo>
+              <title>The Jerk:</title>
+            </titleInfo></mods>"
+        @smods_rec.from_str(m)
+        expect(@smods_rec.sw_title_display).to eq 'The Jerk'
+      end
+      it "removes trailing slash" do
+        m = "<mods #{@ns_decl}><titleInfo>
+              <title>The Jerk /</title>
+            </titleInfo></mods>"
+        @smods_rec.from_str(m)
+        expect(@smods_rec.sw_title_display).to eq 'The Jerk'
+      end
+      it "removes trailing backslash" do
+        m = "<mods #{@ns_decl}><titleInfo>
+              <title>The Jerk \</title>
+            </titleInfo></mods>"
+        @smods_rec.from_str(m)
+        expect(@smods_rec.sw_title_display).to eq 'The Jerk'
+      end
+      it "removes multiple trailing punctuation" do
+        m = "<mods #{@ns_decl}><titleInfo>
+              <title>The Jerk.,\</title>
+            </titleInfo></mods>"
+        @smods_rec.from_str(m)
+        expect(@smods_rec.sw_title_display).to eq 'The Jerk'
+      end
+    end
     context "no subtitle" do
       it "end title with a period" do
         m = "<mods #{@ns_decl}>
@@ -272,7 +330,7 @@ describe "title fields (searchworks.rb)" do
             <title>Olympics!</title>
           </titleInfo></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.sw_title_display).to eq 'The Olympics'
+        expect(@smods_rec.sw_title_display).to eq 'The Olympics!'
       end
     end # no subtitle
     context "subtitle" do
@@ -315,7 +373,7 @@ describe "title fields (searchworks.rb)" do
             <subTitle>a history?</subTitle>
           </titleInfo></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.sw_title_display).to eq 'The Olympics : a history'
+        expect(@smods_rec.sw_title_display).to eq 'The Olympics : a history?'
       end
     end # subtitle
     context "partName" do
@@ -446,14 +504,14 @@ describe "title fields (searchworks.rb)" do
             <partNumber>Part 1!</partNumber>
           </titleInfo></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.sw_title_display).to eq 'The Olympics : a history. Part 1'
+        expect(@smods_rec.sw_title_display).to eq 'The Olympics : a history. Part 1!'
         m = "<mods #{@ns_decl}>
           <titleInfo>
             <title>cfb</title>
             <partNumber>1894?</partNumber>
           </titleInfo></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.sw_title_display).to eq 'cfb. 1894'
+        expect(@smods_rec.sw_title_display).to eq 'cfb. 1894?'
       end
     end # no partName but partNumber
   end # sw_title_display

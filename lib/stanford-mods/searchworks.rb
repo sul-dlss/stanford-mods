@@ -151,17 +151,24 @@ module Stanford
 
           result = parts ? preParts + ". " + parts : preParts
           result += "." if !result.match(/[[:punct:]]$/)
+          result.strip!
           result = nil if result.empty?
           result
         else
           nil
         end
       end
-      
+
+      # like sw_full_title without trailing \,/;:.
+      # spec from solrmarc-sw   sw_index.properties
+      #    title_display = custom, removeTrailingPunct(245abdefghijklmnopqrstuvwxyz, [\\\\,/;:], ([A-Za-z]{4}|[0-9]{3}|\\)|\\,))
       # @return [String] value for title_display (like title_full_display without trailing punctuation)
       def sw_title_display
         result = sw_full_title ? sw_full_title : nil
-        result.sub!(/[[:punct:]]$/, '') if result
+        if result
+          result.sub!(/[\.,;:\/\\]+$/, '')
+          result.strip!
+        end
         result
       end
       
