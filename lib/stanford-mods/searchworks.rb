@@ -629,7 +629,7 @@ module Stanford
                 val << 'Book' if genres and !(genres & book_genres).empty?
                 val << 'Journal/Periodical' if issuance and issuance.include? 'continuing'
               when 'three dimensional object'
-                val << '3D object'
+                val << 'Object'
             end
           end
         end
