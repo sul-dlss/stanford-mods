@@ -274,7 +274,7 @@ describe "Format fields (searchworks.rb)" do
     it "3D object: typeOfResource 'three dimensional object'" do
       m = "<mods #{@ns_decl}><typeOfResource>three dimensional object</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.format_main).to eq ['3D object']
+      expect(@smods_rec.format_main).to eq ['Object']
     end
 
     it "Archive/Manuscript: typeOfResource 'mixed material'" do
