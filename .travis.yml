@@ -4,9 +4,9 @@ rvm:
   - 2.1.1
   - 2.0.0
   - 1.9.3
-#  - ruby-head
+  - ruby-head
   - jruby-19mode # JRuby in 1.9 mode
-  - jruby-head
+#  - jruby-head  # failing 2014-07
 notifications:
   email:
     - ndushay@stanford.edu
