@@ -59,6 +59,7 @@ Example Using SearchWorks Mixins:
 6. Create new Pull Request
 
 == Releases
+* <b>1.0.2</b> add format_main and sw_genre tests to searchworks.rb
 * <b>1.0.1</b> sw_title_display keeps appropriate trailing punct more or less per spec in solrmarc-sw sw_index.properties
 * <b>1.0.0</b> sw_full_title now includes partName and partNumber; sw_title_display created to be like sw_full_title but without trailing punctuation; sw format for typeOfResource sound recording; genre value is librettos, plural; sw format algorithm accommodates first letter upcase; genre value report does NOT map to a format, genre value 'project report' with ToR text is 'Book'
 * <b>0.0.27</b> add genres 'Issue brief', 'Book chapter' and 'Working paper' to map to searchworks format 'Book'
