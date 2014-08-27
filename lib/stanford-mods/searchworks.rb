@@ -619,7 +619,7 @@ module Stanford
                   'technical report', 'Technical report', 'Technical Report',
                   'working paper', 'Working paper', 'Working Paper'
                   ]
-                val << 'Article' if genres and !(genres & article_genres).empty?
+                val << 'Book' if genres and !(genres & article_genres).empty?
                 val << 'Book' if issuance and issuance.include? 'monographic'
                 book_genres = ['conference publication', 'Conference publication', 'Conference Publication',
                   'instruction', 'Instruction',

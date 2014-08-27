@@ -283,47 +283,47 @@ describe "Format fields (searchworks.rb)" do
       expect(@smods_rec.format_main).to eq ['Archive/Manuscript']
     end
 
-    context "Article: typeOfResource text, genre" do
+    context "Book, formerly Article: typeOfResource text, genre" do
       it "'article'" do
         m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre authority=\"marcgt\">article</genre></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.format_main).to eq ['Article']
+        expect(@smods_rec.format_main).to eq ['Book']
         m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre authority=\"marcgt\">Article</genre></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.format_main).to eq ['Article']
+        expect(@smods_rec.format_main).to eq ['Book']
       end
       it "'book chapter'", :email => 'mods-squad 2014-05-22, Joanna Dyla' do
         m = "<mods #{@ns_decl}><genre authority=\"local\">book chapter</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.format_main).to eq ['Article']
+        expect(@smods_rec.format_main).to eq ['Book']
         m = "<mods #{@ns_decl}><genre authority=\"local\">Book chapter</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.format_main).to eq ['Article']
+        expect(@smods_rec.format_main).to eq ['Book']
         m = "<mods #{@ns_decl}><genre authority=\"local\">Book Chapter</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.format_main).to eq ['Article']
+        expect(@smods_rec.format_main).to eq ['Book']
       end
       it "'issue brief'", :email => 'mods-squad 2014-05-22, Joanna Dyla' do
         m = "<mods #{@ns_decl}><genre authority=\"local\">issue brief</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.format_main).to eq ['Article']
+        expect(@smods_rec.format_main).to eq ['Book']
         m = "<mods #{@ns_decl}><genre authority=\"local\">Issue brief</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.format_main).to eq ['Article']
+        expect(@smods_rec.format_main).to eq ['Book']
         m = "<mods #{@ns_decl}><genre authority=\"local\">Issue Brief</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.format_main).to eq ['Article']
+        expect(@smods_rec.format_main).to eq ['Book']
       end
       it "'project report'", :jira => 'GRYP-170', :github => 'gdor-indexer/#7' do
         m = "<mods #{@ns_decl}><genre>project report</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.format_main).to eq ['Article']
+        expect(@smods_rec.format_main).to eq ['Book']
         m = "<mods #{@ns_decl}><genre>Project report</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.format_main).to eq ['Article']
+        expect(@smods_rec.format_main).to eq ['Book']
         m = "<mods #{@ns_decl}><genre>Project Report</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.format_main).to eq ['Article']
+        expect(@smods_rec.format_main).to eq ['Book']
       end
       it "'report' isn't valid", :jira => 'GRYP-170', :github => 'gdor-indexer/#7' do
         m = "<mods #{@ns_decl}><genre>report</genre><typeOfResource>text</typeOfResource></mods>"
@@ -333,38 +333,38 @@ describe "Format fields (searchworks.rb)" do
       it "'student project report'", :consul => '/NGDE/Format 2014-05-28' do
         m = "<mods #{@ns_decl}><genre authority=\"local\">student project report</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.format_main).to eq ['Article']
+        expect(@smods_rec.format_main).to eq ['Book']
         m = "<mods #{@ns_decl}><genre authority=\"local\">Student project report</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.format_main).to eq ['Article']
+        expect(@smods_rec.format_main).to eq ['Book']
         m = "<mods #{@ns_decl}><genre authority=\"local\">Student Project report</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.format_main).to eq ['Article']
+        expect(@smods_rec.format_main).to eq ['Book']
         m = "<mods #{@ns_decl}><genre authority=\"local\">Student Project Report</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.format_main).to eq ['Article']
+        expect(@smods_rec.format_main).to eq ['Book']
       end
       it "'technical report'", :jira => 'GRYPHONDOR-207' do
         m = "<mods #{@ns_decl}><genre authority=\"marcgt\">technical report</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.format_main).to eq ['Article']
+        expect(@smods_rec.format_main).to eq ['Book']
         m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Technical report</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.format_main).to eq ['Article']
+        expect(@smods_rec.format_main).to eq ['Book']
         m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Technical Report</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.format_main).to eq ['Article']
+        expect(@smods_rec.format_main).to eq ['Book']
       end
       it "'working paper'", :email => 'mods-squad 2014-05-22, Joanna Dyla' do
         m = "<mods #{@ns_decl}><genre authority=\"local\">working paper</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.format_main).to eq ['Article']
+        expect(@smods_rec.format_main).to eq ['Book']
         m = "<mods #{@ns_decl}><genre authority=\"local\">Working paper</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.format_main).to eq ['Article']
+        expect(@smods_rec.format_main).to eq ['Book']
         m = "<mods #{@ns_decl}><genre authority=\"local\">Working Paper</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.format_main).to eq ['Article']
+        expect(@smods_rec.format_main).to eq ['Book']
       end
     end # Article
 
@@ -536,12 +536,12 @@ describe "Format fields (searchworks.rb)" do
       it "multiple genre elements, single typeOfResource" do
         m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre>librettos</genre><genre>article</genre></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.format_main).to eq ['Article', 'Book']
+        expect(@smods_rec.format_main).to eq ['Book']
       end
       it "mish mash" do
         m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><typeOfResource>still image</typeOfResource><genre>librettos</genre><genre>article</genre></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.format_main).to eq ['Article', 'Book', 'Image']
+        expect(@smods_rec.format_main).to eq ['Book', 'Image']
       end
       it "doesn't give duplicate values" do
         m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre>librettos</genre><genre>thesis</genre></mods>"
