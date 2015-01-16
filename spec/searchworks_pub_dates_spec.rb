@@ -204,31 +204,4 @@ describe "Date methods (searchworks.rb)" do
     end
   end
 
-  context "pub_date_groups" do
-    it 'should generate the groups' do
-      m = "<mods #{@ns_decl}><originInfo>
-      <dateCreated>1904</dateCreated>
-      </originInfo></mods>"
-      @smods_rec = Stanford::Mods::Record.new
-      @smods_rec.from_str(m)
-      @smods_rec.pub_date_groups(1904).should == ['More than 50 years ago']
-    end
-    it 'should work for a modern date too' do
-      m = "<mods #{@ns_decl}><originInfo>
-      <dateCreated>1904</dateCreated>
-      </originInfo></mods>"
-      @smods_rec = Stanford::Mods::Record.new
-      @smods_rec.from_str(m)
-      @smods_rec.pub_date_groups(2013).should == ["This year"]
-    end
-    it 'should work ok given a nil date' do
-      m = "<mods #{@ns_decl}><originInfo>
-      <dateCreated>1904</dateCreated>
-      </originInfo></mods>"
-      @smods_rec = Stanford::Mods::Record.new
-      @smods_rec.from_str(m)
-      @smods_rec.pub_date_groups(nil).should == nil
-    end
-  end #context pub date groups
-
 end

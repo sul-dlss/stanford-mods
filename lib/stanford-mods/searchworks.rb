@@ -391,34 +391,6 @@ module Stanford
         end
       end
 
-      # @return [Array<String>] values for the pub_date_group_facet
-      # @deprecated
-      def pub_date_groups year
-        if not year
-          return nil
-        end
-        year=year.to_i
-        current_year=Time.new.year.to_i
-        result = []
-        if year >= current_year - 1
-          result << "This year"
-        else
-          if year >= current_year - 3
-            result << "Last 3 years"
-          else
-            if year >= current_year - 10
-              result << "Last 10 years"
-            else
-              if year >= current_year - 50
-                result << "Last 50 years"
-              else
-                result << "More than 50 years ago"
-              end
-            end
-          end
-        end
-      end
-
       #get the dates from dateIssued, and dateCreated merged into 1 array.
       # @return [Array<String>] values for the issue_date_display Solr field for this document or nil if none
       def pub_dates
