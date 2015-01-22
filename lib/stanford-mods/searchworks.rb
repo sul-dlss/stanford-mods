@@ -383,24 +383,62 @@ module Stanford
         vals
       end
 
-      def pub_date_display
-        if pub_dates
-          pub_dates.first
+      # @return [Array<String>] dates with encoding="marc"
+      def dates_marc_encoding
+        if @dates_marc_encoding
+          return @dates_marc_encoding
         else
-          nil
+          split_date_encodings
+          return @dates_marc_encoding
         end
       end
 
-      #get the dates from dateIssued, and dateCreated merged into 1 array.
-      # @return [Array<String>] values for the issue_date_display Solr field for this document or nil if none
-      def pub_dates
-        vals = self.term_values([:origin_info,:dateIssued])
-        if vals
-          vals = vals.concat self.term_values([:origin_info,:dateCreated]) unless not self.term_values([:origin_info,:dateCreated])
+      # @return [Array<String>] dates with encoding not "marc"
+      def dates_no_marc_encoding
+        if @dates_no_marc_encoding
+          return @dates_no_marc_encoding
         else
-          vals = self.term_values([:origin_info,:dateCreated])
+          split_date_encodings
+          return @dates_no_marc_encoding
         end
-        vals and vals.empty? ? nil : vals
+      end
+
+      # Get arrays of dateIssued and dateCreated tags from origin_info with and without encoding=marc for different uses
+      def split_date_encodings
+        @dates_marc_encoding = []
+        @dates_no_marc_encoding = []
+        self.origin_info.dateIssued.each { |di|
+          if di.encoding == "marc"
+            @dates_marc_encoding << di.text
+          else
+            @dates_no_marc_encoding << di.text
+          end
+        }
+        self.origin_info.dateCreated.each { |dc|
+          if dc.encoding == "marc"
+            @dates_marc_encoding << dc.text
+          else
+            @dates_no_marc_encoding << dc.text
+          end 
+        }
+      end
+
+      # For the date display only, the first place to look is in the dates without encoding=marc array.
+      # Next, select the first date in the pub_dates array.  Otherwise return nil
+      # @return [String] value for the pub_date_display Solr field for this document or nil if none
+      def pub_date_display
+          return dates_no_marc_encoding.first unless dates_no_marc_encoding.empty?
+          return pub_dates.first unless pub_dates.empty?
+          return nil
+      end
+
+      # For the date indexing, sorting and faceting, the first place to look is in the dates with encoding=marc array.
+      # If that doesn't exist, look in the dates without encoding=marc array.  Otherwise return nil
+      # @return [Array<String>] values for the date Solr field for this document or nil if none
+      def pub_dates
+        return dates_marc_encoding unless dates_marc_encoding.empty?
+        return dates_no_marc_encoding unless dates_no_marc_encoding.empty?
+        return nil
       end
       
       def is_number?(object)
