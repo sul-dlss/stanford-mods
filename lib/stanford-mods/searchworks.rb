@@ -383,39 +383,6 @@ module Stanford
         vals
       end
 
-      # @return [Array<String>] dates from dateIssued and dateCreated tags from origin_info with encoding="marc"
-      def dates_marc_encoding
-        split_date_encodings unless @dates_marc_encoding
-        return @dates_marc_encoding
-      end
-
-      # @return [Array<String>] dates from dateIssued and dateCreated tags from origin_info with encoding not "marc"
-      def dates_no_marc_encoding
-        split_date_encodings unless @dates_no_marc_encoding
-        return @dates_no_marc_encoding
-      end
-
-      # Populate @dates_marc_encoding and @dates_no_marc_encoding from dateIssued and dateCreated tags from origin_info 
-      # with and without encoding=marc
-      def split_date_encodings
-        @dates_marc_encoding = []
-        @dates_no_marc_encoding = []
-        self.origin_info.dateIssued.each { |di|
-          if di.encoding == "marc"
-            @dates_marc_encoding << di.text
-          else
-            @dates_no_marc_encoding << di.text
-          end
-        }
-        self.origin_info.dateCreated.each { |dc|
-          if dc.encoding == "marc"
-            @dates_marc_encoding << dc.text
-          else
-            @dates_no_marc_encoding << dc.text
-          end 
-        }
-      end
-
       # For the date display only, the first place to look is in the dates without encoding=marc array.
       # If no such dates, select the first date in the pub_dates array.  Otherwise return nil
       # @return [String] value for the pub_date_display Solr field for this document or nil if none
@@ -816,7 +783,40 @@ module Stanford
           end
         end 
         return nil
-      end      
+      end
+
+      # @return [Array<String>] dates from dateIssued and dateCreated tags from origin_info with encoding="marc"
+      def dates_marc_encoding
+        split_date_encodings unless @dates_marc_encoding
+        return @dates_marc_encoding
+      end
+
+      # @return [Array<String>] dates from dateIssued and dateCreated tags from origin_info with encoding not "marc"
+      def dates_no_marc_encoding
+        split_date_encodings unless @dates_no_marc_encoding
+        return @dates_no_marc_encoding
+      end
+
+      # Populate @dates_marc_encoding and @dates_no_marc_encoding from dateIssued and dateCreated tags from origin_info 
+      # with and without encoding=marc
+      def split_date_encodings
+        @dates_marc_encoding = []
+        @dates_no_marc_encoding = []
+        self.origin_info.dateIssued.each { |di|
+          if di.encoding == "marc"
+            @dates_marc_encoding << di.text
+          else
+            @dates_no_marc_encoding << di.text
+          end
+        }
+        self.origin_info.dateCreated.each { |dc|
+          if dc.encoding == "marc"
+            @dates_marc_encoding << dc.text
+          else
+            @dates_no_marc_encoding << dc.text
+          end
+        }
+      end
     end # class Record
   end # Module Mods
 end # Module Stanford
