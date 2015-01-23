@@ -59,6 +59,7 @@ Example Using SearchWorks Mixins:
 6. Create new Pull Request
 
 == Releases
+* <b>1.1.0</b> Changed mechanism for determining dates for display only and for indexing, sorting, and faceting and removed deprecated pub_date_group method
 * <b>1.0.3</b> format_main value 'Article' is now 'Book'
 * <b>1.0.2</b> add format_main and sw_genre tests to searchworks.rb
 * <b>1.0.1</b> sw_title_display keeps appropriate trailing punct more or less per spec in solrmarc-sw sw_index.properties

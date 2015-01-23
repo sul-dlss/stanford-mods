@@ -383,52 +383,22 @@ module Stanford
         vals
       end
 
+      # For the date display only, the first place to look is in the dates without encoding=marc array.
+      # If no such dates, select the first date in the pub_dates array.  Otherwise return nil
+      # @return [String] value for the pub_date_display Solr field for this document or nil if none
       def pub_date_display
-        if pub_dates
-          pub_dates.first
-        else
-          nil
-        end
-      end
-
-      # @return [Array<String>] values for the pub_date_group_facet
-      # @deprecated
-      def pub_date_groups year
-        if not year
+          return dates_no_marc_encoding.first unless dates_no_marc_encoding.empty?
+          return pub_dates.first unless pub_dates.empty?
           return nil
-        end
-        year=year.to_i
-        current_year=Time.new.year.to_i
-        result = []
-        if year >= current_year - 1
-          result << "This year"
-        else
-          if year >= current_year - 3
-            result << "Last 3 years"
-          else
-            if year >= current_year - 10
-              result << "Last 10 years"
-            else
-              if year >= current_year - 50
-                result << "Last 50 years"
-              else
-                result << "More than 50 years ago"
-              end
-            end
-          end
-        end
       end
 
-      #get the dates from dateIssued, and dateCreated merged into 1 array.
-      # @return [Array<String>] values for the issue_date_display Solr field for this document or nil if none
+      # For the date indexing, sorting and faceting, the first place to look is in the dates with encoding=marc array.
+      # If that doesn't exist, look in the dates without encoding=marc array.  Otherwise return nil
+      # @return [Array<String>] values for the date Solr field for this document or nil if none
       def pub_dates
-        vals = self.term_values([:origin_info,:dateIssued])
-        if vals
-          vals = vals.concat self.term_values([:origin_info,:dateCreated]) unless not self.term_values([:origin_info,:dateCreated])
-        else
-          vals = self.term_values([:origin_info,:dateCreated])
-        end
-        vals and vals.empty? ? nil : vals
+        return dates_marc_encoding unless dates_marc_encoding.empty?
+        return dates_no_marc_encoding unless dates_no_marc_encoding.empty?
+        return nil
       end
       
       def is_number?(object)
@@ -813,7 +783,40 @@ module Stanford
           end
         end 
         return nil
-      end      
+      end
+
+      # @return [Array<String>] dates from dateIssued and dateCreated tags from origin_info with encoding="marc"
+      def dates_marc_encoding
+        split_date_encodings unless @dates_marc_encoding
+        return @dates_marc_encoding
+      end
+
+      # @return [Array<String>] dates from dateIssued and dateCreated tags from origin_info with encoding not "marc"
+      def dates_no_marc_encoding
+        split_date_encodings unless @dates_no_marc_encoding
+        return @dates_no_marc_encoding
+      end
+
+      # Populate @dates_marc_encoding and @dates_no_marc_encoding from dateIssued and dateCreated tags from origin_info 
+      # with and without encoding=marc
+      def split_date_encodings
+        @dates_marc_encoding = []
+        @dates_no_marc_encoding = []
+        self.origin_info.dateIssued.each { |di|
+          if di.encoding == "marc"
+            @dates_marc_encoding << di.text
+          else
+            @dates_no_marc_encoding << di.text
+          end
+        }
+        self.origin_info.dateCreated.each { |dc|
+          if dc.encoding == "marc"
+            @dates_marc_encoding << dc.text
+          else
+            @dates_no_marc_encoding << dc.text
+          end
+        }
+      end
     end # class Record
   end # Module Mods
 end # Module Stanford
