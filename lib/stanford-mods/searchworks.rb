@@ -384,11 +384,11 @@ module Stanford
       end
 
       # For the date display only, the first place to look is in the dates without encoding=marc array.
-      # If no such dates, select the first date in the pub_dates array.  Otherwise return nil
+      # If no such dates, select the first date in the dates_marc_encoding array.  Otherwise return nil
       # @return [String] value for the pub_date_display Solr field for this document or nil if none
       def pub_date_display
           return dates_no_marc_encoding.first unless dates_no_marc_encoding.empty?
-          return pub_dates.first unless pub_dates.empty?
+          return dates_marc_encoding.first unless dates_marc_encoding.empty?
           return nil
       end
 
@@ -787,19 +787,23 @@ module Stanford
 
       # @return [Array<String>] dates from dateIssued and dateCreated tags from origin_info with encoding="marc"
       def dates_marc_encoding
-        split_date_encodings unless @dates_marc_encoding
-        return @dates_marc_encoding
+        @dates_marc_encoding ||= begin
+          parse_dates_from_originInfo
+          @dates_marc_encoding
+        end
       end
 
       # @return [Array<String>] dates from dateIssued and dateCreated tags from origin_info with encoding not "marc"
       def dates_no_marc_encoding
-        split_date_encodings unless @dates_no_marc_encoding
-        return @dates_no_marc_encoding
+        @dates_no_marc_encoding ||= begin
+          parse_dates_from_originInfo
+          @dates_no_marc_encoding
+        end
       end
 
       # Populate @dates_marc_encoding and @dates_no_marc_encoding from dateIssued and dateCreated tags from origin_info 
       # with and without encoding=marc
-      def split_date_encodings
+      def parse_dates_from_originInfo
         @dates_marc_encoding = []
         @dates_no_marc_encoding = []
         self.origin_info.dateIssued.each { |di|
