@@ -99,8 +99,8 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
         r = Stanford::Mods::Record.new
         r.from_str "<mods #{@ns_decl}><titleInfo><title>Jerk</title></titleInfo></mods>"
         r.sw_sort_author.should =~ / Jerk$/
-        r.sw_sort_author.should match("\u{FFFF}")
-        r.sw_sort_author.should match("\xEF\xBF\xBF")
+        r.sw_sort_author.should match("\u{10FFFF}")
+        r.sw_sort_author.should match("\xF4\x8F\xBF\xBF")
       end
       it "should not have any punctuation marks" do
         r = Stanford::Mods::Record.new

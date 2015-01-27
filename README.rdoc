@@ -59,6 +59,7 @@ Example Using SearchWorks Mixins:
 6. Create new Pull Request
 
 == Releases
+* <b>1.1.2</b> Corrected java Character.MAX_CODE_POINT value from \u{FFFF} to \u{10FFFF}
 * <b>1.1.1</b> Minor bug fixes
 * <b>1.1.0</b> Changed mechanism for determining dates for display only and for indexing, sorting, and faceting and removed deprecated pub_date_group method
 * <b>1.0.3</b> format_main value 'Article' is now 'Book'

@@ -90,7 +90,7 @@ module Stanford
       # @return [String] value for author_sort field
       def sw_sort_author
         #  substitute java Character.MAX_CODE_POINT for nil main_author so missing main authors sort last
-        val = '' + (main_author_w_date ? main_author_w_date : "\u{FFFF} ") + ( sort_title ? sort_title : '')
+        val = '' + (main_author_w_date ? main_author_w_date : "\u{10FFFF} ") + ( sort_title ? sort_title : '')
         val.gsub(/[[:punct:]]*/, '').strip
       end
       
