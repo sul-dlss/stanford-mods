@@ -31,9 +31,9 @@ Or install it yourself as:
   > m = Stanford::Mods::Record.new
   > m.from_str('<mods><genre>ape</genre></mods>')
   > m.genre
-	=> [#<Nokogiri::XML::Element:0x3fe07b48bb24 name="genre" children=[#<Nokogiri::XML::Text:0x3fe07a09a7dc "ape">]>] 
-	> m.genre.text
-	=> "ape" 
+  => [#<Nokogiri::XML::Element:0x3fe07b48bb24 name="genre" children=[#<Nokogiri::XML::Text:0x3fe07a09a7dc "ape">]>] 
+  > m.genre.text
+  => "ape" 
 
   > m.to_be_removed        <-- method I wrote in stanford-mods for proof of concept
   in foo!
@@ -42,14 +42,14 @@ Or install it yourself as:
 Example Using SearchWorks Mixins:
 
   > require 'stanford-mods/searchworks'
-	> m = Stanford::Mods::Record.new
-	> m.from_str('<mods><language><languageTerm authority="iso639-2b" type="code">dut</languageTerm></language></mods>')
-	> m.language_facet    <-- from Searchworks mixin
-	=> ['Dutch'] 
-	> m.languages         <-- from mods gem
-	=> ['Dutch; Flemish']
+  > m = Stanford::Mods::Record.new
+  > m.from_str('<mods><language><languageTerm authority="iso639-2b" type="code">dut</languageTerm></language></mods>')
+  > m.language_facet    <-- from Searchworks mixin
+  => ['Dutch'] 
+  > m.languages         <-- from mods gem
+  => ['Dutch; Flemish']
 
-## Contributing
+== Contributing
 
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
