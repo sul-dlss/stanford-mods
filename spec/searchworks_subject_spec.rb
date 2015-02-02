@@ -4,7 +4,6 @@ require 'spec_helper'
 describe "Subject fields (searchworks.rb)" do
 
   before(:all) do
-    @smods_rec = Stanford::Mods::Record.new
     @ns_decl = "xmlns='#{Mods::MODS_NS}'"
     @genre = 'genre top level'
     @cart_coord = '6 00 S, 71 30 E'
