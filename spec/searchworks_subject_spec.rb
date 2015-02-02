@@ -27,7 +27,7 @@ describe "Subject fields (searchworks.rb)" do
           <subject><occupation>#{@occupation}</occupation></subject>
           <subject><temporal>#{@temporal}</temporal></subject>
           <subject><titleInfo><title>#{@s_title}</title></titleInfo></subject>
-          <subject><topic>#{@topic}</topic></subject>      
+          <subject><topic>#{@topic}</topic></subject>
         </mods>"
     @smods_rec = Stanford::Mods::Record.new
     @smods_rec.from_str(@subject_mods)
@@ -107,7 +107,7 @@ describe "Subject fields (searchworks.rb)" do
         m = "<mods #{@ns_decl}><subject><geographicCode authority='iso3166'>ca</geographicCode></subject></mods>"
         @smods_rec = Stanford::Mods::Record.new
         @smods_rec.from_str(m)
-        expect(@smods_rec.sw_logger).to receive(:info).with(/#{@fake_druid} has subject geographicCode element with untranslated encoding \(iso3166\): <geographicCode authority=.*>ca<\/geographicCode>/)
+        expect(@smods_rec.sw_logger).to receive(:info).with(/ has subject geographicCode element with untranslated encoding \(iso3166\): <geographicCode authority=.*>ca<\/geographicCode>/)
         @smods_rec.geographic_search
       end
     end # geographic_search
@@ -242,7 +242,7 @@ describe "Subject fields (searchworks.rb)" do
           m = "<mods #{@ns_decl}><subject><temporal encoding='iso8601'>197505</temporal></subject></mods>"
           @smods_rec = Stanford::Mods::Record.new
           @smods_rec.from_str(m)
-          expect(@smods_rec.sw_logger).to receive(:info).with(/#{@fake_druid} has subject temporal element with untranslated encoding: <temporal encoding=.*>197505<\/temporal>/)
+          expect(@smods_rec.sw_logger).to receive(:info).with(/ has subject temporal element with untranslated encoding: <temporal encoding=.*>197505<\/temporal>/)
           @smods_rec.subject_other_subvy_search
         end
         it "should be nil if there are only empty values in the MODS" do
@@ -275,13 +275,16 @@ describe "Subject fields (searchworks.rb)" do
     end # subject_other_subvy_search
 
     context "subject_all_search" do
+      before :each do
+        allow(@smods_rec.sw_logger).to receive(:info).with(/ has subject geographicCode element with untranslated encoding \(iso3166\): <geographicCode authority=.*>us<\/geographicCode>/)
+      end
       it "should be nil if there are no values in the MODS" do
         @smods_rec = Stanford::Mods::Record.new
         @smods_rec.from_str(@ng_mods_no_subject.to_s)
         expect(@smods_rec.subject_all_search).to be_nil
       end
       it "should contain top level <genre> element data" do
-        expect(@smods_rec.subject_all_search).to include(@genre)
+         expect(@smods_rec.subject_all_search).to include(@genre)
       end
       it "should not contain cartographic sub element" do
         expect(@smods_rec.subject_all_search).not_to include(@cart_coord)
@@ -292,6 +295,8 @@ describe "Subject fields (searchworks.rb)" do
       it "should contain all other subject subelement data" do
         @smods_rec = Stanford::Mods::Record.new
         @smods_rec.from_str(@subject_mods)
+        ## need to re-allow/expect :info message with newly assigned object
+        expect(@smods_rec.sw_logger).to receive(:info).with(/ has subject geographicCode element with untranslated encoding \(iso3166\): <geographicCode authority=.*>us<\/geographicCode>/)
         expect(@smods_rec.subject_all_search).to include(@s_genre)
         expect(@smods_rec.subject_all_search).to include(@geo)
         expect(@smods_rec.subject_all_search).to include(@hier_geo_country)
@@ -302,7 +307,7 @@ describe "Subject fields (searchworks.rb)" do
         expect(@smods_rec.subject_all_search).to include(@topic)
       end
     end # subject_all_search
-    
+
   end  # search fields
 
   context "facet fields" do
@@ -367,7 +372,7 @@ describe "Subject fields (searchworks.rb)" do
       end
     end
 
-    context "era_facet" do      
+    context "era_facet" do
       it "should be temporal subelement with the trailing punctuation removed" do
         m = "<mods #{@ns_decl}><subject>
               <temporal>comma,</temporal>
