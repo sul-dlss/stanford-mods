@@ -13,18 +13,18 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
       m = "<mods #{@ns_decl}><language><languageTerm authority='iso639-2b' type='code'>per ara, dut</languageTerm></language></mods>"
       @smods_rec.from_str m
       langs = @smods_rec.sw_language_facet
-      langs.size.should == 3
-      langs.should include("Persian")
-      langs.should include("Arabic")
-      langs.should include("Dutch")
-      langs.should_not include("Dutch; Flemish")
+      expect(langs.size).to eq(3)
+      expect(langs).to include("Persian")
+      expect(langs).to include("Arabic")
+      expect(langs).to include("Dutch")
+      expect(langs).not_to include("Dutch; Flemish")
     end
     it "should not have duplicates" do
       m = "<mods #{@ns_decl}><language><languageTerm type='code' authority='iso639-2b'>eng</languageTerm><languageTerm type='text'>English</languageTerm></language></mods>"
       @smods_rec.from_str m
       langs = @smods_rec.sw_language_facet
-      langs.size.should == 1
-      langs.should include("English")
+      expect(langs.size).to eq(1)
+      expect(langs).to include("English")
     end    
   end
   
@@ -60,52 +60,52 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
       @smods_rec.from_str(m)
     end
     it "main author (for author_1xx_search)" do
-      @smods_rec.should_receive(:main_author_w_date) # in stanford-mods.rb
+      expect(@smods_rec).to receive(:main_author_w_date) # in stanford-mods.rb
       @smods_rec.sw_main_author
     end
     it "additional authors (for author_7xx_search)" do
-      @smods_rec.should_receive(:additional_authors_w_dates) # in stanford-mods.rb
+      expect(@smods_rec).to receive(:additional_authors_w_dates) # in stanford-mods.rb
       @smods_rec.sw_addl_authors
     end
     it "person authors (for author_person_facet, author_person_display)" do
-      @smods_rec.should_receive(:personal_names_w_dates) # in Mods gem
+      expect(@smods_rec).to receive(:personal_names_w_dates) # in Mods gem
       @smods_rec.sw_person_authors
     end
     it "non-person authors (for author_other_facet)" do
-      @smods_rec.sw_impersonal_authors.should == ['Watchful Eye, 1850-', 'Exciting Prints', 'plain', 'conference', 'family']
+      expect(@smods_rec.sw_impersonal_authors).to eq(['Watchful Eye, 1850-', 'Exciting Prints', 'plain', 'conference', 'family'])
     end
     it "corporate authors (for author_corp_display)" do
-      @smods_rec.sw_corporate_authors.should == ['Watchful Eye, 1850-', 'Exciting Prints']
+      expect(@smods_rec.sw_corporate_authors).to eq(['Watchful Eye, 1850-', 'Exciting Prints'])
     end
     it "meeting authors (for author_meeting_display)" do
-      @smods_rec.sw_meeting_authors.should == ['conference']
+      expect(@smods_rec.sw_meeting_authors).to eq(['conference'])
     end    
     context "sort author" do
       it "should be a String" do
-        @smods_rec.sw_sort_author.should == 'qJerk'
+        expect(@smods_rec.sw_sort_author).to eq('qJerk')
       end
       it "should include the main author, as retrieved by :main_author_w_date" do
-        @smods_rec.should_receive(:main_author_w_date) # in stanford-mods.rb
+        expect(@smods_rec).to receive(:main_author_w_date) # in stanford-mods.rb
         @smods_rec.sw_sort_author
       end
       it "should append the sort title, as retrieved by :sort_title" do
-        @smods_rec.should_receive(:sort_title) # in Mods gem
+        expect(@smods_rec).to receive(:sort_title) # in Mods gem
         @smods_rec.sw_sort_author
       end
       it "should not begin or end with whitespace" do
-        @smods_rec.sw_sort_author.should == @smods_rec.sw_sort_author.strip
+        expect(@smods_rec.sw_sort_author).to eq(@smods_rec.sw_sort_author.strip)
       end
       it "should substitute the java Character.MAX_CODE_POINT for nil main_author so missing main authors sort last" do
         r = Stanford::Mods::Record.new
         r.from_str "<mods #{@ns_decl}><titleInfo><title>Jerk</title></titleInfo></mods>"
-        r.sw_sort_author.should =~ / Jerk$/
-        r.sw_sort_author.should match("\u{10FFFF}")
-        r.sw_sort_author.should match("\xF4\x8F\xBF\xBF")
+        expect(r.sw_sort_author).to match(/ Jerk$/)
+        expect(r.sw_sort_author).to match("\u{10FFFF}")
+        expect(r.sw_sort_author).to match("\xF4\x8F\xBF\xBF")
       end
       it "should not have any punctuation marks" do
         r = Stanford::Mods::Record.new
         r.from_str "<mods #{@ns_decl}><titleInfo><title>J,e.r;;;k</title></titleInfo></mods>"
-        r.sw_sort_author.should =~ / Jerk$/
+        expect(r.sw_sort_author).to match(/ Jerk$/)
       end
     end
   end # context sw author methods

@@ -11,7 +11,7 @@ describe "title fields (searchworks.rb)" do
   
   context "short title (for title_245a_search, title_245a_display) " do
     it "should call :short_titles" do
-      @smods_rec.should_receive(:short_titles) # in Mods gem
+      expect(@smods_rec).to receive(:short_titles) # in Mods gem
       @smods_rec.sw_short_title
     end
     it "should be a String" do
@@ -552,7 +552,7 @@ describe "title fields (searchworks.rb)" do
       expect(@smods_rec.sw_sort_title).to be_an_instance_of(String)
     end
     it "should use the sw_full_title as a starting point" do
-      @smods_rec.should_receive(:sw_full_title)
+      expect(@smods_rec).to receive(:sw_full_title)
       @smods_rec.sw_sort_title
     end
     it "should not begin or end with whitespace" do

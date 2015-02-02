@@ -42,18 +42,18 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
     
     context "sw_subject_names" do
       it "should contain <subject><name><namePart> values" do
-        @sw_subject_names.should include(@s_name)
+        expect(@sw_subject_names).to include(@s_name)
       end
       it "should not contain non-name subject subelements" do
-        @sw_subject_names.should_not include(@cart_coord)
-        @sw_subject_names.should_not include(@s_genre)
-        @sw_subject_names.should_not include(@geo)
-        @sw_subject_names.should_not include(@geo_code)
-        @sw_subject_names.should_not include(@hier_geo_country)
-        @sw_subject_names.should_not include(@occupation)
-        @sw_subject_names.should_not include(@temporal)
-        @sw_subject_names.should_not include(@topic)
-        @sw_subject_names.should_not include(@s_title)
+        expect(@sw_subject_names).not_to include(@cart_coord)
+        expect(@sw_subject_names).not_to include(@s_genre)
+        expect(@sw_subject_names).not_to include(@geo)
+        expect(@sw_subject_names).not_to include(@geo_code)
+        expect(@sw_subject_names).not_to include(@hier_geo_country)
+        expect(@sw_subject_names).not_to include(@occupation)
+        expect(@sw_subject_names).not_to include(@temporal)
+        expect(@sw_subject_names).not_to include(@topic)
+        expect(@sw_subject_names).not_to include(@s_title)
       end
       it "should not contain subject/name/role" do
         m = "<mods #{@ns_decl}>
@@ -66,7 +66,7 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
               	</role>
               </name></subject></mods>"
         @smods_rec.from_str m
-        @smods_rec.sw_subject_names.find { |sn| sn =~ /cre/ }.should == nil
+        expect(@smods_rec.sw_subject_names.find { |sn| sn =~ /cre/ }).to eq(nil)
       end
       it "should not contain subject/name/affiliation" do
         m = "<mods #{@ns_decl}>
@@ -76,7 +76,7 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
               	<affiliation>Chemistry Dept., American University</affiliation>
               </name></subject></mods>"
         @smods_rec.from_str m
-        @smods_rec.sw_subject_names.find { |sn| sn =~ /Chemistry/ }.should == nil
+        expect(@smods_rec.sw_subject_names.find { |sn| sn =~ /Chemistry/ }).to eq(nil)
       end
       it "should not contain subject/name/description" do
         m = "<mods #{@ns_decl}>
@@ -85,7 +85,7 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
               	<description>American artist, 20th c.</description>
               </name></subject></mods>"
         @smods_rec.from_str m
-        @smods_rec.sw_subject_names.find { |sn| sn =~ /artist/ }.should == nil
+        expect(@smods_rec.sw_subject_names.find { |sn| sn =~ /artist/ }).to eq(nil)
       end
       it "should not include top level name element" do
         m = "<mods #{@ns_decl}>
@@ -94,7 +94,7 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
               	<description>American artist, 20th c.</description>
               </name></mods>"
         @smods_rec.from_str m
-        @smods_rec.sw_subject_names.should == []
+        expect(@smods_rec.sw_subject_names).to eq([])
       end
       it "should have one value for each name element" do
         m = "<mods #{@ns_decl}>
@@ -107,17 +107,17 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
               </subject>
               </mods>"
         @smods_rec.from_str m
-        @smods_rec.sw_subject_names.should == ['first', 'second', 'third']
+        expect(@smods_rec.sw_subject_names).to eq(['first', 'second', 'third'])
       end
       it "should be an empty Array if there are no values in the mods" do
         m = "<mods #{@ns_decl}><note>notit</note></mods>"
         @smods_rec.from_str m
-        @smods_rec.sw_subject_names.should == []
+        expect(@smods_rec.sw_subject_names).to eq([])
       end
       it "should be an empty Array if there are empty values in the mods" do
         m = "<mods #{@ns_decl}><subject><name><namePart/></name></subject><note>notit</note></mods>"
         @smods_rec.from_str m
-        @smods_rec.sw_subject_names.should == []
+        expect(@smods_rec.sw_subject_names).to eq([])
       end
       context "combining subelements" do
         before(:all) do
@@ -132,33 +132,33 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
           @smods_rec.from_str m
         end
         it "uses a ', ' as the separator by default" do
-          @smods_rec.sw_subject_names.should == ['first, second']
+          expect(@smods_rec.sw_subject_names).to eq(['first, second'])
         end          
         it "honors any string value passed in for the separator" do
-          @smods_rec.sw_subject_names(' --').should == ['first --second']
+          expect(@smods_rec.sw_subject_names(' --')).to eq(['first --second'])
         end
       end
     end # sw_subject_names
     
     context "sw_subject_titles" do
       it "should contain <subject><titleInfo> subelement values" do
-        @sw_subject_titles.should include(@s_title)
+        expect(@sw_subject_titles).to include(@s_title)
       end
       it "should not contain non-name subject subelements" do
-        @sw_subject_titles.should_not include(@cart_coord)
-        @sw_subject_titles.should_not include(@s_genre)
-        @sw_subject_titles.should_not include(@geo)
-        @sw_subject_titles.should_not include(@geo_code)
-        @sw_subject_titles.should_not include(@hier_geo_country)
-        @sw_subject_titles.should_not include(@s_name)
-        @sw_subject_titles.should_not include(@occupation)
-        @sw_subject_titles.should_not include(@temporal)
-        @sw_subject_titles.should_not include(@topic)
+        expect(@sw_subject_titles).not_to include(@cart_coord)
+        expect(@sw_subject_titles).not_to include(@s_genre)
+        expect(@sw_subject_titles).not_to include(@geo)
+        expect(@sw_subject_titles).not_to include(@geo_code)
+        expect(@sw_subject_titles).not_to include(@hier_geo_country)
+        expect(@sw_subject_titles).not_to include(@s_name)
+        expect(@sw_subject_titles).not_to include(@occupation)
+        expect(@sw_subject_titles).not_to include(@temporal)
+        expect(@sw_subject_titles).not_to include(@topic)
       end
       it "should not include top level titleInfo element" do
         m = "<mods #{@ns_decl}><titleInfo><title>Oklahoma</title></titleInfo></mods>"
         @smods_rec.from_str m
-        @smods_rec.sw_subject_titles.should == []
+        expect(@smods_rec.sw_subject_titles).to eq([])
       end
       it "should have one value for each titleInfo element" do
         m = "<mods #{@ns_decl}>
@@ -171,17 +171,17 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
               </subject>
               </mods>"
         @smods_rec.from_str m
-        @smods_rec.sw_subject_titles.should == ['first', 'second', 'third']
+        expect(@smods_rec.sw_subject_titles).to eq(['first', 'second', 'third'])
       end
       it "should be an empty Array if there are no values in the mods" do
         m = "<mods #{@ns_decl}><note>notit</note></mods>"
         @smods_rec.from_str m
-        @smods_rec.sw_subject_titles.should == []
+        expect(@smods_rec.sw_subject_titles).to eq([])
       end
       it "should be an empty Array if there are empty values in the mods" do
         m = "<mods #{@ns_decl}><subject><titleInfo><title/></titleInfo></subject><note>notit</note></mods>"
         @smods_rec.from_str m
-        @smods_rec.sw_subject_titles.should == []
+        expect(@smods_rec.sw_subject_titles).to eq([])
       end
       context "combining subelements" do
         before(:all) do
@@ -196,10 +196,10 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
           @smods_rec.from_str m
         end
         it "uses a ' ' as the separator by default" do
-          @smods_rec.sw_subject_titles.should == ['first second']
+          expect(@smods_rec.sw_subject_titles).to eq(['first second'])
         end          
         it "honors any string value passed in for the separator" do
-          @smods_rec.sw_subject_titles(' --').should == ['first --second']
+          expect(@smods_rec.sw_subject_titles(' --')).to eq(['first --second'])
         end
         it "includes all subelements in the order of occurrence" do
           m = "<mods #{@ns_decl}>
@@ -214,7 +214,7 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
                 </subject>
               </mods>"
           @smods_rec.from_str m
-          @smods_rec.sw_subject_titles.should == ['1 2 3 4 5']
+          expect(@smods_rec.sw_subject_titles).to eq(['1 2 3 4 5'])
         end
       end
     end # sw_subject_titles
@@ -222,45 +222,45 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
     
     context "sw_geographic_search" do
       it "should contain subject <geographic> subelement data" do
-        @sw_geographic_search.should include(@geo)
+        expect(@sw_geographic_search).to include(@geo)
       end
       it "should contain subject <hierarchicalGeographic> subelement data" do
-        @sw_geographic_search.should include(@hier_geo_country)
+        expect(@sw_geographic_search).to include(@hier_geo_country)
       end
       it "should contain translation of <geographicCode> subelement data with translated authorities" do
         m = "<mods #{@ns_decl}><subject><geographicCode authority='marcgac'>e-er</geographicCode></subject></mods>"
         @smods_rec.from_str m
-        @smods_rec.sw_geographic_search.should include('Estonia')
+        expect(@smods_rec.sw_geographic_search).to include('Estonia')
       end
       it "should not contain other subject element data" do
-        @sw_geographic_search.should_not include(@genre)
-        @sw_geographic_search.should_not include(@cart_coord)
-        @sw_geographic_search.should_not include(@s_genre)
-        @sw_geographic_search.should_not include(@s_name)
-        @sw_geographic_search.should_not include(@occupation)
-        @sw_geographic_search.should_not include(@temporal)
-        @sw_geographic_search.should_not include(@topic)
-        @sw_geographic_search.should_not include(@s_title)
+        expect(@sw_geographic_search).not_to include(@genre)
+        expect(@sw_geographic_search).not_to include(@cart_coord)
+        expect(@sw_geographic_search).not_to include(@s_genre)
+        expect(@sw_geographic_search).not_to include(@s_name)
+        expect(@sw_geographic_search).not_to include(@occupation)
+        expect(@sw_geographic_search).not_to include(@temporal)
+        expect(@sw_geographic_search).not_to include(@topic)
+        expect(@sw_geographic_search).not_to include(@s_title)
       end
       it "should be [] if there are no values in the MODS" do
         m = "<mods #{@ns_decl}><note>notit</note></mods>"
         @smods_rec.from_str m
-        @smods_rec.sw_geographic_search.should == []
+        expect(@smods_rec.sw_geographic_search).to eq([])
       end
       it "should not be empty Array if there are only subject/geographic elements" do
         m = "<mods #{@ns_decl}><subject><geographic>#{@geo}</geographic></subject></mods>"
         @smods_rec.from_str m
-        @smods_rec.sw_geographic_search.should == [@geo]
+        expect(@smods_rec.sw_geographic_search).to eq([@geo])
       end
       it "should not be empty Array if there are only subject/hierarchicalGeographic" do
         m = "<mods #{@ns_decl}><subject><hierarchicalGeographic><country>#{@hier_geo_country}</country></hierarchicalGeographic></subject></mods>"
         @smods_rec.from_str m
-        @smods_rec.sw_geographic_search.should == [@hier_geo_country]
+        expect(@smods_rec.sw_geographic_search).to eq([@hier_geo_country])
       end
       it "should not be empty Array if there are only subject/geographicCode elements" do
         m = "<mods #{@ns_decl}><subject><geographicCode authority='marcgac'>e-er</geographicCode></subject></mods>"
         @smods_rec.from_str m
-        @smods_rec.sw_geographic_search.should == ['Estonia']
+        expect(@smods_rec.sw_geographic_search).to eq(['Estonia'])
       end
       context "geographic subelement" do
         it "should have a separate value for each geographic element" do
@@ -272,12 +272,12 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
                 <subject><geographic>Washington (D.C.)</geographic></subject>
               </mods>"
           @smods_rec.from_str m
-          @smods_rec.sw_geographic_search.should == ['Mississippi', 'Tippah County', 'Washington (D.C.)']
+          expect(@smods_rec.sw_geographic_search).to eq(['Mississippi', 'Tippah County', 'Washington (D.C.)'])
         end
         it "should be empty Array if there are only empty values in the MODS" do
           m = "<mods #{@ns_decl}><subject><geographic/></subject><note>notit</note></mods>"
           @smods_rec.from_str m
-          @smods_rec.sw_geographic_search.should == []
+          expect(@smods_rec.sw_geographic_search).to eq([])
         end
       end
       context "hierarchicalGeographic subelement" do
@@ -290,12 +290,12 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
                 <subject><hierarchicalGeographic><area>third</area></hierarchicalGeographic></subject>
               </mods>"
           @smods_rec.from_str m
-          @smods_rec.sw_geographic_search.should == ['first', 'second', 'third']
+          expect(@smods_rec.sw_geographic_search).to eq(['first', 'second', 'third'])
         end
         it "should be empty Array if there are only empty values in the MODS" do
           m = "<mods #{@ns_decl}><subject><hierarchicalGeographic/></subject><note>notit</note></mods>"
           @smods_rec.from_str m
-          @smods_rec.sw_geographic_search.should == []
+          expect(@smods_rec.sw_geographic_search).to eq([])
         end
         context "combining subelements" do
           before(:all) do
@@ -310,10 +310,10 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
             @smods_rec.from_str m
           end
           it "uses a space as the separator by default" do
-            @smods_rec.sw_geographic_search.should == ['Canada British Columbia Vancouver']
+            expect(@smods_rec.sw_geographic_search).to eq(['Canada British Columbia Vancouver'])
           end          
           it "honors any string value passed in for the separator" do
-            @smods_rec.sw_geographic_search(' --').should == ['Canada --British Columbia --Vancouver']
+            expect(@smods_rec.sw_geographic_search(' --')).to eq(['Canada --British Columbia --Vancouver'])
           end
         end
       end # hierarchicalGeographic
@@ -329,19 +329,19 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
           @geo_search_from_codes = @smods_rec.sw_geographic_search   
         end
         it "should not add untranslated values" do
-          @geo_search_from_codes.should_not include('n-us-md')
-          @geo_search_from_codes.should_not include('e-er')
-          @geo_search_from_codes.should_not include('mg')
-          @geo_search_from_codes.should_not include('us')
+          expect(@geo_search_from_codes).not_to include('n-us-md')
+          expect(@geo_search_from_codes).not_to include('e-er')
+          expect(@geo_search_from_codes).not_to include('mg')
+          expect(@geo_search_from_codes).not_to include('us')
         end
         it "should translate marcgac codes" do
-          @geo_search_from_codes.should include('Estonia')
+          expect(@geo_search_from_codes).to include('Estonia')
         end
         it "should translate marccountry codes" do
-          @geo_search_from_codes.should include('Madagascar')
+          expect(@geo_search_from_codes).to include('Madagascar')
         end
         it "should not translate other codes" do
-          @geo_search_from_codes.should_not include('United States')
+          expect(@geo_search_from_codes).not_to include('United States')
         end
         it "should have a separate value for each geographicCode element" do
           m = "<mods #{@ns_decl}>
@@ -352,12 +352,12 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
                 <subject><geographicCode authority='marcgac'>n-us-md</geographicCode></subject>
               </mods>"
           @smods_rec.from_str m
-          @smods_rec.sw_geographic_search.should == ['Estonia', 'Madagascar', 'Maryland']
+          expect(@smods_rec.sw_geographic_search).to eq(['Estonia', 'Madagascar', 'Maryland'])
         end
         it "should be empty Array if there are only empty values in the MODS" do
           m = "<mods #{@ns_decl}><subject><geographicCode/></subject><note>notit</note></mods>"
           @smods_rec.from_str m
-          @smods_rec.sw_geographic_search.should == []
+          expect(@smods_rec.sw_geographic_search).to eq([])
         end
         it "should add the translated value if it wasn't present already" do
           m = "<mods #{@ns_decl}>
@@ -365,8 +365,8 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
             <subject><geographicCode authority='marcgac'>e-er</geographicCode></subject>
           </mods>"
           @smods_rec.from_str m
-          @smods_rec.sw_geographic_search.size.should == 2
-          @smods_rec.sw_geographic_search.should include('Estonia')
+          expect(@smods_rec.sw_geographic_search.size).to eq(2)
+          expect(@smods_rec.sw_geographic_search).to include('Estonia')
         end
         it "should not add the translated value if it was already present" do
           m = "<mods #{@ns_decl}>
@@ -374,8 +374,8 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
             <subject><geographicCode authority='marcgac'>e-er</geographicCode></subject>
           </mods>"
           @smods_rec.from_str m
-          @smods_rec.sw_geographic_search.size.should == 1
-          @smods_rec.sw_geographic_search.should == ['Estonia']
+          expect(@smods_rec.sw_geographic_search.size).to eq(1)
+          expect(@smods_rec.sw_geographic_search).to eq(['Estonia'])
         end
       end
     end # sw_geographic_search
