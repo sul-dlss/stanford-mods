@@ -43,7 +43,7 @@ describe "Subject fields (searchworks.rb)" do
         m = "<mods #{@ns_decl}></mods>"
         @smods_rec = Stanford::Mods::Record.new
         @smods_rec.from_str(m)
-        expect(@smods_rec.topic_search).to eq(nil)
+        expect(@smods_rec.topic_search).to be_nil
       end
       it "should contain subject <topic> subelement data" do
         expect(@smods_rec.topic_search).to include(@topic)
@@ -91,7 +91,7 @@ describe "Subject fields (searchworks.rb)" do
           m = "<mods #{@ns_decl}><subject><topic/></subject><note>notit</note></mods>"
           @smods_rec = Stanford::Mods::Record.new
           @smods_rec.from_str(m)
-          expect(@smods_rec.topic_search).to eq(nil)
+          expect(@smods_rec.topic_search).to be_nil
         end
       end
     end # topic_search
@@ -128,7 +128,7 @@ describe "Subject fields (searchworks.rb)" do
         m = "<mods #{@ns_decl}></mods>"
         @smods_rec = Stanford::Mods::Record.new
         @smods_rec.from_str(m)
-        expect(@smods_rec.subject_other_search).to eq(nil)
+        expect(@smods_rec.subject_other_search).to be_nil
       end
       it "should contain subject <name> SUBelement data" do
         expect(@smods_rec.subject_other_search).to include(@s_name)
@@ -186,7 +186,7 @@ describe "Subject fields (searchworks.rb)" do
           m = "<mods #{@ns_decl}><subject><occupation/></subject><note>notit</note></mods>"
           @smods_rec = Stanford::Mods::Record.new
           @smods_rec.from_str(m)
-          expect(@smods_rec.subject_other_search).to eq(nil)
+          expect(@smods_rec.subject_other_search).to be_nil
         end
       end
     end # subject_other_search
@@ -195,7 +195,7 @@ describe "Subject fields (searchworks.rb)" do
       it "should be nil if there are no values in the MODS" do
         @smods_rec = Stanford::Mods::Record.new
         @smods_rec.from_str(@ng_mods_no_subject.to_s)
-        expect(@smods_rec.subject_other_subvy_search).to eq(nil)
+        expect(@smods_rec.subject_other_subvy_search).to be_nil
       end
       it "should contain subject <temporal> subelement data" do
         expect(@smods_rec.subject_other_subvy_search).to include(@temporal)
@@ -250,7 +250,7 @@ describe "Subject fields (searchworks.rb)" do
           m = "<mods #{@ns_decl}><subject><temporal/></subject><note>notit</note></mods>"
           @smods_rec = Stanford::Mods::Record.new
           @smods_rec.from_str(m)
-          expect(@smods_rec.subject_other_subvy_search).to eq(nil)
+          expect(@smods_rec.subject_other_subvy_search).to be_nil
         end
       end
       context "genre subelement" do
@@ -270,7 +270,7 @@ describe "Subject fields (searchworks.rb)" do
           m = "<mods #{@ns_decl}><subject><genre/></subject><note>notit</note></mods>"
           @smods_rec = Stanford::Mods::Record.new
           @smods_rec.from_str(m)
-          expect(@smods_rec.subject_other_subvy_search).to eq(nil)
+          expect(@smods_rec.subject_other_subvy_search).to be_nil
         end
       end
     end # subject_other_subvy_search
@@ -279,7 +279,7 @@ describe "Subject fields (searchworks.rb)" do
       it "should be nil if there are no values in the MODS" do
         @smods_rec = Stanford::Mods::Record.new
         @smods_rec.from_str(@ng_mods_no_subject.to_s)
-        expect(@smods_rec.subject_all_search).to eq(nil)
+        expect(@smods_rec.subject_all_search).to be_nil
       end
       it "should contain top level <genre> element data" do
         expect(@smods_rec.subject_all_search).to include(@genre)
@@ -338,7 +338,7 @@ describe "Subject fields (searchworks.rb)" do
       it "should be nil if there are no values" do
         @smods_rec = Stanford::Mods::Record.new
         @smods_rec.from_str(@ng_mods_no_subject.to_s)
-        expect(@smods_rec.topic_facet).to eq(nil)
+        expect(@smods_rec.topic_facet).to be_nil
       end
     end
 
@@ -364,7 +364,7 @@ describe "Subject fields (searchworks.rb)" do
       it "should be nil if there are no values" do
         @smods_rec = Stanford::Mods::Record.new
         @smods_rec.from_str(@ng_mods_no_subject.to_s)
-        expect(@smods_rec.  geographic_facet).to eq(nil)
+        expect(@smods_rec.geographic_facet).to be_nil
       end
     end
 
@@ -386,7 +386,7 @@ describe "Subject fields (searchworks.rb)" do
       it "should be nil if there are no values" do
         @smods_rec = Stanford::Mods::Record.new
         @smods_rec.from_str(@ng_mods_no_subject.to_s)
-        expect(@smods_rec.era_facet).to eq(nil)
+        expect(@smods_rec.era_facet).to be_nil
       end
     end
 

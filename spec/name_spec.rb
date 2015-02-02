@@ -74,7 +74,7 @@ describe "name/author concepts" do
       end
       it "should skip names when role isn't marcrelator authority" do
         @smods_rec.from_str(@mods_start + @plain_creator_non_mr + @mods_end)
-        expect(@smods_rec.main_author_w_date).to eq(nil)
+        expect(@smods_rec.main_author_w_date).to be_nil
       end
       it "should skip names without roles in favor of marcrelator role of 'Creator'" do
         @smods_rec.from_str(@mods_start + @personal_no_role + @plain_creator_text + @other_no_role + @mods_end)
@@ -101,7 +101,7 @@ describe "name/author concepts" do
       end
       it "should skip names when role isn't marcrelator authority" do
         @smods_rec.from_str(@mods_start + @plain_author_non_mr + @mods_end)
-        expect(@smods_rec.main_author_w_date).to eq(nil)
+        expect(@smods_rec.main_author_w_date).to be_nil
       end
       it "should skip names without roles in favor of marcrelator role of 'Author'" do
         @smods_rec.from_str(@mods_start + @personal_no_role + @plain_author_text + @other_no_role + @mods_end)
@@ -136,7 +136,7 @@ describe "name/author concepts" do
     
     it "should be nil if there is no name with marcrelator role of 'Creator' or 'Author' and no name without a role" do
       @smods_rec.from_str(@mods_start + @plain_author_non_mr + @personal_other_role + @mods_end)
-      expect(@smods_rec.main_author_w_date).to eq(nil)
+      expect(@smods_rec.main_author_w_date).to be_nil
     end
 
     it "should use the display name if it is present" do
@@ -235,7 +235,7 @@ describe "name/author concepts" do
       expect(@addl_authors).to include('Watchful Eye, 1850-')
     end
     it "should not include roles" do
-      expect(@addl_authors.find { |a| a =~ Regexp.new('lithographer') }).to eq(nil)
+      expect(@addl_authors.find { |a| a =~ Regexp.new('lithographer') }).to be_nil
     end
   end # additional_authors_w_dates
   

@@ -36,8 +36,8 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
       </mods>"
       @smods_rec.from_str m
       @sw_geographic_search = @smods_rec.sw_geographic_search 
-      @sw_subject_titles = @smods_rec.sw_subject_titles
-      @sw_subject_names = @smods_rec.sw_subject_names
+      @sw_subject_titles    = @smods_rec.sw_subject_titles
+      @sw_subject_names     = @smods_rec.sw_subject_names
     end
     
     context "sw_subject_names" do
@@ -66,7 +66,7 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
               	</role>
               </name></subject></mods>"
         @smods_rec.from_str m
-        expect(@smods_rec.sw_subject_names.find { |sn| sn =~ /cre/ }).to eq(nil)
+        expect(@smods_rec.sw_subject_names.find { |sn| sn =~ /cre/ }).to be_nil
       end
       it "should not contain subject/name/affiliation" do
         m = "<mods #{@ns_decl}>
@@ -76,7 +76,7 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
               	<affiliation>Chemistry Dept., American University</affiliation>
               </name></subject></mods>"
         @smods_rec.from_str m
-        expect(@smods_rec.sw_subject_names.find { |sn| sn =~ /Chemistry/ }).to eq(nil)
+        expect(@smods_rec.sw_subject_names.find { |sn| sn =~ /Chemistry/ }).to be_nil
       end
       it "should not contain subject/name/description" do
         m = "<mods #{@ns_decl}>
@@ -85,7 +85,7 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
               	<description>American artist, 20th c.</description>
               </name></subject></mods>"
         @smods_rec.from_str m
-        expect(@smods_rec.sw_subject_names.find { |sn| sn =~ /artist/ }).to eq(nil)
+        expect(@smods_rec.sw_subject_names.find { |sn| sn =~ /artist/ }).to be_nil
       end
       it "should not include top level name element" do
         m = "<mods #{@ns_decl}>
