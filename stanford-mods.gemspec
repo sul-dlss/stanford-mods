@@ -22,17 +22,17 @@ Gem::Specification.new do |gem|
   # gem.add_runtime_dependency 'nokogiri'
 
   # Development dependencies
-  # Bundler will install these gems too if you've checked out solrmarc-wrapper source from git and run 'bundle install'
-  # It will not add these as dependencies if you require solrmarc-wrapper for other projects
+  # Bundler WILL install these gems too if you've checked out from git and run 'bundle install'
+  # Bundler WILL NOT add these as dependencies if you gem install or add this gem to your Gemfile
   gem.add_development_dependency "rake"
   # docs
   gem.add_development_dependency "rdoc"
   gem.add_development_dependency "yard"
   # tests
-	gem.add_development_dependency 'rspec'
-	# using coveralls with travis now
-	# gem.add_development_dependency 'simplecov'
-	# gem.add_development_dependency 'simplecov-rcov'
-	# gem.add_development_dependency 'ruby-debug19'
+  gem.add_development_dependency 'rspec'
+  # using coveralls with travis now
+  # gem.add_development_dependency 'simplecov'
+  # gem.add_development_dependency 'simplecov-rcov'
+  # gem.add_development_dependency 'ruby-debug19'
 
 end

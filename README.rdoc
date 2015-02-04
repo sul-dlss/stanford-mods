@@ -26,7 +26,6 @@ Or install it yourself as:
 
 1. add stanford-mods to your gemfile
 2. require 'stanford-mods'
-3. (I don't think you will also need to require 'mods', but you might)
 
   > m = Stanford::Mods::Record.new
   > m.from_str('<mods><genre>ape</genre></mods>')

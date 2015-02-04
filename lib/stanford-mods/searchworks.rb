@@ -1,6 +1,8 @@
 # encoding: UTF-8
 require 'stanford-mods/searchworks_languages'
 require 'logger'
+require 'mods'
+
 # SearchWorks specific wranglings of MODS metadata as a mixin to the Stanford::Mods::Record object
 module Stanford
   module Mods
