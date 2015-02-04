@@ -15,9 +15,9 @@ Gem::Specification.new do |gem|
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^spec/})
   gem.require_paths = ["lib"]
-  
+
   gem.add_dependency 'mods'
-  
+
   # Runtime dependencies
   # gem.add_runtime_dependency 'nokogiri'
 

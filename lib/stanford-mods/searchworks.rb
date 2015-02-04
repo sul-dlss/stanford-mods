@@ -8,16 +8,16 @@ module Stanford
   module Mods
 
     class Record < ::Mods::Record
-      
+
       # include langagues known to SearchWorks; try to error correct when possible (e.g. when ISO-639 disagrees with MARC standard)
       def sw_language_facet
         result = []
-        @mods_ng_xml.language.each { |n| 
+        @mods_ng_xml.language.each { |n|
           # get languageTerm codes and add their translations to the result
-          n.code_term.each { |ct| 
+          n.code_term.each { |ct|
             if ct.authority.match(/^iso639/)
               begin
-                vals = ct.text.split(/[,|\ ]/).reject {|x| x.strip.length == 0 } 
+                vals = ct.text.split(/[,|\ ]/).reject {|x| x.strip.length == 0 }
                 vals.each do |v|
                   iso639_val = ISO_639.find(v.strip).english_name
                   if SEARCHWORKS_LANGUAGES.has_value?(iso639_val)
@@ -31,14 +31,14 @@ module Stanford
                 p "Couldn't find english name for #{ct.text}"
               end
             else
-              vals = ct.text.split(/[,|\ ]/).reject {|x| x.strip.length == 0 } 
+              vals = ct.text.split(/[,|\ ]/).reject {|x| x.strip.length == 0 }
               vals.each do |v|
                 result << SEARCHWORKS_LANGUAGES[v.strip]
               end
             end
           }
           # add languageTerm text values
-          n.text_term.each { |tt| 
+          n.text_term.each { |tt|
             val = tt.text.strip
             result << val if val.length > 0 && SEARCHWORKS_LANGUAGES.has_value?(val)
           }
@@ -50,42 +50,42 @@ module Stanford
         }
         result.uniq
       end # language_facet
-      
-      
+
+
       # ---- AUTHOR ----
-      
+
       # @return [String] value for author_1xx_search field
       def sw_main_author
         main_author_w_date
       end
-      
+
       # @return [Array<String>] values for author_7xx_search field
       def sw_addl_authors
         additional_authors_w_dates
       end
-      
+
       # @return [Array<String>] values for author_person_facet, author_person_display
       def sw_person_authors
         personal_names_w_dates
       end
-      
+
       # return the display_value_w_date for all <mods><name> elements that do not have type='personal'
       # @return [Array<String>] values for author_other_facet
       def sw_impersonal_authors
         @mods_ng_xml.plain_name.select {|n| n.type_at != 'personal'}.map { |n| n.display_value_w_date }
       end
-      
+
       # @return [Array<String>] values for author_corp_display
       def sw_corporate_authors
         val = @mods_ng_xml.plain_name.select {|n| n.type_at == 'corporate'}.map { |n| n.display_value_w_date }
         val
       end
-      
+
       # @return [Array<String>] values for author_meeting_display
       def sw_meeting_authors
         @mods_ng_xml.plain_name.select {|n| n.type_at == 'conference'}.map { |n| n.display_value_w_date }
       end
-      
+
       # Returns a sortable version of the main_author:
       #  main_author + sorting title
       # which is the mods approximation of the value created for a marc record
@@ -95,7 +95,7 @@ module Stanford
         val = '' + (main_author_w_date ? main_author_w_date : "\u{10FFFF} ") + ( sort_title ? sort_title : '')
         val.gsub(/[[:punct:]]*/, '').strip
       end
-      
+
       def main_author_w_date_test
         result = nil
         first_wo_role = nil
@@ -104,10 +104,10 @@ module Stanford
             first_wo_role ||= n
           end
           n.role.each { |r|
-            if r.authority.include?('marcrelator') && 
+            if r.authority.include?('marcrelator') &&
               (r.value.include?('Creator') || r.value.include?('Author'))
               result ||= n.display_value_w_date
-            end          
+            end
           }
         }
         if !result && first_wo_role
@@ -117,14 +117,14 @@ module Stanford
       end
 
       # ---- end AUTHOR ----
-      
+
       # ---- TITLE ----
 
       # @return [String] value for title_245a_search field
       def sw_short_title
         short_titles ? short_titles.first : nil
       end
-      
+
       # @return [String] value for title_245_search, title_full_display
       def sw_full_title
         outer_nodes = @mods_ng_xml.title_info
@@ -138,7 +138,7 @@ module Stanford
           subTitle = outer_node.subTitle.text.strip
           preParts = subTitle.empty? ? preSubTitle : preSubTitle + " : " + subTitle
           preParts.sub!(/\.$/, '') if preParts # remove trailing period
-          
+
           partName   = outer_node.partName.text.strip   unless outer_node.partName.text.strip.empty?
           partNumber = outer_node.partNumber.text.strip unless outer_node.partNumber.text.strip.empty?
           partNumber.sub!(/,$/, '') if partNumber # remove trailing comma
@@ -173,13 +173,13 @@ module Stanford
         end
         result
       end
-      
-      # this includes all titles except 
+
+      # this includes all titles except
       # @return [Array<String>] values for title_variant_search
       def sw_addl_titles
         full_titles.select { |s| s !~ Regexp.new(Regexp.escape(sw_short_title)) }
       end
-      
+
       # Returns a sortable version of the main title
       # @return [String] value for title_sort field
       def sw_sort_title
@@ -189,13 +189,13 @@ module Stanford
         if outer_node
           nonSort = outer_node.nonSort.text.strip.empty? ? nil : outer_node.nonSort.text.strip
         end
-        
+
         val = '' + ( sw_full_title ? sw_full_title : '')
         val.sub!(Regexp.new("^" + nonSort), '') if nonSort
         val.gsub!(/[[:punct:]]*/, '').strip
         val.squeeze(" ").strip
       end
-      
+
       #remove trailing commas
       # @deprecated in favor of sw_title_display
       def sw_full_title_without_commas
@@ -203,11 +203,11 @@ module Stanford
         result.sub!(/,$/, '') if result
         result
       end
-    
+
       # ---- end TITLE ----
 
       # ---- SUBJECT ----
-      
+
       # Values are the contents of:
       #   subject/geographic
       #   subject/hierarchicalGeographic
@@ -216,11 +216,11 @@ module Stanford
       # @return [Array<String>] values for geographic_search Solr field for this document or [] if none
       def sw_geographic_search(sep = ' ')
         result = term_values([:subject, :geographic]) || []
-        
+
         # hierarchicalGeographic has sub elements
-        @mods_ng_xml.subject.hierarchicalGeographic.each { |hg_node|  
+        @mods_ng_xml.subject.hierarchicalGeographic.each { |hg_node|
           hg_vals = []
-          hg_node.element_children.each { |e| 
+          hg_node.element_children.each { |e|
             hg_vals << e.text unless e.text.empty?
           }
           result << hg_vals.join(sep) unless hg_vals.empty?
@@ -228,14 +228,14 @@ module Stanford
 
         trans_code_vals = @mods_ng_xml.subject.geographicCode.translated_value
         if trans_code_vals
-          trans_code_vals.each { |val|  
+          trans_code_vals.each { |val|
             result << val if !result.include?(val)
           }
         end
 
-        result    
+        result
       end
-      
+
       # Values are the contents of:
       #   subject/name/namePart
       #  "Values from namePart subelements should be concatenated in the order they appear (e.g. "Shakespeare, William, 1564-1616")"
@@ -243,13 +243,13 @@ module Stanford
       # @return [Array<String>] values for names inside subject elements or [] if none
       def sw_subject_names(sep = ', ')
         result = []
-        @mods_ng_xml.subject.name_el.select { |n_el| n_el.namePart }.each { |name_el_w_np|  
+        @mods_ng_xml.subject.name_el.select { |n_el| n_el.namePart }.each { |name_el_w_np|
           parts = name_el_w_np.namePart.map { |npn| npn.text unless npn.text.empty? }.compact
           result << parts.join(sep).strip unless parts.empty?
         }
         result
       end
-      
+
       # Values are the contents of:
       #   subject/titleInfo/(subelements)
       # @param [String] sep - the separator string for joining titleInfo sub elements
@@ -262,7 +262,7 @@ module Stanford
         }
         result
       end
-            
+
       # Values are the contents of:
       #   mods/genre
       #   mods/subject/topic
@@ -281,13 +281,13 @@ module Stanford
       #   subject/title
       #   subject/occupation
       #  with trailing comma, semicolon, and backslash (and any preceding spaces) removed
-      # @return [Array<String>] values for the topic_facet Solr field for this document or nil if none 
+      # @return [Array<String>] values for the topic_facet Solr field for this document or nil if none
       def topic_facet
         vals = subject_topics ? Array.new(subject_topics) : []
         vals.concat(subject_names) if subject_names
         vals.concat(subject_titles) if subject_titles
         vals.concat(subject_occupations) if subject_occupations
-        vals.map! { |val| 
+        vals.map! { |val|
           v = val.sub(/[\\,;]$/, '')
           v.strip
         }
@@ -295,13 +295,13 @@ module Stanford
       end
 
       # geographic_search values with trailing comma, semicolon, and backslash (and any preceding spaces) removed
-      # @return [Array<String>] values for the geographic_facet Solr field for this document or nil if none 
+      # @return [Array<String>] values for the geographic_facet Solr field for this document or nil if none
       def geographic_facet
         geographic_search.map { |val| val.sub(/[\\,;]$/, '').strip } unless !geographic_search
       end
 
       # subject/temporal values with trailing comma, semicolon, and backslash (and any preceding spaces) removed
-      # @return [Array<String>] values for the era_facet Solr field for this document or nil if none 
+      # @return [Array<String>] values for the era_facet Solr field for this document or nil if none
       def era_facet
         subject_temporal.map { |val| val.sub(/[\\,;]$/, '').strip } unless !subject_temporal
       end
@@ -318,7 +318,7 @@ module Stanford
           # TODO:  this should go into stanford-mods ... but then we have to set that gem up with a Logger
           # print a message for any unrecognized encodings
           xvals = self.subject.geographicCode.translated_value
-          codes = self.term_values([:subject, :geographicCode]) 
+          codes = self.term_values([:subject, :geographicCode])
           if codes && codes.size > xvals.size
             self.subject.geographicCode.each { |n|
               if n.authority != 'marcgac' && n.authority != 'marccountry'
@@ -327,7 +327,7 @@ module Stanford
             }
           end
 
-          # FIXME:  stanford-mods should be returning [], not nil ... 
+          # FIXME:  stanford-mods should be returning [], not nil ...
           return nil if !result || result.empty?
           result
         end
@@ -358,14 +358,14 @@ module Stanford
           vals.concat(gvals) if gvals
 
           # print a message for any temporal encodings
-          self.subject.temporal.each { |n| 
+          self.subject.temporal.each { |n|
             sw_logger.info("#{druid} has subject temporal element with untranslated encoding: #{n.to_xml}") if !n.encoding.empty?
           }
 
           vals.empty? ? nil : vals
         end
       end
-      
+
       # Values are the contents of:
       #  all subject subelements except subject/cartographic plus  genre top level element
       # @return [Array<String>] values for the subject_all_search Solr field for this document or nil if none
@@ -402,14 +402,14 @@ module Stanford
         return dates_no_marc_encoding unless dates_no_marc_encoding.empty?
         return nil
       end
-      
+
       def is_number?(object)
         true if Integer(object) rescue false
       end
       def is_date?(object)
         true if Date.parse(object) rescue false
       end
-  
+
       # Get the publish year from mods
       # @return [String] 4 character year or nil if no valid date was found
       def pub_year
@@ -425,7 +425,7 @@ module Stanford
           year = []
           pruned_dates = []
           dates.each do |f_date|
-            #remove ? and [] 
+            #remove ? and []
             pruned_dates << f_date.gsub('?','').gsub('[','').gsub(']','')
           end
           #try to find a date starting with the most normal date formats and progressing to more wonky ones
@@ -446,7 +446,7 @@ module Stanford
         @pub_year=''
         return nil
       end
-      
+
       #creates a date suitable for sorting. Guarnteed to be 4 digits or nil
       def pub_date_sort
         pd=nil
@@ -457,16 +457,16 @@ module Stanford
           end
           pd=pd.gsub('--','00')
         end
-        raise "pub_date_sort was about to return a non 4 digit value #{pd}!" if pd and pd.length !=4 
+        raise "pub_date_sort was about to return a non 4 digit value #{pd}!" if pd and pd.length !=4
         pd
       end
-      
+
       #The year the object was published, , filtered based on max_pub_date and min_pub_date from the config file
       #@return [String] 4 character year or nil
       def pub_date
         pub_year || nil
       end
-      
+
       #Values for the pub date facet. This is less strict than the 4 year date requirements for pub_date
       #@return <Array[String]> with values for the pub date facet
       def pub_date_facet
@@ -486,13 +486,13 @@ module Stanford
           nil
         end
       end
-      
+
       # ---- end PUBLICATION (place, year) ----
 
       def sw_logger
         @logger ||= Logger.new(STDOUT)
       end
-      
+
       # select one or more format values from the controlled vocabulary here:
       #   http://searchworks-solr-lb.stanford.edu:8983/solr/select?facet.field=format&rows=0&facet.sort=index
       # @return <Array[String]> value in the SearchWorks controlled vocabulary
@@ -524,8 +524,8 @@ module Stanford
               when 'text'
                 val << 'Book' if issuance and issuance.include? 'monographic'
                 book_genres = ['book chapter', 'Book chapter', 'Book Chapter',
-                  'issue brief', 'Issue brief', 'Issue Brief', 
-                  'librettos', 'Librettos', 
+                  'issue brief', 'Issue brief', 'Issue Brief',
+                  'librettos', 'Librettos',
                   'project report', 'Project report', 'Project Report',
                   'technical report', 'Technical report', 'Technical Report',
                   'working paper', 'Working paper', 'Working Paper']
@@ -669,13 +669,13 @@ module Stanford
       def subject_topics
         @subject_topics ||= self.term_values([:subject, :topic])
       end
-  
+
       #get a 4 digit year like 1865 from the date array
       def get_plain_four_digit_year dates
         dates.each do |f_date|
           matches=f_date.scan(/\d{4}/)
           if matches.length == 1
-            @pub_year=matches.first 
+            @pub_year=matches.first
             return matches.first
           else
             #if there are multiples, check for ones with CE after them
@@ -685,15 +685,15 @@ module Stanford
               pos = pos ? pos.to_i : 0
               if f_date.include?(match+' CE') or pos > 0
                 @pub_year=match
-                return match  
-              end 
+                return match
+              end
             end
             return matches.first
           end
         end
         return nil
       end
-      
+
       # If a year has a "u" in it, replace instances of u with 0
       # @param [String] dates
       # @return String
@@ -712,7 +712,7 @@ module Stanford
         end
         return nil
       end
-  
+
       #get a double digit century like '12th century' from the date array
       def get_double_digit_century dates
         dates.each do |f_date|
@@ -730,13 +730,13 @@ module Stanford
               if f_date.include?(match+' CE') or pos > 0
                 @pub_year=((match[0,2].to_i) - 1).to_s+'--'
                 return @pub_year
-              end 
+              end
             end
           end
         end
         return nil
       end
-  
+
       #get a 3 digit year like 965 from the date array
       def get_three_digit_year dates
         dates.each do |f_date|
@@ -751,14 +751,14 @@ module Stanford
       def get_bc_year dates
         dates.each do |f_date|
           matches=f_date.scan(/\d{3} B.C./)
-          if matches.length > 0   
+          if matches.length > 0
             bc_year=matches.first[0..2]
             return (bc_year.to_i-1000).to_s
           end
         end
         return nil
       end
-  
+
       #get a single digit century like '9th century' from the date array
       def get_single_digit_century dates
         dates.each do |f_date|
@@ -776,10 +776,10 @@ module Stanford
               if f_date.include?(match+' CE') or pos > 0
                 @pub_year=((match[0,1].to_i) - 1).to_s+'--'
                 return @pub_year
-              end 
+              end
             end
           end
-        end 
+        end
         return nil
       end
 
@@ -799,7 +799,7 @@ module Stanford
         end
       end
 
-      # Populate @dates_marc_encoding and @dates_no_marc_encoding from dateIssued and dateCreated tags from origin_info 
+      # Populate @dates_marc_encoding and @dates_no_marc_encoding from dateIssued and dateCreated tags from origin_info
       # with and without encoding=marc
       def parse_dates_from_originInfo
         @dates_marc_encoding = []

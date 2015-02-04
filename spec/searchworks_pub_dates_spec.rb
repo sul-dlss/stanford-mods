@@ -7,7 +7,7 @@ describe "Date methods (searchworks.rb)" do
     @smods_rec = Stanford::Mods::Record.new
     @ns_decl = "xmlns='#{Mods::MODS_NS}'"
   end
-  
+
   context "pub_dates" do
     it "should choose the first date" do
       m = "<mods #{@ns_decl}><originInfo>
@@ -117,16 +117,14 @@ describe "Date methods (searchworks.rb)" do
       m = "<mods #{@ns_decl}><originInfo><dateIssued>3rd century AH / 9th CE</dateIssued><issuance>monographic</issuance></originInfo>"
       @smods_rec = Stanford::Mods::Record.new
       @smods_rec.from_str(m)
-  
       expect(@smods_rec.pub_date).to eq('8--')
       expect(@smods_rec.pub_date_sort).to eq('0800')
       expect(@smods_rec.pub_date_facet).to eq('9th century')
-    end  
+    end
     it 'should use the dateIssued without marc encoding for pub_date_display and the one with marc encoding for indexing, sorting and faceting' do
       m = "<mods #{@ns_decl}><originInfo><dateIssued>[186-?]</dateIssued><dateIssued encoding=\"marc\">1860</dateIssued><issuance>monographic</issuance></originInfo>"
       @smods_rec = Stanford::Mods::Record.new
       @smods_rec.from_str(m)
-
       expect(@smods_rec.pub_date_display).to eq('[186-?]')
       expect(@smods_rec.pub_date).to eq('1860')
       expect(@smods_rec.pub_date_sort).to eq('1860')
@@ -134,7 +132,7 @@ describe "Date methods (searchworks.rb)" do
     end
   end # pub_date
 
-  context "dates with u notation (198u, 19uu)" do    
+  context "dates with u notation (198u, 19uu)" do
     context "single digit u notation (198u)" do
       before(:all) do
         m = "<mods #{@ns_decl}>

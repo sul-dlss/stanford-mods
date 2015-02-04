@@ -38,7 +38,7 @@ describe "name/author concepts" do
                                 <namePart>plain_other_role_mr</namePart>
                                 <role><roleTerm type='text' authority='marcrelator'>Actor</roleTerm></role>
                             </name>"
-                            
+
       @personal_no_role = "<name><namePart type='personal'>personal_no_role</namePart></name>"
       @personal_creator_code = "<name>
                                     <namePart type='personal'>personal_creator_code</namePart>
@@ -89,7 +89,7 @@ describe "name/author concepts" do
         expect(@smods_rec.main_author_w_date).to eq('corp_creator_text')
       end
     end
-    
+
     context "marcrelator role Author" do
       it "should find role with roleTerm type text" do
         @smods_rec.from_str(@mods_start + @plain_author_text + @mods_end)
@@ -116,24 +116,24 @@ describe "name/author concepts" do
         expect(@smods_rec.main_author_w_date).to eq('corp_author_code')
       end
     end
-    
+
     it "should be a String" do
       @smods_rec.from_str(@mods_start + @personal_author_text + @corp_creator_text + @mods_end)
       expect(@smods_rec.main_author_w_date).to be_an_instance_of(String)
     end
-    
+
     it "should take first name with marcrelator role of 'Creator' or 'Author'" do
       @smods_rec.from_str(@mods_start + @personal_author_text + @corp_creator_text + @mods_end)
       expect(@smods_rec.main_author_w_date).to eq('personal_author_text')
       @smods_rec.from_str(@mods_start + @corp_creator_text + @personal_creator_code + @mods_end)
       expect(@smods_rec.main_author_w_date).to eq('corp_creator_text')
     end
-    
+
     it "should take the first name without a role if there are no instances of marcrelator role 'Creator' or 'Actor'" do
       @smods_rec.from_str(@mods_start + @plain_author_non_mr + @personal_other_role + @personal_no_role + @plain_no_role + @mods_end)
       expect(@smods_rec.main_author_w_date).to eq('personal_no_role')
     end
-    
+
     it "should be nil if there is no name with marcrelator role of 'Creator' or 'Author' and no name without a role" do
       @smods_rec.from_str(@mods_start + @plain_author_non_mr + @personal_other_role + @mods_end)
       expect(@smods_rec.main_author_w_date).to be_nil
@@ -238,5 +238,5 @@ describe "name/author concepts" do
       expect(@addl_authors.find { |a| a =~ Regexp.new('lithographer') }).to be_nil
     end
   end # additional_authors_w_dates
-  
+
 end

@@ -23,11 +23,11 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
       m = "<mods #{@ns_decl}><language><languageTerm type='code' authority='iso639-2b'>eng</languageTerm><languageTerm type='text'>English</languageTerm></language></mods>"
       @smods_rec.from_str m
       langs = @smods_rec.sw_language_facet
-      expect(langs.size).to eq(1)
-      expect(langs).to include("English")
-    end    
+      expect(langs.size).to eq 1
+      expect(langs).to include "English"
+    end
   end
-  
+
   context "sw author methods" do
     before(:all) do
       m = "<mods #{@ns_decl}><name type='personal'>
@@ -79,7 +79,7 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
     end
     it "meeting authors (for author_meeting_display)" do
       expect(@smods_rec.sw_meeting_authors).to eq(['conference'])
-    end    
+    end
     context "sort author" do
       it "should be a String" do
         expect(@smods_rec.sw_sort_author).to eq('qJerk')

@@ -6,9 +6,9 @@ describe "title fields (searchworks.rb)" do
     @smods_rec = Stanford::Mods::Record.new
     @ns_decl = "xmlns='#{Mods::MODS_NS}'"
     m = "<mods #{@ns_decl}><titleInfo><title>Jerk</title><subTitle>A Tale of Tourettes</subTitle><nonSort>The</nonSort></titleInfo></mods>"
-    @smods_rec.from_str m      
+    @smods_rec.from_str m
   end
-  
+
   context "short title (for title_245a_search, title_245a_display) " do
     it "should call :short_titles" do
       expect(@smods_rec).to receive(:short_titles) # in Mods gem
@@ -18,7 +18,7 @@ describe "title fields (searchworks.rb)" do
       expect(@smods_rec.sw_short_title).to eq 'The Jerk'
     end
   end
-  
+
   context "full title (for title_245_search, title_full_display)" do
     it "should be a String" do
       expect(@smods_rec.sw_full_title).to eq 'The Jerk : A Tale of Tourettes.'
@@ -244,7 +244,7 @@ describe "title fields (searchworks.rb)" do
       end # no partName but partNumber
     end # punctuation
   end # sw_full_title
-  
+
   context "sw_title_display removes end punctuation of sw_full_title_display" do
 
     # title_display = custom, removeTrailingPunct(245abdefghijklmnopqrstuvwxyz, [\\\\,/;:], ([A-Za-z]{4}|[0-9]{3}|\\)|\\,))
@@ -515,7 +515,7 @@ describe "title fields (searchworks.rb)" do
       end
     end # no partName but partNumber
   end # sw_title_display
-  
+
   context "additional titles (for title_variant_search)" do
     before(:all) do
       m = "<mods #{@ns_decl}>
@@ -545,8 +545,8 @@ describe "title fields (searchworks.rb)" do
       @smods_rec.from_str(m)
       expect(@smods_rec.sw_addl_titles).to eq ['Alternative', 'Joke]']
     end
-  end    
-  
+  end
+
   context "sort title" do
     it "should be a String" do
       expect(@smods_rec.sw_sort_title).to be_an_instance_of(String)
@@ -568,7 +568,7 @@ describe "title fields (searchworks.rb)" do
       expect(r.sw_sort_title).to match /^Jerk$/
     end
   end
-  
+
   context "part number should be in full title and sort title", :jira => ['INDEX-31', 'GRYPHONDOR-372'] do
     before(:all) do
       @mccarthy_smods_rec = Stanford::Mods::Record.new

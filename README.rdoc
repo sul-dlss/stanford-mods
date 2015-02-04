@@ -30,13 +30,13 @@ Or install it yourself as:
   > m = Stanford::Mods::Record.new
   > m.from_str('<mods><genre>ape</genre></mods>')
   > m.genre
-  => [#<Nokogiri::XML::Element:0x3fe07b48bb24 name="genre" children=[#<Nokogiri::XML::Text:0x3fe07a09a7dc "ape">]>] 
+  => [#<Nokogiri::XML::Element:0x3fe07b48bb24 name="genre" children=[#<Nokogiri::XML::Text:0x3fe07a09a7dc "ape">]>]
   > m.genre.text
-  => "ape" 
+  => "ape"
 
   > m.to_be_removed        <-- method I wrote in stanford-mods for proof of concept
   in foo!
-  => nil 
+  => nil
 
 Example Using SearchWorks Mixins:
 
@@ -44,7 +44,7 @@ Example Using SearchWorks Mixins:
   > m = Stanford::Mods::Record.new
   > m.from_str('<mods><language><languageTerm authority="iso639-2b" type="code">dut</languageTerm></language></mods>')
   > m.language_facet    <-- from Searchworks mixin
-  => ['Dutch'] 
+  => ['Dutch']
   > m.languages         <-- from mods gem
   => ['Dutch; Flemish']
 

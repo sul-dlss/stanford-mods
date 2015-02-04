@@ -16,9 +16,9 @@ rescue Bundler::BundlerError => e
   exit e.status_code
 end
 
-task :default => :ci  
+task :default => :ci
 
-desc "run continuous integration suite (tests, coverage, docs)" 
+desc "run continuous integration suite (tests, coverage, docs)"
 task :ci => [:rspec, :doc]
 
 task :spec => :rspec
@@ -42,5 +42,5 @@ rescue LoadError
   task :doc do
     abort "Please install the YARD gem to generate rdoc."
   end
-end  
+end
 

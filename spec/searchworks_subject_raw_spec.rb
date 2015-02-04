@@ -32,14 +32,14 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
         <subject><occupation>#{@occupation}</occupation></subject>
         <subject><temporal>#{@temporal}</temporal></subject>
         <subject><titleInfo><title>#{@s_title}</title></titleInfo></subject>
-        <subject><topic>#{@topic}</topic></subject>      
+        <subject><topic>#{@topic}</topic></subject>
       </mods>"
       @smods_rec.from_str m
-      @sw_geographic_search = @smods_rec.sw_geographic_search 
+      @sw_geographic_search = @smods_rec.sw_geographic_search
       @sw_subject_titles    = @smods_rec.sw_subject_titles
       @sw_subject_names     = @smods_rec.sw_subject_names
     end
-    
+
     context "sw_subject_names" do
       it "should contain <subject><name><namePart> values" do
         expect(@sw_subject_names).to include(@s_name)
@@ -132,14 +132,14 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
           @smods_rec.from_str m
         end
         it "uses a ', ' as the separator by default" do
-          expect(@smods_rec.sw_subject_names).to eq(['first, second'])
-        end          
+          expect(@smods_rec.sw_subject_names).to eq ['first, second']
+        end
         it "honors any string value passed in for the separator" do
           expect(@smods_rec.sw_subject_names(' --')).to eq(['first --second'])
         end
       end
     end # sw_subject_names
-    
+
     context "sw_subject_titles" do
       it "should contain <subject><titleInfo> subelement values" do
         expect(@sw_subject_titles).to include(@s_title)
@@ -196,8 +196,8 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
           @smods_rec.from_str m
         end
         it "uses a ' ' as the separator by default" do
-          expect(@smods_rec.sw_subject_titles).to eq(['first second'])
-        end          
+          expect(@smods_rec.sw_subject_titles).to eq ['first second']
+        end
         it "honors any string value passed in for the separator" do
           expect(@smods_rec.sw_subject_titles(' --')).to eq(['first --second'])
         end
@@ -218,8 +218,8 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
         end
       end
     end # sw_subject_titles
-    
-    
+
+
     context "sw_geographic_search" do
       it "should contain subject <geographic> subelement data" do
         expect(@sw_geographic_search).to include(@geo)
@@ -310,8 +310,8 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
             @smods_rec.from_str m
           end
           it "uses a space as the separator by default" do
-            expect(@smods_rec.sw_geographic_search).to eq(['Canada British Columbia Vancouver'])
-          end          
+            expect(@smods_rec.sw_geographic_search).to eq ['Canada British Columbia Vancouver']
+          end
           it "honors any string value passed in for the separator" do
             expect(@smods_rec.sw_geographic_search(' --')).to eq(['Canada --British Columbia --Vancouver'])
           end
@@ -326,7 +326,7 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
             <subject><geographicCode authority='iso3166'>us</geographicCode></subject>
           </mods>"
           @smods_rec.from_str m
-          @geo_search_from_codes = @smods_rec.sw_geographic_search   
+          @geo_search_from_codes = @smods_rec.sw_geographic_search
         end
         it "should not add untranslated values" do
           expect(@geo_search_from_codes).not_to include('n-us-md')

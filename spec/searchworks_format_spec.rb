@@ -93,7 +93,7 @@ describe "Format fields (searchworks.rb)" do
         end
       end
     end # 'Book'
-  
+
     context "Computer File: typeOfResource 'software, multimedia'" do
       it "no genre (e.g. Dataset)" do
         m = "<mods #{@ns_decl}><typeOfResource>software, multimedia</typeOfResource></mods>"
@@ -121,7 +121,7 @@ describe "Format fields (searchworks.rb)" do
       @smods_rec.from_str(m)
       expect(@smods_rec.format).to eq ['Conference Proceedings']
     end
-  
+
     context "Journal/Periodical: typeOfResource 'text'," do
       it "genre 'article" do
         m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre>article</genre></mods>"
@@ -143,7 +143,7 @@ describe "Format fields (searchworks.rb)" do
       @smods_rec.from_str(m)
       expect(@smods_rec.format).to eq ['Image']
     end
-    
+
     it "Manuscript/Archive: typeOfResource 'mixed material'" do
       m = "<mods #{@ns_decl}><typeOfResource>mixed material</typeOfResource></mods>"
       @smods_rec.from_str(m)
@@ -155,7 +155,7 @@ describe "Format fields (searchworks.rb)" do
       @smods_rec.from_str(m)
       expect(@smods_rec.format).to eq ['Map/Globe']
     end
-  
+
     it "Music - Recording: typeOfResource 'sound recording-musical'", :jira => 'GRYPHONDOR-207' do
       m = "<mods #{@ns_decl}><typeOfResource>sound recording-musical</typeOfResource></mods>"
       @smods_rec.from_str(m)
@@ -182,7 +182,7 @@ describe "Format fields (searchworks.rb)" do
       @smods_rec.from_str(m)
       expect(@smods_rec.format).to eq ['Other']
     end
-  
+
     context "Sound Recording:" do
       it "typeOfResource 'sound recording-nonmusical', genre 'sound", :jira => 'GRYPHONDOR-207' do
         m = "<mods #{@ns_decl}><genre>sound</genre><typeOfResource>sound recording-nonmusical</typeOfResource></mods>"
@@ -269,7 +269,7 @@ describe "Format fields (searchworks.rb)" do
       expect(@smods_rec.format).to eq []
     end
   end # format
-   
+
   context "format_main" do
     it "3D object: typeOfResource 'three dimensional object'" do
       m = "<mods #{@ns_decl}><typeOfResource>three dimensional object</typeOfResource></mods>"
