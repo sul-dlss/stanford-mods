@@ -131,7 +131,7 @@ module Stanford
         outer_node = outer_nodes ? outer_nodes.first : nil
         if outer_node
           nonSort = outer_node.nonSort.text.strip.empty? ? nil : outer_node.nonSort.text.strip
-          title = outer_node.title.text.strip.empty? ? nil: outer_node.title.text.strip
+          title   = outer_node.title.text.strip.empty?   ? nil : outer_node.title.text.strip
           preSubTitle = nonSort ? [nonSort, title].compact.join(" ") : title
           preSubTitle.sub!(/:$/, '') if preSubTitle # remove trailing colon
 
@@ -139,7 +139,7 @@ module Stanford
           preParts = subTitle.empty? ? preSubTitle : preSubTitle + " : " + subTitle
           preParts.sub!(/\.$/, '') if preParts # remove trailing period
           
-          partName = outer_node.partName.text.strip unless outer_node.partName.text.strip.empty?
+          partName   = outer_node.partName.text.strip   unless outer_node.partName.text.strip.empty?
           partNumber = outer_node.partNumber.text.strip unless outer_node.partNumber.text.strip.empty?
           partNumber.sub!(/,$/, '') if partNumber # remove trailing comma
           if partNumber && partName
@@ -390,7 +390,7 @@ module Stanford
       # @return [String] value for the pub_date_display Solr field for this document or nil if none
       def pub_date_display
           return dates_no_marc_encoding.first unless dates_no_marc_encoding.empty?
-          return dates_marc_encoding.first unless dates_marc_encoding.empty?
+          return dates_marc_encoding.first    unless dates_marc_encoding.empty?
           return nil
       end
 
@@ -398,7 +398,7 @@ module Stanford
       # If that doesn't exist, look in the dates without encoding=marc array.  Otherwise return nil
       # @return [Array<String>] values for the date Solr field for this document or nil if none
       def pub_dates
-        return dates_marc_encoding unless dates_marc_encoding.empty?
+        return dates_marc_encoding    unless dates_marc_encoding.empty?
         return dates_no_marc_encoding unless dates_no_marc_encoding.empty?
         return nil
       end
@@ -464,11 +464,7 @@ module Stanford
       #The year the object was published, , filtered based on max_pub_date and min_pub_date from the config file
       #@return [String] 4 character year or nil
       def pub_date
-        val=pub_year
-        if val
-          return val
-        end
-        nil
+        pub_year || nil
       end
       
       #Values for the pub date facet. This is less strict than the 4 year date requirements for pub_date
@@ -557,6 +553,19 @@ module Stanford
       def format_main
         val = []
         types = self.term_values(:typeOfResource)
+        article_genres = ['article', 'Article',
+          'book chapter', 'Book chapter', 'Book Chapter',
+          'issue brief', 'Issue brief', 'Issue Brief',
+          'project report', 'Project report', 'Project Report',
+          'student project report', 'Student project report', 'Student Project report', 'Student Project Report',
+          'technical report', 'Technical report', 'Technical Report',
+          'working paper', 'Working paper', 'Working Paper'
+        ]
+        book_genres = ['conference publication', 'Conference publication', 'Conference Publication',
+          'instruction', 'Instruction',
+          'librettos', 'Librettos',
+          'thesis', 'Thesis'
+        ]
         if types
           genres = self.term_values(:genre)
           issuance = self.term_values([:origin_info,:issuance])
@@ -583,22 +592,9 @@ module Stanford
               when 'still image'
                 val << 'Image'
               when 'text'
-                article_genres = ['article', 'Article',
-                  'book chapter', 'Book chapter', 'Book Chapter',
-                  'issue brief', 'Issue brief', 'Issue Brief',
-                  'project report', 'Project report', 'Project Report',
-                  'student project report', 'Student project report', 'Student Project report', 'Student Project Report',
-                  'technical report', 'Technical report', 'Technical Report',
-                  'working paper', 'Working paper', 'Working Paper'
-                  ]
-                val << 'Book' if genres and !(genres & article_genres).empty?
+                val << 'Book' if genres   and !(genres & article_genres).empty?
                 val << 'Book' if issuance and issuance.include? 'monographic'
-                book_genres = ['conference publication', 'Conference publication', 'Conference Publication',
-                  'instruction', 'Instruction',
-                  'librettos', 'Librettos',
-                  'thesis', 'Thesis'
-                  ]
-                val << 'Book' if genres and !(genres & book_genres).empty?
+                val << 'Book' if genres   and !(genres & book_genres).empty?
                 val << 'Journal/Periodical' if issuance and issuance.include? 'continuing'
               when 'three dimensional object'
                 val << 'Object'
