@@ -16,7 +16,7 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^spec/})
   gem.require_paths = ["lib"]
 
-  gem.add_dependency 'mods'
+  gem.add_dependency 'mods', '~> 2.0.2'
 
   # Runtime dependencies
   # gem.add_runtime_dependency 'nokogiri'
