@@ -425,8 +425,12 @@ module Stanford
           year = []
           pruned_dates = []
           dates.each do |f_date|
-            #remove ? and []
-            pruned_dates << f_date.gsub('?','').gsub('[','').gsub(']','')
+            #remove ? and []  
+            if (f_date.length == 4 && f_date.end_with?('?'))
+              pruned_dates << f_date.gsub('?','0')
+            else
+              pruned_dates << f_date.gsub('?','').gsub('[','').gsub(']','')
+            end
           end
           #try to find a date starting with the most normal date formats and progressing to more wonky ones
           @pub_year = get_plain_four_digit_year pruned_dates

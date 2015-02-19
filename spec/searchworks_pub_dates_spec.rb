@@ -130,6 +130,15 @@ describe "Date methods (searchworks.rb)" do
       expect(@smods_rec.pub_date_sort).to eq('1860')
       expect(@smods_rec.pub_date_facet).to eq('1860')
     end
+    it 'should use the dateIssued without marc encoding for pub_date_display and the one with marc encoding for indexing, sorting and faceting' do
+      m = "<mods #{@ns_decl}><originInfo><dateIssued>1860?]</dateIssued><dateIssued encoding=\"marc\">186?</dateIssued><issuance>monographic</issuance></originInfo>"
+      @smods_rec = Stanford::Mods::Record.new
+      @smods_rec.from_str(m)
+      expect(@smods_rec.pub_date_display).to eq('1860?]')
+      expect(@smods_rec.pub_date).to eq('1860')
+      expect(@smods_rec.pub_date_sort).to eq('1860')
+      expect(@smods_rec.pub_date_facet).to eq('1860')
+    end
   end # pub_date
 
   context "dates with u notation (198u, 19uu)" do
