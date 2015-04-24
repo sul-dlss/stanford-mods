@@ -353,8 +353,9 @@ describe "Subject fields (searchworks.rb)" do
       end
       it "should be like geographic_search with the trailing punctuation (and preceding spaces) removed" do
         m = "<mods #{@ns_decl}><subject>
-        <geographic>comma,</geographic>
-        <geographic>semicolon;</geographic>
+        <geographic>  comma,</geographic>
+        <geographic>
+          semicolon;</geographic>
         <geographic>backslash \\</geographic>
         <geographic>internal, punct;uation</geographic>
         </subject></mods>"
