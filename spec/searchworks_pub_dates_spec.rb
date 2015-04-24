@@ -4,7 +4,6 @@ require 'spec_helper'
 describe "Date methods (searchworks.rb)" do
 
   before(:all) do
-    @smods_rec = Stanford::Mods::Record.new
     @ns_decl = "xmlns='#{Mods::MODS_NS}'"
   end
 
@@ -22,11 +21,14 @@ describe "Date methods (searchworks.rb)" do
   end
 
   context "pub_date" do
+    before :each do
+      @smods_rec = Stanford::Mods::Record.new
+    end
+
     it "should choose the first date" do
       m = "<mods #{@ns_decl}><originInfo>
       <dateCreated>1904</dateCreated>
       </originInfo></mods>"
-      @smods_rec = Stanford::Mods::Record.new
       @smods_rec.from_str(m)
       expect(@smods_rec.pub_date).to eq('1904')
     end
@@ -34,7 +36,6 @@ describe "Date methods (searchworks.rb)" do
       m = "<mods #{@ns_decl}><originInfo>
       <dateCreated>Aug. 3rd, 1886</dateCreated>
       </originInfo></mods>"
-      @smods_rec = Stanford::Mods::Record.new
       @smods_rec.from_str(m)
       expect(@smods_rec.pub_date).to eq('1886')
     end
@@ -42,7 +43,6 @@ describe "Date methods (searchworks.rb)" do
       m = "<mods #{@ns_decl}><originInfo>
       <dateCreated>Aug. 3rd, [18]86?</dateCreated>
       </originInfo></mods>"
-      @smods_rec = Stanford::Mods::Record.new
       @smods_rec.from_str(m)
       expect(@smods_rec.pub_date).to eq('1886')
     end
@@ -50,31 +50,26 @@ describe "Date methods (searchworks.rb)" do
       m = "<mods #{@ns_decl}><originInfo>
       <dateCreated>early 1890s</dateCreated>
       </originInfo></mods>"
-      @smods_rec = Stanford::Mods::Record.new
       @smods_rec.from_str(m)
       expect(@smods_rec.pub_date).to eq('1890')
     end
     it 'should choose a date ending with CE if there are multiple dates' do
       m = "<mods #{@ns_decl}><originInfo><dateIssued>7192 AM (li-Adam) / 1684 CE</dateIssued><issuance>monographic</issuance></originInfo>"
-      @smods_rec = Stanford::Mods::Record.new
       @smods_rec.from_str(m)
       expect(@smods_rec.pub_date).to eq('1684')
     end
     it 'should handle hyphenated range dates' do
       m = "<mods #{@ns_decl}><originInfo><dateIssued>1282 AH / 1865-6 CE</dateIssued><issuance>monographic</issuance></originInfo>"
-      @smods_rec = Stanford::Mods::Record.new
       @smods_rec.from_str(m)
       expect(@smods_rec.pub_date).to eq('1865')
     end
     it 'should work with multiple 4 digit dates' do
       m = "<mods #{@ns_decl}><originInfo><dateCreated>Text dated June 4, 1594; miniatures added by 1596</dateCreated></originInfo>"
-      @smods_rec = Stanford::Mods::Record.new
       @smods_rec.from_str(m)
-       expect(@smods_rec.pub_date).to eq('1594')
+      expect(@smods_rec.pub_date).to eq('1594')
     end
     it 'should work on 3 digit BC dates' do
       m = "<mods #{@ns_decl}><originInfo><dateCreated>300 B.C.</dateCreated></originInfo>"
-      @smods_rec = Stanford::Mods::Record.new
       @smods_rec.from_str(m)
        expect(@smods_rec.pub_year).to eq('-700')
        expect(@smods_rec.pub_date).to eq('-700')
@@ -83,7 +78,6 @@ describe "Date methods (searchworks.rb)" do
     end
     it 'should handle century based dates' do
       m = "<mods #{@ns_decl}><originInfo><dateIssued>13th century AH / 19th CE</dateIssued><issuance>monographic</issuance></originInfo>"
-      @smods_rec = Stanford::Mods::Record.new
       @smods_rec.from_str(m)
       expect(@smods_rec.pub_date_facet).to eq('19th century')
       expect(@smods_rec.pub_date_sort).to eq('1800')
@@ -91,7 +85,6 @@ describe "Date methods (searchworks.rb)" do
     end
     it 'should handle multiple CE dates' do
       m = "<mods #{@ns_decl}><originInfo><dateIssued>6 Dhu al-Hijjah 923 AH / 1517 CE -- 7 Rabi I 924 AH / 1518 CE</dateIssued><issuance>monographic</issuance></originInfo>"
-      @smods_rec = Stanford::Mods::Record.new
       @smods_rec.from_str(m)
       expect(@smods_rec.pub_date).to eq('1517')
       expect(@smods_rec.pub_date_sort).to eq('1517')
@@ -99,7 +92,6 @@ describe "Date methods (searchworks.rb)" do
     end
     it 'should handle this case from walters' do
       m = "<mods #{@ns_decl}><originInfo><dateIssued>Late 14th or early 15th century CE</dateIssued><issuance>monographic</issuance></originInfo>"
-      @smods_rec = Stanford::Mods::Record.new
       @smods_rec.from_str(m)
       expect(@smods_rec.pub_date).to eq('14--')
       expect(@smods_rec.pub_date_sort).to eq('1400')
@@ -107,7 +99,6 @@ describe "Date methods (searchworks.rb)" do
     end
     it 'should work on 3 digit dates' do
       m = "<mods #{@ns_decl}><originInfo><dateIssued>966 CE</dateIssued><issuance>monographic</issuance></originInfo>"
-      @smods_rec = Stanford::Mods::Record.new
       @smods_rec.from_str(m)
       expect(@smods_rec.pub_date).to eq('966')
       expect(@smods_rec.pub_date_sort).to eq('0966')
@@ -115,7 +106,6 @@ describe "Date methods (searchworks.rb)" do
     end
     it 'should work on 3 digit dates' do
       m = "<mods #{@ns_decl}><originInfo><dateIssued>3rd century AH / 9th CE</dateIssued><issuance>monographic</issuance></originInfo>"
-      @smods_rec = Stanford::Mods::Record.new
       @smods_rec.from_str(m)
       expect(@smods_rec.pub_date).to eq('8--')
       expect(@smods_rec.pub_date_sort).to eq('0800')
@@ -123,7 +113,6 @@ describe "Date methods (searchworks.rb)" do
     end
     it 'should use the dateIssued without marc encoding for pub_date_display and the one with marc encoding for indexing, sorting and faceting' do
       m = "<mods #{@ns_decl}><originInfo><dateIssued>[186-?]</dateIssued><dateIssued encoding=\"marc\">1860</dateIssued><issuance>monographic</issuance></originInfo>"
-      @smods_rec = Stanford::Mods::Record.new
       @smods_rec.from_str(m)
       expect(@smods_rec.pub_date_display).to eq('[186-?]')
       expect(@smods_rec.pub_date).to eq('1860')
@@ -132,7 +121,6 @@ describe "Date methods (searchworks.rb)" do
     end
     it 'should use the dateIssued without marc encoding for pub_date_display and the one with marc encoding for indexing, sorting and faceting' do
       m = "<mods #{@ns_decl}><originInfo><dateIssued>1860?]</dateIssued><dateIssued encoding=\"marc\">186?</dateIssued><issuance>monographic</issuance></originInfo>"
-      @smods_rec = Stanford::Mods::Record.new
       @smods_rec.from_str(m)
       expect(@smods_rec.pub_date_display).to eq('1860?]')
       expect(@smods_rec.pub_date).to eq('1860')
