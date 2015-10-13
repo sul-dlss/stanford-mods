@@ -191,7 +191,7 @@ module Stanford
         end
 
         val = '' + ( sw_full_title ? sw_full_title : '')
-        val.sub!(Regexp.new("^" + nonSort), '') if nonSort
+        val.sub!(Regexp.new("^" + Regexp.escape(nonSort)), '') if nonSort
         val.gsub!(/[[:punct:]]*/, '').strip
         val.squeeze(" ").strip
       end
@@ -425,7 +425,7 @@ module Stanford
           year = []
           pruned_dates = []
           dates.each do |f_date|
-            #remove ? and []  
+            #remove ? and []
             if (f_date.length == 4 && f_date.end_with?('?'))
               pruned_dates << f_date.gsub('?','0')
             else
