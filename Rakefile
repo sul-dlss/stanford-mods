@@ -32,8 +32,8 @@ begin
 
   YARD::Rake::YardocTask.new(:doc) do |yt|
     yt.files = Dir.glob(File.join(project_root, 'lib', '**', '*.rb')) +
-                 [ File.join(project_root, 'README.rdoc') ]
-    yt.options = ['--output-dir', doc_dest_dir, '--readme', 'README.rdoc', '--title', 'Stanford-Mods Documentation']
+                 [ File.join(project_root, 'README.md') ]
+    yt.options = ['--output-dir', doc_dest_dir, '--readme', 'README.md', '--title', 'Stanford-Mods Documentation']
   end
 rescue LoadError
   desc "Generate YARD Documentation"
@@ -41,4 +41,3 @@ rescue LoadError
     abort "Please install the YARD gem to generate rdoc."
   end
 end
-
