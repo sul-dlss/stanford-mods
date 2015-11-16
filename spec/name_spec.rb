@@ -88,7 +88,7 @@ describe "name/author concepts" do
         @smods_rec.from_str(@mods_start + @personal_no_role + @corp_creator_text + @mods_end)
         expect(@smods_rec.main_author_w_date).to eq('corp_creator_text')
       end
-    end
+    end # marcrelator role Creator
 
     context "marcrelator role Author" do
       it "should find role with roleTerm type text" do
@@ -175,7 +175,7 @@ describe "name/author concepts" do
       @smods_rec.from_str(m)
       expect(@smods_rec.main_author_w_date).to eq('corporate, 1990-')
     end
-  end # main_author_w_date
+  end # marcrelator role Author
 
   context "additional_authors_w_dates" do
     before(:all) do
