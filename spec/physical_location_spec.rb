@@ -8,36 +8,36 @@ describe "Physical Location for series, box, folder" do
 
   let(:smods_rec) { Stanford::Mods::Record.new }
   let(:mods_loc_phys_loc) do
-      <<-EOF
-        <mods xmlns="#{Mods::MODS_NS}">
+    <<-EOF
+      <mods xmlns="#{Mods::MODS_NS}">
+        <location>
+          <physicalLocation>#{example}</physicalLocation>
+        </location>
+      </mods>
+    EOF
+  end
+  let(:mods_rel_item_loc_phys_loc) do
+    <<-EOF
+      <mods xmlns="#{Mods::MODS_NS}">
+        <relatedItem>
           <location>
             <physicalLocation>#{example}</physicalLocation>
           </location>
-        </mods>
-      EOF
-    end
-    let(:mods_rel_item_loc_phys_loc) do
-      <<-EOF
-        <mods xmlns="#{Mods::MODS_NS}">
-          <relatedItem>
-            <location>
-              <physicalLocation>#{example}</physicalLocation>
-            </location>
-          </relatedItem>
-        </mods>
-      EOF
-    end
+        </relatedItem>
+      </mods>
+    EOF
+  end
 
-    let(:mods_loc_multiple_phys_loc) do
-      <<-EOF
-        <mods xmlns="#{Mods::MODS_NS}">
-          <location>
-            <physicalLocation>Irrelevant Data</physicalLocation>
-            <physicalLocation>#{example}</physicalLocation>
-          </location>
-        </mods>
-      EOF
-    end
+  let(:mods_loc_multiple_phys_loc) do
+    <<-EOF
+      <mods xmlns="#{Mods::MODS_NS}">
+        <location>
+          <physicalLocation>Irrelevant Data</physicalLocation>
+          <physicalLocation>#{example}</physicalLocation>
+        </location>
+      </mods>
+    EOF
+  end
 
   describe '#add_box' do
     # example string as key, expected box name as value

@@ -2,10 +2,6 @@
 require "bundler/gem_tasks"
 require 'bundler'
 
-require 'rspec/core/rake_task'
-require 'yard'
-require 'yard/rake/yardoc_task'
-
 begin
   Bundler.setup(:default, :development)
 rescue Bundler::BundlerError => e
@@ -16,23 +12,31 @@ end
 
 task :default => :ci
 
-desc "run continuous integration suite (tests, coverage, docs)"
-task :ci => [:rspec, :doc]
+desc "run continuous integration suite (tests, coverage, rubocop lint)"
+task :ci => [:rspec, :rubocop]
 
 task :spec => :rspec
 
+require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:rspec) do |spec|
   spec.rspec_opts = ["-c", "--tty", "-f progress", "-r ./spec/spec_helper.rb"]
 end
 
+require 'rubocop/rake_task'
+RuboCop::RakeTask.new(:rubocop) do |task|
+  task.options = ['-l'] # run lint cops only
+end
+
 # Use yard to build docs
+require 'yard'
+require 'yard/rake/yardoc_task'
 begin
   project_root = File.expand_path(File.dirname(__FILE__))
   doc_dest_dir = File.join(project_root, 'doc')
 
   YARD::Rake::YardocTask.new(:doc) do |yt|
     yt.files = Dir.glob(File.join(project_root, 'lib', '**', '*.rb')) +
-                 [ File.join(project_root, 'README.md') ]
+               [File.join(project_root, 'README.md')]
     yt.options = ['--output-dir', doc_dest_dir, '--readme', 'README.md', '--title', 'Stanford-Mods Documentation']
   end
 rescue LoadError

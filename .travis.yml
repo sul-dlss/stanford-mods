@@ -1,5 +1,5 @@
 language: ruby
-script: rake rspec
+script: rake
 rvm:
   - ruby-head
   - 2.2.3  # spotlight

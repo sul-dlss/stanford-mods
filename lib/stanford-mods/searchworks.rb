@@ -26,7 +26,7 @@ module Stanford
                     result << SEARCHWORKS_LANGUAGES[v.strip]
                   end
                 end
-              rescue => e
+              rescue
                 # TODO:  this should be written to a logger
                 p "Couldn't find english name for #{ct.text}"
               end
@@ -422,7 +422,6 @@ module Stanford
         end
         dates = pub_dates
         if dates
-          year = []
           pruned_dates = []
           dates.each do |f_date|
             #remove ? and []
