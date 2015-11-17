@@ -1,18 +1,17 @@
 language: ruby
 script: rake rspec
 rvm:
+  - ruby-head
+  - 2.2.3  # spotlight
   - 2.2.0
   - 2.1.5
   - 2.0.0
-  - 1.9.3
-  - ruby-head
-  - jruby-1.7.9-d19 # fails after 1.7.10 for some reason
-#  - jruby-19mode # JRuby in 1.9 mode
-#  - jruby-head  # failing 2014-07
-notifications:
-  email:
-    - ndushay@stanford.edu
-    - laneymcg@stanford.edu
-    - bess@stanford.edu
-#before_install:
-#  gem update --system 1.8.24
+  - 1.9.3  # argo, FRDA
+  # we used to use jruby for merged DOR + MARC records, but no more ...
+  - jruby-head
+matrix:
+  allow_failures:
+    - rvm: jruby-head
+
+notifications: false
+sudo: false
