@@ -45,6 +45,40 @@ module Stanford
         results
       end
 
+      COLLECTOR_ROLE_URI = 'http://id.loc.gov/vocabulary/relators/col'
+
+      # @return Array of Strings, each containing the computed display value of a personal name
+      #   except for the collector role (see mods gem nom_terminology for display value algorithm)
+      # FIXME:  this is broken if there are multiple role codes and some of them are not marcrelator
+      def non_collector_person_authors
+        result = []
+        @mods_ng_xml.personal_name.map do |n|
+          r = n.role
+          unless (r.authority.include?('marcrelator') && r.value.include?('Collector')) ||
+                  r.roleTerm.valueURI.first == COLLECTOR_ROLE_URI
+            result << n.display_value_w_date
+          end
+        end
+        result unless result.empty?
+      end
+
+      # @return Array of Strings, each containing the computed display value of
+      #  a personal name with the role of Collector (see mods gem nom_terminology for display value algorithm)
+      def collectors_w_dates
+        result = []
+        @mods_ng_xml.personal_name.each do |n|
+          unless n.role.size == 0
+            n.role.each { |r|
+              if (r.authority.include?('marcrelator') && r.value.include?('Collector')) ||
+                  r.roleTerm.valueURI.first == COLLECTOR_ROLE_URI
+                result << n.display_value_w_date
+              end
+            }
+          end
+        end
+        result unless result.empty?
+      end
+
     end # class Record
   end # Module Mods
 end # Module Stanford

@@ -243,4 +243,179 @@ describe "name/author concepts" do
     end
   end # additional_authors_w_dates
 
+  context '#non_collector_person_authors' do
+    let(:name) { 'Hermione Grainger' }
+    let(:name2) { 'Ron Weasley' }
+    context 'has personal names that are not collectors' do
+      it 'only non-collector persons' do
+        name_snippet =
+          <<-EOF
+            <name type="personal">
+              <namePart>#{name}</namePart>
+              <role>
+                <roleTerm type="code" authority="marcrelator">cre</roleTerm>
+              </role>
+            </name>
+            <name type="personal">
+              <namePart>#{name2}</namePart>
+              <role>
+                <roleTerm type="code" authority="marcrelator">con</roleTerm>
+              </role>
+            </name>
+          EOF
+        smods_rec.from_str(mods_start + name_snippet + mods_end)
+        expect(smods_rec.non_collector_person_authors).to include(name, name2)
+      end
+      it 'some collectors, some non-collectors' do
+        name_snippet =
+          <<-EOF
+            <name type="personal">
+              <namePart>#{name}</namePart>
+              <role>
+                <roleTerm type="code" authority="marcrelator">cre</roleTerm>
+              </role>
+            </name>
+            <name type="personal">
+              <namePart>#{name2}</namePart>
+              <role>
+                <roleTerm type="code" authority="marcrelator">col</roleTerm>
+              </role>
+            </name>
+          EOF
+        smods_rec.from_str(mods_start + name_snippet + mods_end)
+        expect(smods_rec.non_collector_person_authors).to eq [name]
+      end
+    end
+    it 'nil if only collectors' do
+      name_snippet =
+        <<-EOF
+          <name type="personal">
+            <namePart>#{name}</namePart>
+            <role>
+              <roleTerm type="code" authority="marcrelator">col</roleTerm>
+            </role>
+          </name>
+          <name type="personal">
+            <namePart>Ron Weasley</namePart>
+            <role>
+              <roleTerm type="code" authority="marcrelator">col</roleTerm>
+            </role>
+          </name>
+        EOF
+      smods_rec.from_str(mods_start + name_snippet + mods_end)
+      expect(smods_rec.non_collector_person_authors).to eq nil
+    end
+  end
+
+  context '#collectors_w_dates' do
+    let(:collector_name) { 'Dr. Seuss' }
+    context 'valueURI for roleTerm' do
+      it 'roleTerm has value' do
+        name_snippet =
+          <<-EOF
+            <name type="personal">
+              <namePart>#{collector_name}</namePart>
+              <role>
+                <roleTerm type="text" authority="marcrelator" authorityURI="http://id.loc.gov/vocabulary/relators" valueURI="http://id.loc.gov/vocabulary/relators/col">Collector</roleTerm>
+              </role>
+            </name>
+          EOF
+        smods_rec.from_str(mods_start + name_snippet + mods_end)
+        expect(smods_rec.collectors_w_dates).to eq [collector_name]
+      end
+      it 'empty roleTerm' do
+        name_snippet =
+          <<-EOF
+            <name type="personal">
+              <namePart>#{collector_name}</namePart>
+              <role>
+                <roleTerm authority="marcrelator" authorityURI="http://id.loc.gov/vocabulary/relators" valueURI="http://id.loc.gov/vocabulary/relators/col" />
+              </role>
+            </name>
+          EOF
+        smods_rec.from_str(mods_start + name_snippet + mods_end)
+        expect(smods_rec.collectors_w_dates).to eq [collector_name]
+      end
+    end
+    context 'no valueURI for roleTerm' do
+      it 'collector marc relator code' do
+        name_snippet =
+          <<-EOF
+            <name type="personal">
+              <namePart>#{collector_name}</namePart>
+              <role>
+                <roleTerm type="code" authority="marcrelator">col</roleTerm>
+              </role>
+            </name>
+          EOF
+        smods_rec.from_str(mods_start + name_snippet + mods_end)
+        expect(smods_rec.collectors_w_dates).to eq [collector_name]
+      end
+      it 'collector marc relator text' do
+        name_snippet =
+          <<-EOF
+            <name type="personal">
+              <namePart>#{collector_name}</namePart>
+              <role>
+                <roleTerm type="text" authority="marcrelator">Collector</roleTerm>
+              </role>
+            </name>
+          EOF
+        smods_rec.from_str(mods_start + name_snippet + mods_end)
+        expect(smods_rec.collectors_w_dates).to eq [collector_name]
+      end
+    end
+    it 'does not include non-collectors' do
+      name_snippet =
+        <<-EOF
+          <name type="personal">
+            <namePart>#{collector_name}</namePart>
+            <role>
+              <roleTerm type="text" authority="marcrelator">Collector</roleTerm>
+            </role>
+          </name>
+          <name type="personal">
+            <namePart>Freddy</namePart>
+            <role>
+              <roleTerm type='code' authority='marcrelator'>cre</roleTerm>
+            </role>
+          </name>
+        EOF
+      smods_rec.from_str(mods_start + name_snippet + mods_end)
+      expect(smods_rec.collectors_w_dates).to eq [collector_name]
+    end
+    it 'multiple collectors' do
+      addl_name = 'Feigenbaum, Edward A.'
+      name_snippet =
+        <<-EOF
+          <name type="personal">
+            <namePart>#{collector_name}</namePart>
+            <role>
+              <roleTerm type="text" authority="marcrelator">Collector</roleTerm>
+            </role>
+          </name>
+          <name type="personal">
+            <namePart>#{addl_name}</namePart>
+            <role>
+              <roleTerm type='code' authority='marcrelator'>col</roleTerm>
+            </role>
+          </name>
+        EOF
+      smods_rec.from_str(mods_start + name_snippet + mods_end)
+      expect(smods_rec.collectors_w_dates).to include(collector_name, addl_name)
+    end
+    it 'nil if no collectors' do
+      name_snippet =
+        <<-EOF
+          <name type="personal">
+            <namePart>Freddy</namePart>
+            <role>
+              <roleTerm type='code' authority='marcrelator'>cre</roleTerm>
+            </role>
+          </name>
+        EOF
+      smods_rec.from_str(mods_start + name_snippet + mods_end)
+      expect(smods_rec.collectors_w_dates).to eq nil
+    end
+  end
 end
