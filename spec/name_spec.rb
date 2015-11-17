@@ -60,25 +60,25 @@ describe "name/author concepts" do
                           </name>" }
     let(:other_no_role) { "<name><namePart type='conference'>conference_no_role</namePart></name>" }
     context "marcrelator role Creator" do
-      it "should find role with roleTerm type text" do
+      it "finds role with roleTerm type text" do
         smods_rec.from_str(mods_start + plain_creator_text + mods_end)
         expect(smods_rec.main_author_w_date).to eq('plain_creator_text')
       end
-      it "should find role with roleTerm type code" do
+      it "finds role with roleTerm type code" do
         smods_rec.from_str(mods_start + plain_creator_code + mods_end)
         expect(smods_rec.main_author_w_date).to eq('plain_creator_code')
       end
-      it "should skip names when role isn't marcrelator authority" do
+      it "skips names when role isn't marcrelator authority" do
         smods_rec.from_str(mods_start + plain_creator_non_mr + mods_end)
         expect(smods_rec.main_author_w_date).to be_nil
       end
-      it "should skip names without roles in favor of marcrelator role of 'Creator'" do
+      it "skips names without roles in favor of marcrelator role of 'Creator'" do
         smods_rec.from_str(mods_start + personal_no_role + plain_creator_text + other_no_role + mods_end)
         expect(smods_rec.main_author_w_date).to eq('plain_creator_text')
         smods_rec.from_str(mods_start + corp_no_role + plain_creator_code + mods_end)
         expect(smods_rec.main_author_w_date).to eq('plain_creator_code')
       end
-      it "shouldn't care about name type" do
+      it "does not care about name type" do
         smods_rec.from_str(mods_start + personal_creator_code + corp_creator_text + mods_end)
         expect(smods_rec.main_author_w_date).to eq('personal_creator_code')
         smods_rec.from_str(mods_start + personal_no_role + corp_creator_text + mods_end)
@@ -87,25 +87,25 @@ describe "name/author concepts" do
     end # marcrelator role Creator
 
     context "marcrelator role Author" do
-      it "should find role with roleTerm type text" do
+      it "finds role with roleTerm type text" do
         smods_rec.from_str(mods_start + plain_author_text + mods_end)
         expect(smods_rec.main_author_w_date).to eq('plain_author_text')
       end
-      it "should find role with roleTerm type code" do
+      it "finds role with roleTerm type code" do
         smods_rec.from_str(mods_start + plain_author_code + mods_end)
         expect(smods_rec.main_author_w_date).to eq('plain_author_code')
       end
-      it "should skip names when role isn't marcrelator authority" do
+      it "skips names when role isn't marcrelator authority" do
         smods_rec.from_str(mods_start + plain_author_non_mr + mods_end)
         expect(smods_rec.main_author_w_date).to be_nil
       end
-      it "should skip names without roles in favor of marcrelator role of 'Author'" do
+      it "skips names without roles in favor of marcrelator role of 'Author'" do
         smods_rec.from_str(mods_start + personal_no_role + plain_author_text + other_no_role + mods_end)
         expect(smods_rec.main_author_w_date).to eq('plain_author_text')
         smods_rec.from_str(mods_start + corp_no_role + personal_no_role + plain_author_code + mods_end)
         expect(smods_rec.main_author_w_date).to eq('plain_author_code')
       end
-      it "shouldn't care about name type" do
+      it "doesn't care about name type" do
         smods_rec.from_str(mods_start + personal_author_text + corp_author_code + mods_end)
         expect(smods_rec.main_author_w_date).to eq('personal_author_text')
         smods_rec.from_str(mods_start + personal_no_role + corp_author_code + mods_end)
@@ -113,29 +113,29 @@ describe "name/author concepts" do
       end
     end # marcrelator role Author
 
-    it "should be a String" do
+    it "is a String" do
       smods_rec.from_str(mods_start + personal_author_text + corp_creator_text + mods_end)
       expect(smods_rec.main_author_w_date).to be_an_instance_of(String)
     end
 
-    it "should take first name with marcrelator role of 'Creator' or 'Author'" do
+    it "takes first name with marcrelator role of 'Creator' or 'Author'" do
       smods_rec.from_str(mods_start + personal_author_text + corp_creator_text + mods_end)
       expect(smods_rec.main_author_w_date).to eq('personal_author_text')
       smods_rec.from_str(mods_start + corp_creator_text + personal_creator_code + mods_end)
       expect(smods_rec.main_author_w_date).to eq('corp_creator_text')
     end
 
-    it "should take the first name without a role if there are no instances of marcrelator role 'Creator' or 'Actor'" do
+    it "takes the first name without a role if there are no instances of marcrelator role 'Creator' or 'Actor'" do
       smods_rec.from_str(mods_start + plain_author_non_mr + personal_other_role + personal_no_role + plain_no_role + mods_end)
       expect(smods_rec.main_author_w_date).to eq('personal_no_role')
     end
 
-    it "should be nil if there is no name with marcrelator role of 'Creator' or 'Author' and no name without a role" do
+    it "nil if there is no name with marcrelator role of 'Creator' or 'Author' and no name without a role" do
       smods_rec.from_str(mods_start + plain_author_non_mr + personal_other_role + mods_end)
       expect(smods_rec.main_author_w_date).to be_nil
     end
 
-    it "should use the display name if it is present" do
+    it "uses the display name if it is present" do
       m = "<mods xmlns=\"#{Mods::MODS_NS}\">
             <name type='personal'>
               <namePart type='given'>John</namePart>
@@ -152,7 +152,7 @@ describe "name/author concepts" do
       smods_rec.from_str(m)
       expect(smods_rec.main_author_w_date).to eq('q')
     end
-    it "should include dates, when available" do
+    it "includes dates, when available" do
       m = "<mods xmlns=\"#{Mods::MODS_NS}\">
             <name type='personal'>
               <namePart>personal</namePart>
@@ -213,32 +213,32 @@ describe "name/author concepts" do
       smods_rec.from_str(m)
       smods_rec.additional_authors_w_dates
     end
-    it "should be an Array of Strings" do
+    it "is an Array of Strings" do
       expect(addl_authors).to be_an_instance_of(Array)
       expect(addl_authors.first).to be_an_instance_of(String)
     end
-    it "should not include main author" do
+    it "does not include main author" do
       expect(addl_authors).not_to include(smods_rec.main_author_w_date)
     end
-    it "should include personal authors that are not main author" do
+    it "includes personal authors that are not main author" do
       expect(addl_authors).to include('Crusty The Clown, 1990-')
     end
-    it "should include corporate (and other) authors that are not main author" do
+    it "includes corporate (and other) authors that are not main author" do
       expect(addl_authors).to include('Watchful Eye, 1850-')
       expect(addl_authors).to include('Exciting Prints')
     end
-    it "should include plain authors" do
+    it "includes plain authors" do
       expect(addl_authors).to include('plain')
     end
-    it "should include conference and other typed authors" do
+    it "includes conference and other typed authors" do
       expect(addl_authors).to include('conference')
       expect(addl_authors).to include('family')
     end
-    it "should include dates, when available" do
+    it "includes dates, when available" do
       expect(addl_authors).to include('Crusty The Clown, 1990-')
       expect(addl_authors).to include('Watchful Eye, 1850-')
     end
-    it "should not include roles" do
+    it "does not include roles" do
       expect(addl_authors.find { |a| a =~ Regexp.new('lithographer') }).to be_nil
     end
   end # additional_authors_w_dates
