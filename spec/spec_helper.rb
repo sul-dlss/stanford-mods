@@ -6,5 +6,5 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 
 require 'stanford-mods'
 
-#RSpec.configure do |config|
-#end
+# RSpec.configure do |config|
+# end

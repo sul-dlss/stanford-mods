@@ -564,12 +564,12 @@ describe 'title fields (searchworks.rb)' do
     it 'should not have any punctuation marks' do
       r = Stanford::Mods::Record.new
       r.from_str "<mods #{@ns_decl}><titleInfo><title>J,e.r;;;k</title></titleInfo></mods>"
-      expect(r.sw_sort_title).to match /^Jerk$/
+      expect(r.sw_sort_title).to match(/^Jerk$/)
     end
     it 'should properly handle nonSort tags with metacharacters' do
       r = Stanford::Mods::Record.new
       r.from_str "<mods #{@ns_decl}><titleInfo><nonSort>[“</nonSort><title>In hat mappa lector... cum enim tota Chilensis regionus...”]</title></titleInfo></mods>"
-      expect(r.sw_sort_title).to match /^In hat mappa lector cum enim tota Chilensis regionus$/
+      expect(r.sw_sort_title).to match(/^In hat mappa lector cum enim tota Chilensis regionus$/)
     end
   end
 

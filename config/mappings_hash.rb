@@ -17,7 +17,7 @@ name_to_xpath = {
 
 # titleInfo
   'title'         => '//mods/titleInfo[not(@type="alternative")]', # .first, extract_title_from_title_info(node)
-  'subtitle'      => '//mods/titleInfo/subTitle' #.first.text
+  'subtitle'      => '//mods/titleInfo/subTitle', #.first.text
   'full_title'    => '//mods/titleInfo', # .first, extract_full_title_from_title_info(node)
   'title_variant' => '//mods/titleInfo[@type="alternative"]', # .first, extract_title_from_title_info(node)
 
