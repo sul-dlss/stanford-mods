@@ -45,22 +45,16 @@ module Stanford
         results
       end
 
-      COLLECTOR_ROLE_URI = 'http://id.loc.gov/vocabulary/relators/col'
-
       # @return Array of Strings, each containing the computed display value of a personal name
       #   except for the collector role (see mods gem nom_terminology for display value algorithm)
       # FIXME:  this is broken if there are multiple role codes and some of them are not marcrelator
       def non_collector_person_authors
         result = []
         @mods_ng_xml.personal_name.map do |n|
-          unless n.role.size == 0
-            n.role.each { |r|
-              unless (r.authority.include?('marcrelator') && r.value.include?('Collector')) ||
-                      r.roleTerm.valueURI.first == COLLECTOR_ROLE_URI
-                result << n.display_value_w_date
-              end
-            }
-          end
+          next if n.role.size.zero?
+          n.role.each { |r|
+            result << n.display_value_w_date unless includes_marc_relator_collector_role?(r)
+          }
         end
         result unless result.empty?
       end
@@ -70,16 +64,21 @@ module Stanford
       def collectors_w_dates
         result = []
         @mods_ng_xml.personal_name.each do |n|
-          unless n.role.size == 0
-            n.role.each { |r|
-              if (r.authority.include?('marcrelator') && r.value.include?('Collector')) ||
-                  r.roleTerm.valueURI.first == COLLECTOR_ROLE_URI
-                result << n.display_value_w_date
-              end
-            }
-          end
+          next if n.role.size.zero?
+          n.role.each { |r|
+            result << n.display_value_w_date if includes_marc_relator_collector_role?(r)
+          }
         end
         result unless result.empty?
+      end
+
+      COLLECTOR_ROLE_URI = 'http://id.loc.gov/vocabulary/relators/col'
+
+      # @param Nokogiri::XML::Node role_node the role node from a parent name node
+      # @return true if there is a MARC relator collector role assigned
+      def includes_marc_relator_collector_role?(role_node)
+        (role_node.authority.include?('marcrelator') && role_node.value.include?('Collector')) ||
+        role_node.roleTerm.valueURI.first == COLLECTOR_ROLE_URI
       end
 
     end # class Record
