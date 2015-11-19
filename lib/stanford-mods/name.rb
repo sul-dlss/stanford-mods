@@ -53,10 +53,13 @@ module Stanford
       def non_collector_person_authors
         result = []
         @mods_ng_xml.personal_name.map do |n|
-          r = n.role
-          unless (r.authority.include?('marcrelator') && r.value.include?('Collector')) ||
-                  r.roleTerm.valueURI.first == COLLECTOR_ROLE_URI
-            result << n.display_value_w_date
+          unless n.role.size == 0
+            n.role.each { |r|
+              unless (r.authority.include?('marcrelator') && r.value.include?('Collector')) ||
+                      r.roleTerm.valueURI.first == COLLECTOR_ROLE_URI
+                result << n.display_value_w_date
+              end
+            }
           end
         end
         result unless result.empty?
