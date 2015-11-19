@@ -305,6 +305,16 @@ describe "name/author concepts" do
       smods_rec.from_str(mods_start + name_snippet + mods_end)
       expect(smods_rec.non_collector_person_authors).to eq nil
     end
+    it 'no role present' do
+      name_snippet =
+        <<-EOF
+          <name type="personal" usage="primary">
+            <namePart>#{name}</namePart>
+          </name>
+        EOF
+      smods_rec.from_str(mods_start + name_snippet + mods_end)
+      expect(smods_rec.non_collector_person_authors).to eq nil
+    end
   end
 
   context '#collectors_w_dates' do
@@ -412,6 +422,16 @@ describe "name/author concepts" do
             <role>
               <roleTerm type='code' authority='marcrelator'>cre</roleTerm>
             </role>
+          </name>
+        EOF
+      smods_rec.from_str(mods_start + name_snippet + mods_end)
+      expect(smods_rec.collectors_w_dates).to eq nil
+    end
+    it 'no role present' do
+      name_snippet =
+        <<-EOF
+          <name type="personal" usage="primary">
+            <namePart>Nobody</namePart>
           </name>
         EOF
       smods_rec.from_str(mods_start + name_snippet + mods_end)
