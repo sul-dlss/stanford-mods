@@ -1,7 +1,6 @@
 language: ruby
 script: rake
 rvm:
-  - ruby-head
   - 2.2.3  # spotlight
   - 2.2.0
   - 2.1.5
@@ -9,9 +8,12 @@ rvm:
   - 1.9.3  # argo, FRDA
   # we used to use jruby for merged DOR + MARC records, but no more ...
   - jruby-head
+  # we also test against ruby-head, which may be unstable.
+  - ruby-head
 matrix:
   allow_failures:
     - rvm: jruby-head
+    - rvm: ruby-head
 
 notifications: false
 sudo: false
