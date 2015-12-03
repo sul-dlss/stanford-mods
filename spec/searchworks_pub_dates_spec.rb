@@ -140,11 +140,6 @@ describe "Date methods (searchworks.rb)" do
         @smods_rec = Stanford::Mods::Record.new
         @smods_rec.from_str(m)
       end
-      it "get_u_year recognizes notation" do
-        dates = ["198u", "9999"]
-        uDate = @smods_rec.get_u_year dates
-        expect(uDate).to eql("1980")
-      end
       it 'pub_date: 198u = 1980' do
         expect(@smods_rec.pub_date).to eq('1980')
       end
@@ -164,11 +159,6 @@ describe "Date methods (searchworks.rb)" do
         </originInfo></mods>"
         @smods_rec = Stanford::Mods::Record.new
         @smods_rec.from_str(m)
-      end
-      it "get_u_year recognizes notation" do
-        dates = ["19uu", "9999"]
-        uDate = @smods_rec.get_u_year dates
-        expect(uDate).to eql("19--")
       end
       it 'pub_date: 19uu = 19--' do
         expect(@smods_rec.pub_date).to eq('19--')
