@@ -29,6 +29,19 @@ describe "Cartographic coordinates" do
     EOF
   end
 
+  let(:with_bad_data) do
+    <<-EOF
+      <mods xmlns="#{Mods::MODS_NS}">
+        <subject>
+          <cartographics>
+          <scale>Scale 1:500,000</scale>
+          <coordinates>(Unknown).</coordinates>
+          </cartographics>
+        </subject>
+      </mods>
+    EOF
+  end
+
   context "coordinates" do
     it "returns empty array if no coordinates in the mods" do
       smods_rec.from_str(no_coord)
@@ -43,6 +56,10 @@ describe "Cartographic coordinates" do
   context "point_bbox" do
     it "returns empty array if no coordinates in the mods" do
       smods_rec.from_str(no_coord)
+      expect(smods_rec.point_bbox).to eq([])
+    end
+    it "returns empty array if bad data is in the mods" do
+      smods_rec.from_str(with_bad_data)
       expect(smods_rec.point_bbox).to eq([])
     end
     it "returns decimal representation of latitude and longitude" do
