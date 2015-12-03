@@ -4,3 +4,7 @@ require: rubocop-rspec
 
 Metrics/LineLength:
   Max: 120
+
+# shut hound up re: quote styles
+Style/StringLiterals:
+  Enabled: false
