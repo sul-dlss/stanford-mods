@@ -389,16 +389,16 @@ module Stanford
       # If no such dates, select the first date in the dates_marc_encoding array.  Otherwise return nil
       # @return [String] value for the pub_date_display Solr field for this document or nil if none
       def pub_date_display
-          return dates_no_marc_encoding.first unless dates_no_marc_encoding.empty?
-          return dates_marc_encoding.first    unless dates_marc_encoding.empty?
-          return nil
+        return dates_no_marc_encoding.first unless dates_no_marc_encoding.empty?
+        return dates_marc_encoding.first unless dates_marc_encoding.empty?
+        nil
       end
 
       # For the date indexing, sorting and faceting, the first place to look is in the dates with encoding=marc array.
       # If that doesn't exist, look in the dates without encoding=marc array.  Otherwise return nil
       # @return [Array<String>] values for the date Solr field for this document or nil if none
       def pub_dates
-        return dates_marc_encoding    unless dates_marc_encoding.empty?
+        return dates_marc_encoding unless dates_marc_encoding.empty?
         return dates_no_marc_encoding unless dates_no_marc_encoding.empty?
         return nil
       end
@@ -413,22 +413,21 @@ module Stanford
       # Get the publish year from mods
       # @return [String] 4 character year or nil if no valid date was found
       def pub_year
-        #use the cached year if there is one
+        # use the cached year if there is one
         if @pub_year
-          if @pub_year == ''
-            return nil
-          end
+          return nil if @pub_year == ''
           return @pub_year
         end
+
         dates = pub_dates
         if dates
           pruned_dates = []
           dates.each do |f_date|
-            #remove ? and []
-            if (f_date.length == 4 && f_date.end_with?('?'))
-              pruned_dates << f_date.gsub('?','0')
+            # remove ? and []
+            if f_date.length == 4 && f_date.end_with?('?')
+              pruned_dates << f_date.tr('?', '0')
             else
-              pruned_dates << f_date.gsub('?','').gsub('[','').gsub(']','')
+              pruned_dates << f_date.tr('?', '').tr('[', '').tr(']', '')
             end
           end
           #try to find a date starting with the most normal date formats and progressing to more wonky ones
@@ -446,48 +445,44 @@ module Stanford
           @pub_year = get_single_digit_century pruned_dates
           return @pub_year if @pub_year
         end
-        @pub_year=''
+        @pub_year = ''
         return nil
       end
 
-      #creates a date suitable for sorting. Guarnteed to be 4 digits or nil
+      # creates a date suitable for sorting. Guarnteed to be 4 digits or nil
       def pub_date_sort
-        pd=nil
         if pub_date
-          pd=pub_date
-          if pd.length == 3
-            pd='0'+pd
-          end
-          pd=pd.gsub('--','00')
+          pd = pub_date
+          pd = '0' + pd if pd.length == 3
+          pd = pd.gsub('--', '00')
         end
-        raise "pub_date_sort was about to return a non 4 digit value #{pd}!" if pd and pd.length !=4
+        raise "pub_date_sort was about to return a non 4 digit value #{pd}!" if pd && pd.length != 4
         pd
       end
 
-      #The year the object was published, , filtered based on max_pub_date and min_pub_date from the config file
-      #@return [String] 4 character year or nil
+      # The year the object was published, filtered based on max_pub_date and min_pub_date from the config file
+      # @return [String] 4 character year or nil
       def pub_date
         pub_year || nil
       end
 
-      #Values for the pub date facet. This is less strict than the 4 year date requirements for pub_date
-      #@return <Array[String]> with values for the pub date facet
+      # Values for the pub date facet. This is less strict than the 4 year date requirements for pub_date
+      # @return <Array[String]> with values for the pub date facet
       def pub_date_facet
         if pub_date
           if pub_date.start_with?('-')
             return (pub_date.to_i + 1000).to_s + ' B.C.'
           end
           if pub_date.include? '--'
-            cent=pub_date[0,2].to_i
-            cent+=1
-            cent=cent.to_s+'th century'
+            cent = pub_date[0, 2].to_i
+            cent += 1
+            cent = cent.to_s + 'th century'
             return cent
           else
             return pub_date
           end
-        else
-          nil
         end
+        nil
       end
 
       # ---- end PUBLICATION (place, year) ----
@@ -525,23 +520,23 @@ module Stanford
               when 'still image'
                 val << 'Image'
               when 'text'
-                val << 'Book' if issuance and issuance.include? 'monographic'
+                val << 'Book' if issuance && issuance.include?('monographic')
                 book_genres = ['book chapter', 'Book chapter', 'Book Chapter',
                   'issue brief', 'Issue brief', 'Issue Brief',
                   'librettos', 'Librettos',
                   'project report', 'Project report', 'Project Report',
                   'technical report', 'Technical report', 'Technical Report',
                   'working paper', 'Working paper', 'Working Paper']
-                val << 'Book' if genres and !(genres & book_genres).empty?
+                val << 'Book' if genres && !(genres & book_genres).empty?
                 conf_pub = ['conference publication', 'Conference publication', 'Conference Publication']
-                val << 'Conference Proceedings' if genres and !(genres & conf_pub).empty?
-                val << 'Journal/Periodical' if issuance and issuance.include? 'continuing'
+                val << 'Conference Proceedings' if genres && !(genres & conf_pub).empty?
+                val << 'Journal/Periodical' if issuance && issuance.include?('continuing')
                 article = ['article', 'Article']
-                val << 'Journal/Periodical' if genres and !(genres & article).empty?
+                val << 'Journal/Periodical' if genres && !(genres & article).empty?
                 stu_proj_rpt = ['student project report', 'Student project report', 'Student Project report', 'Student Project Report']
-                val << 'Other' if genres and !(genres & stu_proj_rpt).empty?
+                val << 'Other' if genres && !(genres & stu_proj_rpt).empty?
                 thesis = ['thesis', 'Thesis']
-                val << 'Thesis' if genres and !(genres & thesis).empty?
+                val << 'Thesis' if genres && !(genres & thesis).empty?
               when 'three dimensional object'
                 val << 'Other'
             end
@@ -571,7 +566,7 @@ module Stanford
         ]
         if types
           genres = self.term_values(:genre)
-          issuance = self.term_values([:origin_info,:issuance])
+          issuance = self.term_values([:origin_info, :issuance])
           types.each do |type|
             case type
               when 'cartographic'
@@ -583,7 +578,7 @@ module Stanford
               when 'notated music'
                 val << 'Music score'
               when 'software, multimedia'
-                if genres and (genres.include?('dataset') || genres.include?('Dataset'))
+                if genres && (genres.include?('dataset') || genres.include?('Dataset'))
                   val << 'Dataset'
                 else
                   val << 'Software/Multimedia'
@@ -595,10 +590,10 @@ module Stanford
               when 'still image'
                 val << 'Image'
               when 'text'
-                val << 'Book' if genres   and !(genres & article_genres).empty?
-                val << 'Book' if issuance and issuance.include? 'monographic'
-                val << 'Book' if genres   and !(genres & book_genres).empty?
-                val << 'Journal/Periodical' if issuance and issuance.include? 'continuing'
+                val << 'Book' if genres && !(genres & article_genres).empty?
+                val << 'Book' if issuance && issuance.include?('monographic')
+                val << 'Book' if genres && !(genres & book_genres).empty?
+                val << 'Journal/Periodical' if issuance && issuance.include?('continuing')
               when 'three dimensional object'
                 val << 'Object'
             end
@@ -633,15 +628,17 @@ module Stanford
 
       # @return [String] value with the numeric catkey in it, or nil if none exists
       def catkey
-        catkey=self.term_values([:record_info,:recordIdentifier])
-        if catkey and catkey.length>0
-          return catkey.first.gsub('a','') #need to ensure catkey is numeric only
+        catkey = self.term_values([:record_info, :recordIdentifier])
+        if catkey && catkey.length > 0
+          return catkey.first.tr('a', '') # ensure catkey is numeric only
         end
         nil
       end
-      def druid= new_druid
-        @druid=new_druid
+
+      def druid=(new_druid)
+        @druid = new_druid
       end
+
       def druid
         @druid ? @druid : 'Unknown item'
       end
