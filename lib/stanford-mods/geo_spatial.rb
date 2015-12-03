@@ -23,16 +23,21 @@ module Stanford
       private
 
       def coord_to_bbox(coord)
-        lng, lat = coord.split('/')
+        matches = coord.match %r{(?<lat>.+--.+)\s*/\s*(?<lng>.+--.+)}
+        return unless matches
 
-        min_x, max_x = lng.split('--').map { |x| coord_to_decimal(x) }
-        max_y, min_y = lat.split('--').map { |y| coord_to_decimal(y) }
+        min_x, max_x = matches['lat'].split('--').map { |x| coord_to_decimal(x) }
+        max_y, min_y = matches['lng'].split('--').map { |y| coord_to_decimal(y) }
+
         "#{min_x} #{min_y} #{max_x} #{max_y}"
       end
 
       def coord_to_decimal(point)
         regex = /(?<dir>[NESW])\s*(?<deg>\d+)°(?:(?<sec>\d+)ʹ)?/
         match = regex.match(point)
+
+        return unless match
+
         dec = 0
 
         dec += match['deg'].to_i
