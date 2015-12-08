@@ -54,6 +54,32 @@ describe "computations from /originInfo field" do
     end
   end
 
+  context '#keyDate' do
+    it 'returns nil if passed nodeset is empty' do
+      mods_str = "#{mods_origin_info_start_str}#{mods_origin_info_end_str}"
+      smods_rec.from_str(mods_str)
+      expect(smods_rec.keyDate(smods_rec.date_issued_nodeset)).to be_nil
+    end
+    it 'returns nil if passed nodeset has no element with keyDate attribute' do
+      mods_str = "#{mods_origin_info_start_str}<dateIssued>[1738]</dateIssued>#{mods_origin_info_end_str}"
+      smods_rec.from_str(mods_str)
+      expect(smods_rec.keyDate(smods_rec.date_issued_nodeset)).to be_nil
+    end
+    it 'returns nil if passed nodeset has multiple elements with keyDate attribute' do
+      mods_str = "#{mods_origin_info_start_str}
+        <dateIssued>[1968?-</dateIssued>
+        <dateIssued encoding='marc' point='start' keyDate='yes'>1968</dateIssued>
+        <dateIssued encoding='marc' point='end' keyDate='yes'>9999</dateIssued>
+        #{mods_origin_info_end_str}"
+      smods_rec.from_str(mods_str)
+      expect(smods_rec.keyDate(smods_rec.date_issued_nodeset)).to be_nil
+    end
+    it 'returns single Nokogiri::XML::Element if nodeset has single element with keyDate attribute' do
+      mods_str = "#{mods_origin_info_start_str}<dateIssued encoding='w3cdtf' keyDate='yes'>2011</dateIssued>#{mods_origin_info_end_str}"
+      smods_rec.from_str(mods_str)
+      expect(smods_rec.keyDate(smods_rec.date_issued_nodeset)).to be_instance_of(Nokogiri::XML::Element)
+    end
+  end
 
   context '#get_u_year' do
     it "turns ending u to 0" do

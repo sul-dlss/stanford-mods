@@ -13,6 +13,7 @@ module Stanford
 
 
 # -- likely to be private or protected
+
       # return all /originInfo/dateCreated elements in MODS records
       # @return [Nokogiri::XML::NodeSet<Nokogiri::XML::Element>]
       def date_created_nodeset
@@ -23,6 +24,15 @@ module Stanford
       # @return [Nokogiri::XML::NodeSet<Nokogiri::XML::Element>]
       def date_issued_nodeset
         @mods_ng_xml.origin_info.dateIssued   # returns nokogiri element/node objects
+      end
+
+      # given a set of date elements, return the single element with attribute keyDate="yes"
+      #  or return nil if no elements have attribute keyDate="yes", or if multiple elements have keyDate="yes"
+      # @param [Nokogiri::XML::NodeSet<Nokogiri::XML::Element>] nodeset set of date elements
+      # @return [Nokogiri::XML::Element, nil] single date element with attribute keyDate="yes", or nil
+      def keyDate(nodeset)
+        keyDates = nodeset.select { |node| node["keyDate"] == 'yes' }
+        return keyDates.first if keyDates.size == 1
       end
 
 # ----   old
