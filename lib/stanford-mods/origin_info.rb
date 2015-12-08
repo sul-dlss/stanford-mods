@@ -35,6 +35,14 @@ module Stanford
         return keyDates.first if keyDates.size == 1
       end
 
+      # @param [Nokogiri::XML::NodeSet<Nokogiri::XML::Element>] nodeset set of date elements
+      # @return [Nokogiri::XML::NodeSet<Nokogiri::XML::Element>] the set of date elements minus any that
+      #   had a qualifier attribute of 'approximate' or 'questionable'
+      def remove_approximate(nodeset)
+        nodeset.select { |node| node unless date_is_approximate?(node) }
+      end
+
+
       # NOTE: legal values for MODS date elements with attribute qualifier are
       #   'approximate', 'inferred' or 'questionable'
       # @param [Nokogiri::XML::Element] date_element MODS date element

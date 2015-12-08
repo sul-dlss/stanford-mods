@@ -81,6 +81,22 @@ describe "computations from /originInfo field" do
     end
   end
 
+  context '#remove_approximate' do
+    it 'removes elements when date_is_approximate? returns true' do
+      mods_str = "#{mods_origin_info_start_str}
+        <dateIssued>1900</dateIssued>
+        <dateIssued qualifier='inferred'>1910</dateIssued>
+        <dateIssued qualifier='questionable'>1930</dateIssued>
+        #{mods_origin_info_end_str}"
+      smods_rec.from_str(mods_str)
+      nodeset = smods_rec.date_issued_nodeset
+      expect(nodeset.size).to eq 3
+      result = smods_rec.remove_approximate(nodeset)
+      expect(result.size).to eq 2
+      expect(result.select { |date_el| smods_rec.date_is_approximate?(date_el) }).to eq []
+    end
+  end
+
   context '#date_is_approximate?' do
     it 'false if bad param passed' do
       expect(smods_rec.date_is_approximate?(true)).to eq false
