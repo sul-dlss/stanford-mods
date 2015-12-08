@@ -81,6 +81,38 @@ describe "computations from /originInfo field" do
     end
   end
 
+  context '#date_is_approximate?' do
+    it 'false if bad param passed' do
+      expect(smods_rec.date_is_approximate?(true)).to eq false
+    end
+    it 'false if there is no qualifier attrib' do
+      mods_str = "#{mods_origin_info_start_str}<dateIssued>1968</dateIssued>#{mods_origin_info_end_str}"
+      smods_rec.from_str(mods_str)
+      date_el = smods_rec.date_issued_nodeset.first
+      expect(smods_rec.date_is_approximate?(date_el)).to eq false
+    end
+    # value of qualifier attribute as key, expected result as value
+    {
+      'approximate' => true,
+      'questionable' => true,
+      'inferred' => false,
+      'typo' => false
+    }.each do |attr_value, expected|
+      describe "for qualifier value: '#{attr_value}'" do
+        let(:mods_str) do
+          "#{mods_origin_info_start_str}
+             <dateIssued qualifier='#{attr_value}'>1968</dateIssued>
+          #{mods_origin_info_end_str}"
+        end
+        it "#{expected}" do
+          smods_rec.from_str(mods_str)
+          date_el = smods_rec.date_issued_nodeset.first
+          expect(smods_rec.date_is_approximate?(date_el)).to eq expected
+        end
+      end
+    end
+  end
+
   context '#get_u_year' do
     it "turns ending u to 0" do
       expect(smods_rec.send(:get_u_year, ["201u"])).to eql "2010"

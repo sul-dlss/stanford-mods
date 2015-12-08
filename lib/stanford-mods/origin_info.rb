@@ -35,6 +35,17 @@ module Stanford
         return keyDates.first if keyDates.size == 1
       end
 
+      # NOTE: legal values for MODS date elements with attribute qualifier are
+      #   'approximate', 'inferred' or 'questionable'
+      # @param [Nokogiri::XML::Element] date_element MODS date element
+      # @return [Boolean] true if date_element has a qualifier attribute of "approximate" or "questionable",
+      #   false if no qualifier attribute, or if attribute is 'inferred' or some other value
+      def date_is_approximate?(date_element)
+        qualifier = date_element["qualifier"] if date_element.respond_to?('[]')
+        qualifier == 'approximate' || qualifier == 'questionable'
+      end
+
+
 # ----   old
 
       # @return [Array<String>] dates from dateIssued and dateCreated tags from origin_info with encoding="marc"
