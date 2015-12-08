@@ -11,6 +11,22 @@ module Stanford
   module Mods
     class Record < ::Mods::Record
 
+
+# -- likely to be private or protected
+      # return all /originInfo/dateCreated elements in MODS records
+      # @return [Nokogiri::XML::NodeSet<Nokogiri::XML::Element>]
+      def date_created_nodeset
+        @mods_ng_xml.origin_info.dateCreated   # returns nokogiri element/node objects
+      end
+
+      # return all /originInfo/dateIssued elements in MODS records
+      # @return [Nokogiri::XML::NodeSet<Nokogiri::XML::Element>]
+      def date_issued_nodeset
+        @mods_ng_xml.origin_info.dateIssued   # returns nokogiri element/node objects
+      end
+
+# ----   old
+
       # @return [Array<String>] dates from dateIssued and dateCreated tags from origin_info with encoding="marc"
       def dates_marc_encoding
         @dates_marc_encoding ||= begin
@@ -47,8 +63,6 @@ module Stanford
           end
         }
       end
-
-
 
     protected
 

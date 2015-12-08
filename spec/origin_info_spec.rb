@@ -1,8 +1,59 @@
-require 'spec_helper'
-
 describe "computations from /originInfo field" do
 
   let(:smods_rec) { Stanford::Mods::Record.new }
+
+  let(:mods_origin_info_start_str) { "<mods xmlns=\"#{Mods::MODS_NS}\"><originInfo>" }
+  let(:mods_origin_info_end_str) { '</originInfo></mods>' }
+
+  let(:mods_origin_info) do
+    <<-EOF
+      <mods xmlns="#{Mods::MODS_NS}">
+        <originInfo>
+          #{example}
+        </originInfo>
+      </mods>
+    EOF
+  end
+
+  context '#date_issued_nodeset' do
+    # example string as key, expected num of Elements as value
+    {
+      '<dateIssued>[1717]</dateIssued><dateIssued encoding="marc">1717</dateIssued>' => 2,
+      '' => 0
+    }.each do |example, expected|
+      describe "for example: #{example}" do
+        let(:example) { example }
+        it 'returns Nokogiri NodeSet of Elements matching /originInfo/dateIssued' do
+          smods_rec.from_str(mods_origin_info)
+          result = smods_rec.date_issued_nodeset
+          expect(result).to be_instance_of(Nokogiri::XML::NodeSet)
+          expect(result.size).to eq expected
+          expect(result).to all(be_an(Nokogiri::XML::Element))
+        end
+      end
+    end
+  end
+
+  context '#date_created_nodeset' do
+    # example string as key, expected num of Elements as value
+    {
+      '<dateCreated encoding="edtf" keydate="yes" point="start">-0012</dateCreated>
+         <dateCreated encoding="edtf" point="end">-0044</dateCreated>' => 2,
+      '' => 0
+    }.each do |example, expected|
+      describe "for example: #{example}" do
+        let(:example) { example }
+        it 'returns Nokogiri NodeSet of Elements matching /originInfo/dateCreated' do
+          smods_rec.from_str(mods_origin_info)
+          result = smods_rec.date_created_nodeset
+          expect(result).to be_instance_of(Nokogiri::XML::NodeSet)
+          expect(result.size).to eq expected
+          expect(result).to all(be_an(Nokogiri::XML::Element))
+        end
+      end
+    end
+  end
+
 
   context '#get_u_year' do
     it "turns ending u to 0" do
