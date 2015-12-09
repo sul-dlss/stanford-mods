@@ -22,3 +22,4 @@ tmp
 *.tmproj
 tmtags
 .idea/*
+.pry_history
