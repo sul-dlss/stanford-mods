@@ -66,6 +66,36 @@ describe "Cartographic coordinates" do
       smods_rec.from_str(with_coords)
       expect(smods_rec.point_bbox).to eq(["-16.0 -15.0 28.0 13.0"])
     end
-  end
 
+    {
+      %((W 123°23ʹ16ʺ--W 122°31ʹ22ʺ/N 39°23ʹ57ʺ--N 38°17ʹ53ʺ)) =>
+        ['-123.38777777777779 38.29805555555556 -122.52277777777778 39.399166666666666'],
+      %(E 10°03'00"--E 12°58'00"/N 45°00'00"--N 41°46'00") =>
+        ['10.05 41.766666666666666 12.966666666666667 45.0'],
+      %(W80°--E100°/N487°--S42°) =>
+        [], # N487 is out of bounds for the bounding box
+      %(W 650--W 100/N 700--N 550) =>
+        [] # missing degree character, and all coordinates are out of bounds.
+    }.each do |value, expected|
+      describe 'data mappings' do
+        let(:mods) do
+          <<-EOF
+            <mods xmlns="#{Mods::MODS_NS}">
+              <subject>
+                <cartographics>
+                  <coordinates>#{value}</coordinates>
+                </cartographics>
+              </subject>
+            </mods>
+          EOF
+        end
+
+        let(:smods_rec) { Stanford::Mods::Record.new.from_str(mods) }
+
+        it 'maps to the right bounding box' do
+          expect(smods_rec.point_bbox).to eq expected
+        end
+      end
+    end
+  end
 end # describe Cartographic coordinates
