@@ -1,7 +1,6 @@
 # encoding: utf-8
 describe "date parsing methods" do
 
-  let(:smods_rec) { Stanford::Mods::Record.new }
 
   unparseable = [
     nil,
@@ -11,8 +10,6 @@ describe "date parsing methods" do
     '-1',
     '-15',
     '0',
-    '0000-00-00',
-    '9999',
     'uuuu',
     'Aug',
     'publiée le 26 germinal an VI',
@@ -33,19 +30,6 @@ describe "date parsing methods" do
     '20',
     'Undated'
   ]
-  decade_only = {
-    '156u' => '',
-    '167-?]' => '',
-    '[171-?]' => '',
-    '[189-]' => '',
-    'ca.170-?]' => '',
-    '200-?]' => '',
-    '186?' => '',
-    'early 1890s' => '',
-    '195x' => '',
-    '1950s' => '',
-    "1950's" => ''
-  }
   century_only = {
     '17th century CE' => '17th century',
     '17uu' => '18th century',
@@ -56,19 +40,21 @@ describe "date parsing methods" do
   }
   # example string as key, expected parsed value as value
   invalid_but_can_get_year = {
-    '1966-14-14' => '1966',   # 14 isn't a valid month ...
-    '1966\4\11' => '1966',  # slashes wrong way
-    '2/31/1950' => '1950',  # no 31 of Feb
+    '1966-14-14' => '1966',  # 14 isn't a valid month ...
+    '1966\4\11' => '1966',   # slashes wrong way
+    '2/31/1950' => '1950',   # no 31 of Feb
     '1869-00-00' => '1869',
     '1862-01-00' => '1862',
-    '1985-05-00' => '1985'
+    '1985-05-00' => '1985',
+    '0000-00-00' => '0000',  # needs to be identified as invalid downstream
+    '9999' => '9999' # needs to be identified as invalid downstream
   }
   # example string as key, expected parsed value as value
   single_year = {
-    '0700' => '700',
-    '0999' => '999',
+    '0700' => '0700',
+    '0999' => '0999',
     '1000' => '1000',
-    '1798' => '1789',
+    '1798' => '1798',
     '1583.' => '1583',
     '1885-' => '1885',
     '1644.]' => '1644',
@@ -79,7 +65,6 @@ describe "date parsing methods" do
     '1877?' => '1877',
     '1797 goda' => '1797',
     "1616: Con licenza de'svperiori" => '1616',
-    '169[5]' => '1695',
 
     '[ ?] 10 1793' => '1793',
     '[1789]' => '1789',
@@ -121,7 +106,7 @@ describe "date parsing methods" do
     'anno 1599 (v. 1).' => '1599',
     'anno MDCXXXV [1635].' => '1635',
     'anno dom. 1600 (v. 3).' => '1600',
-    'anno j65i [1651]' => '1951',
+    'anno j65i [1651]' => '1651',
     'Ca. 1580 CE' => '1580',
     'c1887' => '1887',
     'ca 1796]' => '1796',
@@ -144,36 +129,26 @@ describe "date parsing methods" do
   }
   # example string as key, expected parsed value as value
   specific_month = {
-    '[ ?] 10 1793' => '1793',
-    'agosto 1799' => '1799',
+    '1975-05' => '1975',     # vs 1918-27
+    '1996 Jun' => '1996',
     'February 1798' => '1798',
     'March, 1794' => '1794',
-    '1975-05' => '1975',  # vs 1918-27
+    '[ ?] 10 1793' => '1793',
+    'agosto 1799' => '1799',
     'Jan.y. thes.et 1798' => '1798',
-    'April, 1875' => '1875',
     '[[décembre 1783]]' => '1783',
     'im Mai 1793' => '1793',
     'in Febr. 1795' => '1795',
-    "juin année 1797" => '1797',
-    '1961-04' => '1961',  # vs. 1918-20
-    '1996 Jun' => '1996'
+    "juin année 1797" => '1797'
   }
   # example string as key, expected parsed value as value
   specific_day = {
     '1/1/1961' => '1961',
-    '1/2/79' => '1979',
     '1/10/1979' => '1979',
-    '2/12/15' => '2015',
-    '6/11/99' => '1999',
     '10/1/1987' => '1987',
-    '10/1/90' => '1990',
     '10/20/1976' => '1976',
-    '10/21/08' => '2008',
     '5-1-1959' => '1959',
-    '5-1-59' => '1959',
-    '5-1-21' => '1921',
     '5-1-2014' => '2014',
-    '5-1-14' => '2014',
 
     # year first
     '1888-02-18' => '1888',
@@ -258,6 +233,7 @@ describe "date parsing methods" do
 
     'June 1 1793' => '1793',
     'June 1. 1800' => '1800',
+    'June1st.1805' => '1805',
     'June 22, 1804' => '1804',
     'July 23d 1792' => '1792',
     'June 30th 1799' => '1799',
@@ -297,18 +273,27 @@ describe "date parsing methods" do
     'Oct.r 25 1796' => '1796',
     'Oct.r 25th 1794' => '1794',
     'Octo.r 15 1795' => '1795',
-    'October 3, [18]91' => '1891',
 
     'Sep.r 1, 1795' => '1795',
     'Sep.tr 15.th 1796' => '1796',
     'Sept.r 5th 1793' => '1793'
   }
   # example string as key, expected parsed value as value
+  specific_day_2_digit_year = {
+    '1/2/79' => '1979',
+    '2/12/15' => '2015',
+    '6/11/99' => '1999',
+    '10/1/90' => '1990',
+    '10/21/08' => '2008',
+    '5-1-59' => '1959',
+    '5-1-21' => '1921',
+    '5-1-14' => '2014'
+  }
+  # example string as key, expected parsed value as value
   multiple_years = {
     '1783-1788' => ['1783', '1784', '1785', '1786', '1787', '1788'],
     '1862-1868]' => ['1862', '1863', '1864', '1865', '1866', '1867', '1868'],
     '1640-1645?]' => ['1640', '1641', '1642', '1643', '1644', '1645'],
-    '1918-20' => ['1918', '1919', '1920'],   # vs. 1961-04
     '1578, 1584]' => ['1578', '1584'],
     '1860, [1862]' => ['1860', '1862'],
     '1901, c1900' => ['1901', '1900'], # pub date is one without the c,
@@ -316,7 +301,6 @@ describe "date parsing methods" do
     '1698/1715' => ['1698', '1715'],
     '1965,1968' => ['1965', '1968'],  # revs
     '1965|1968' => ['1965', '1968'], # revs
-    '1965-8' => ['1965', '1966', '1967', '1968'], # revs
     '1789 ou 1790]' => ['1789', '1790'],
     '1689 [i.e. 1688-89]' => ['1688', '1689'],
     '1598 or 1599' => ['1598', '1599'],
@@ -328,7 +312,6 @@ describe "date parsing methods" do
 
     '[1789-1791]' => ['1789', '1790', '1791'],
     '[1627-1628].' => ['1627', '1628'],
-    '[1846-51]' => ['1846', '1847', '1848', '1849', '1850', '1851'],
     '[1789-1791' => ['1789', '1790', '1791'],
     '[1793 ou 1794]' => ['1793', '1794'],
     '[entre 1789 et 1791]' => ['1789', '1790', '1791'],
@@ -353,29 +336,83 @@ describe "date parsing methods" do
     's.a. [ca. 1660, erschienen: 1782]' => ['1660', '1782'],
     'view of approximately 1848, published about 1865' => ['1848', '1865']
   }
+  # example string as key, expected parsed value as value
+  multiple_years_4_digits_once = {
+    '1918-20' => ['1918', '1919', '1920'],   # vs. 1961-04
+    '1965-8' => ['1965', '1966', '1967', '1968'], # revs
+    '[1846-51]' => ['1846', '1847', '1848', '1849', '1850', '1851']
+  }
+  # example string as key, expected parsed value as value
+  decade_only_4_digits = {
+    'early 1890s' => ['1890', '1891', '1892', '1893', '1894', '1895', '1896', '1897', '1898', '1899'],
+    '1950s' => ['1950', '1951', '1952', '1953', '1954', '1955', '1956', '1957', '1958', '1959'],
+    "1950's" => ['1950', '1951', '1952', '1953', '1954', '1955', '1956', '1957', '1958', '1959']
+  }
+  decade_only = {
+    '156u' => ['1560', '1561', '1562', '1563', '1564', '1565', '1566', '1567', '1568', '1569'],
+    '167-?]' => ['1670', '1671', '1672', '1673', '1674', '1675', '1676', '1677', '1678', '1679'],
+    '[171-?]' => ['1710', '1711', '1712', '1713', '1714', '1715', '1716', '1717', '1718', '1719'],
+    '[189-]' => ['1890', '1891', '1892', '1893', '1894', '1895', '1896', '1897', '1898', '1899'],
+    'ca.170-?]' => ['1700', '1701', '1702', '1703', '1704', '1705', '1706', '1707', '1708', '1709'],
+    '200-?]' => ['2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009'],
+    '186?' => ['1860', '1861', '1862', '1863', '1864', '1865', '1866', '1867', '1868', '1869'],
+    '195x' => ['1950', '1951', '1952', '1953', '1954', '1955', '1956', '1957', '1958', '1959']
+  }
+  brackets_in_middle_of_year = {
+    '169[5]' => '1695',
+    'October 3, [18]91' => '1891'
+  }
 
+  context '*sortable_year_from_date_str' do
+    single_year
+      .merge(specific_month)
+      .merge(specific_day)
+      .merge(invalid_but_can_get_year).each do |example, expected|
+      it "gets #{expected} from #{example}" do
+        expect(Stanford::Mods::DateParsing.sortable_year_from_date_str(example)).to eq expected
+      end
+    end
 
-  context '#year_via_ruby_parsing' do
+    multiple_years_4_digits_once
+      .merge(decade_only_4_digits).each do |example, expected|
+      it "gets #{expected} from #{example}" do
+        expect(Stanford::Mods::DateParsing.sortable_year_from_date_str(example)).to eq expected.first
+      end
+    end
+
+    unparseable
+      .push(*brackets_in_middle_of_year.keys)
+      .push(*specific_day_2_digit_year.keys)
+      .push(*decade_only.keys)
+      .push(*multiple_years.keys)
+      .push(*century_only.keys).each do |example|
+      it "nil for #{example}" do
+        expect(Stanford::Mods::DateParsing.sortable_year_from_date_str(example)).to eq nil
+      end
+    end
+  end
+
+  context '*year_via_ruby_parsing' do
     specific_day.each do |example, expected|
       it "gets #{expected} from #{example}" do
         skip "to be coded"
-        expect(smods_rec.year_via_ruby_parsing(example)).to eq expected
+        expect(Stanford::Mods::DateParsing.year_via_ruby_parsing(example)).to eq expected
       end
     end
     single_year.each do |example, expected|
       it "gets #{expected} from #{example}" do
         skip "to be coded"
-        expect(smods_rec.year_via_ruby_parsing(example)).to eq expected
+        expect(Stanford::Mods::DateParsing.year_via_ruby_parsing(example)).to eq expected
       end
     end
 #    specific_month
 #    multiple_years
+#    decade_only
 
-#    unparseable.push(*decade_only.keys).push(*century_only.keys).push(*invalid_but_can_get_year.keys).each do |example|
     unparseable.push(*century_only.keys).push(*invalid_but_can_get_year.keys).each do |example|
-#    unparseable.each do |example|
       it "nil for #{example}" do
-        expect(Stanford::Mods::Record.year_via_ruby_parsing(example)).to eq nil
+        skip "to be coded"
+        expect(Stanford::Mods::DateParsing.year_via_ruby_parsing(example)).to eq nil
       end
     end
   end
