@@ -25,20 +25,20 @@ module Stanford
       private
 
       def coord_to_bbox(coord)
-        matches = coord.match %r{\A(?<lat>[EW].+--.+)\s*/\s*(?<lng>[NS].+--.+)\Z}
+        matches = coord.match %r{\A(?<lat>[EW].+-+.+)\s*/\s*(?<lng>[NS].+-+.+)\Z}
         return unless matches
 
-        min_x, max_x = matches['lat'].split('--').map { |x| coord_to_decimal(x) }
-        max_y, min_y = matches['lng'].split('--').map { |y| coord_to_decimal(y) }
+        min_x, max_x = matches['lat'].split(/-+/).map { |x| coord_to_decimal(x) }.minmax
+        min_y, max_y = matches['lng'].split(/-+/).map { |y| coord_to_decimal(y) }.minmax
 
-        "#{min_x} #{min_y} #{max_x} #{max_y}" if valid_bbox?(min_x, max_x, max_y, min_y)
+        "#{min_x} #{min_y} #{max_x} #{max_y}" if valid_bbox?(min_x, max_x, min_y, max_y)
       end
 
       def coord_to_decimal(point)
-        regex = /(?<dir>[NESW])\s*(?<deg>\d+)°(?:(?<min>\d+)[ʹ'])?(?:(?<sec>\d+)[ʺ"])?/
+        regex = /(?<dir>[NESW])\s*(?<deg>\d+)[°⁰º](?:(?<min>\d+)[ʹ'])?(?:(?<sec>\d+)[ʺ"])?/
         match = regex.match(point)
 
-        return Float::NAN unless match
+        return Float::INFINITY unless match
 
         dec = match['deg'].to_i
         dec += match['min'].to_f / 60
@@ -48,7 +48,7 @@ module Stanford
         dec
       end
 
-      def valid_bbox?(min_x, max_x, max_y, min_y)
+      def valid_bbox?(min_x, max_x, min_y, max_y)
         range_x = -180.0..180.0
         range_y = -90.0..90.0
 

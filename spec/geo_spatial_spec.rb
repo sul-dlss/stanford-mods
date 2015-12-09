@@ -72,8 +72,16 @@ describe "Cartographic coordinates" do
         ['-123.38777777777779 38.29805555555556 -122.52277777777778 39.399166666666666'],
       %(E 10°03'00"--E 12°58'00"/N 45°00'00"--N 41°46'00") =>
         ['10.05 41.766666666666666 12.966666666666667 45.0'],
+      %(E 8°41'-E 12°21'/N 46°04'-N 44°23') =>
+        ['8.683333333333334 44.38333333333333 12.35 46.06666666666667'],
+      %((E17°--E11°/N14°--N18°).) =>
+        ['11.0 14.0 17.0 18.0'], # coordinates need to be reordered
+      %((W 170⁰--E 55⁰/N 40⁰--S 36⁰).) =>
+        ['-170.0 -36.0 55.0 40.0'], # superscript 0 is almost a degree character..
       %(W80°--E100°/N487°--S42°) =>
         [], # N487 is out of bounds for the bounding box
+      %((W 0°-W 0°/S 90°---S 90°)) =>
+        ['-0.0 -90.0 -0.0 -90.0'], # one dash, two dashes, three dashes.. what's the difference?
       %(W 650--W 100/N 700--N 550) =>
         [] # missing degree character, and all coordinates are out of bounds.
     }.each do |value, expected|
