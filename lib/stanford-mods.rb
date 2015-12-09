@@ -1,4 +1,5 @@
 require 'mods'
+require 'stanford-mods/date_parsing'
 require 'stanford-mods/geo_spatial'
 require 'stanford-mods/name'
 require 'stanford-mods/origin_info'
