@@ -30,7 +30,7 @@ module Stanford
       #  or return nil if no elements have attribute keyDate="yes", or if multiple elements have keyDate="yes"
       # @param [Nokogiri::XML::NodeSet<Nokogiri::XML::Element>] nodeset set of date elements
       # @return [Nokogiri::XML::Element, nil] single date element with attribute keyDate="yes", or nil
-      def keyDate(nodeset)
+      def self.keyDate(nodeset)
         keyDates = nodeset.select { |node| node["keyDate"] == 'yes' }
         return keyDates.first if keyDates.size == 1
       end
@@ -38,7 +38,7 @@ module Stanford
       # @param [Nokogiri::XML::NodeSet<Nokogiri::XML::Element>] nodeset set of date elements
       # @return [Nokogiri::XML::NodeSet<Nokogiri::XML::Element>] the set of date elements minus any that
       #   had a qualifier attribute of 'approximate' or 'questionable'
-      def remove_approximate(nodeset)
+      def self.remove_approximate(nodeset)
         nodeset.select { |node| node unless date_is_approximate?(node) }
       end
 
@@ -48,13 +48,13 @@ module Stanford
       # @param [Nokogiri::XML::Element] date_element MODS date element
       # @return [Boolean] true if date_element has a qualifier attribute of "approximate" or "questionable",
       #   false if no qualifier attribute, or if attribute is 'inferred' or some other value
-      def date_is_approximate?(date_element)
+      def self.date_is_approximate?(date_element)
         qualifier = date_element["qualifier"] if date_element.respond_to?('[]')
         qualifier == 'approximate' || qualifier == 'questionable'
       end
 
 
-# ----   old
+# ----   old date parsing methods;  will be deprecated/replaced with new date parsing methods
 
       # @return [Array<String>] dates from dateIssued and dateCreated tags from origin_info with encoding="marc"
       def dates_marc_encoding

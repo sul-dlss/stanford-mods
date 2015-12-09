@@ -58,12 +58,12 @@ describe "computations from /originInfo field" do
     it 'returns nil if passed nodeset is empty' do
       mods_str = "#{mods_origin_info_start_str}#{mods_origin_info_end_str}"
       smods_rec.from_str(mods_str)
-      expect(smods_rec.keyDate(smods_rec.date_issued_nodeset)).to be_nil
+      expect(Stanford::Mods::Record.keyDate(smods_rec.date_issued_nodeset)).to be_nil
     end
     it 'returns nil if passed nodeset has no element with keyDate attribute' do
       mods_str = "#{mods_origin_info_start_str}<dateIssued>[1738]</dateIssued>#{mods_origin_info_end_str}"
       smods_rec.from_str(mods_str)
-      expect(smods_rec.keyDate(smods_rec.date_issued_nodeset)).to be_nil
+      expect(Stanford::Mods::Record.keyDate(smods_rec.date_issued_nodeset)).to be_nil
     end
     it 'returns nil if passed nodeset has multiple elements with keyDate attribute' do
       mods_str = "#{mods_origin_info_start_str}
@@ -72,12 +72,12 @@ describe "computations from /originInfo field" do
         <dateIssued encoding='marc' point='end' keyDate='yes'>9999</dateIssued>
         #{mods_origin_info_end_str}"
       smods_rec.from_str(mods_str)
-      expect(smods_rec.keyDate(smods_rec.date_issued_nodeset)).to be_nil
+      expect(Stanford::Mods::Record.keyDate(smods_rec.date_issued_nodeset)).to be_nil
     end
     it 'returns single Nokogiri::XML::Element if nodeset has single element with keyDate attribute' do
       mods_str = "#{mods_origin_info_start_str}<dateIssued encoding='w3cdtf' keyDate='yes'>2011</dateIssued>#{mods_origin_info_end_str}"
       smods_rec.from_str(mods_str)
-      expect(smods_rec.keyDate(smods_rec.date_issued_nodeset)).to be_instance_of(Nokogiri::XML::Element)
+      expect(Stanford::Mods::Record.keyDate(smods_rec.date_issued_nodeset)).to be_instance_of(Nokogiri::XML::Element)
     end
   end
 
@@ -91,21 +91,21 @@ describe "computations from /originInfo field" do
       smods_rec.from_str(mods_str)
       nodeset = smods_rec.date_issued_nodeset
       expect(nodeset.size).to eq 3
-      result = smods_rec.remove_approximate(nodeset)
+      result = Stanford::Mods::Record.remove_approximate(nodeset)
       expect(result.size).to eq 2
-      expect(result.select { |date_el| smods_rec.date_is_approximate?(date_el) }).to eq []
+      expect(result.select { |date_el| Stanford::Mods::Record.date_is_approximate?(date_el) }).to eq []
     end
   end
 
   context '#date_is_approximate?' do
     it 'false if bad param passed' do
-      expect(smods_rec.date_is_approximate?(true)).to eq false
+      expect(Stanford::Mods::Record.date_is_approximate?(true)).to eq false
     end
     it 'false if there is no qualifier attrib' do
       mods_str = "#{mods_origin_info_start_str}<dateIssued>1968</dateIssued>#{mods_origin_info_end_str}"
       smods_rec.from_str(mods_str)
       date_el = smods_rec.date_issued_nodeset.first
-      expect(smods_rec.date_is_approximate?(date_el)).to eq false
+      expect(Stanford::Mods::Record.date_is_approximate?(date_el)).to eq false
     end
     # value of qualifier attribute as key, expected result as value
     {
@@ -123,7 +123,7 @@ describe "computations from /originInfo field" do
         it "#{expected}" do
           smods_rec.from_str(mods_str)
           date_el = smods_rec.date_issued_nodeset.first
-          expect(smods_rec.date_is_approximate?(date_el)).to eq expected
+          expect(Stanford::Mods::Record.date_is_approximate?(date_el)).to eq expected
         end
       end
     end
