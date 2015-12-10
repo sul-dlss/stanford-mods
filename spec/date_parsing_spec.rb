@@ -397,6 +397,7 @@ describe "date parsing methods" do
       end
     end
 
+    # some strings this method cannot handle (and must be parsed with other class methods)
     unparseable
       .push(*brackets_in_middle_of_year.keys)
       .push(*specific_day_2_digit_year.keys)
@@ -417,6 +418,7 @@ describe "date parsing methods" do
     it '2000 for 12/25/00' do
       expect(Stanford::Mods::DateParsing.sortable_year_from_yy('12/25/00')).to eq '2000'
     end
+    # some strings this method cannot handle (and must be parsed with other class methods)
     it 'nil for yy/mm/dd' do
       expect(Stanford::Mods::DateParsing.sortable_year_from_yy('92/1/31')).to eq nil
     end
@@ -448,6 +450,7 @@ describe "date parsing methods" do
     it '2020 for 202x' do
       expect(Stanford::Mods::DateParsing.sortable_year_from_decade('202x')).to eq '2020'
     end
+    # some strings this method cannot handle (and must be parsed with other class methods)
     decade_only_4_digits.keys
       .push(*specific_day_2_digit_year.keys).each do |example|
       it "gets nil from #{example}" do
@@ -463,6 +466,7 @@ describe "date parsing methods" do
       end
     end
 
+    # some strings this method cannot handle (and must be parsed with other class methods)
     multiple_years.keys
       .push(*multiple_years_4_digits_once.keys)
       .push(*decade_only_4_digits.keys)
