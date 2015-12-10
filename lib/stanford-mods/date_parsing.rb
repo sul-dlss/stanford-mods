@@ -27,7 +27,7 @@ module Stanford
           date_obj = Date.new(date_obj.year - 100, date_obj.month, date_obj.mday)
         end
         date_obj.year.to_s if date_obj
-      rescue
+      rescue ArgumentError
         nil # explicitly want nil if date won't parse
       end
 
@@ -39,10 +39,9 @@ module Stanford
         decade_matches = date_str.match(/\d{3}[u\-?x]/) if date_str
         if decade_matches
           new_str = String.new(decade_matches.to_s).tr('u\-?x', '0')
-          sortable_year_from_date_str(new_str)
+          return sortable_year_from_date_str(new_str)
         end
-      rescue
-        nil # explicitly want nil if date won't parse
+        nil
       end
 
       # NOTE:  while Date.parse() works for many dates, the *sortable_year_from_date_str
@@ -58,7 +57,7 @@ module Stanford
         return if date_str.match(/\d\s*B.C./) # skip B.C. dates
         date_obj = Date.parse(date_str)
         date_obj.year.to_s
-      rescue
+      rescue ArgumentError
         nil # explicitly want nil if date won't parse
       end
 
