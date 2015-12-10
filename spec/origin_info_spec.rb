@@ -2,16 +2,16 @@ describe "computations from /originInfo field" do
 
   let(:smods_rec) { Stanford::Mods::Record.new }
 
+  # used for single examples
   let(:mods_origin_info_start_str) { "<mods xmlns=\"#{Mods::MODS_NS}\"><originInfo>" }
   let(:mods_origin_info_end_str) { '</originInfo></mods>' }
 
+  # used for hashes/arrays of examples
   let(:mods_origin_info) do
     <<-EOF
-      <mods xmlns="#{Mods::MODS_NS}">
-        <originInfo>
-          #{example}
-        </originInfo>
-      </mods>
+    #{mods_origin_info_start_str}
+        #{example}
+     #{mods_origin_info_end_str}
     EOF
   end
 
