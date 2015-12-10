@@ -420,7 +420,7 @@ module Stanford
             if f_date.length == 4 && f_date.end_with?('?')
               pruned_dates << f_date.tr('?', '0')
             else
-              pruned_dates << f_date.tr('?', '').tr('[', '').tr(']', '')
+              pruned_dates << f_date.delete('?[]')
             end
           end
           #try to find a date starting with the most normal date formats and progressing to more wonky ones
