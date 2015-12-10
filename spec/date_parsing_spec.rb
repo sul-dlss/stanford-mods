@@ -144,15 +144,11 @@ describe "date parsing methods" do
   # example string as key, expected parsed value as value
   specific_day = {
     '1/1/1961' => '1961',
-    '1/10/1979' => '1979',
     '10/1/1987' => '1987',
-    '10/20/1976' => '1976',
     '5-1-1959' => '1959',
-    '5-1-2014' => '2014',
 
     # year first
     '1888-02-18' => '1888',
-    '1980-23-02' => '1980',
     '1966-2-5' => '1966',
 
     # text; starts with day
@@ -167,7 +163,6 @@ describe "date parsing methods" do
     '23 Nov.r 1797' => '1797',
 
     # text; starts with year
-    '1792 20 Dec' => '1792',
     '1793 March 1st' => '1793',
     '1892, Jan. 1' => '1892',
     '1991 May 14' => '1991',
@@ -176,8 +171,6 @@ describe "date parsing methods" do
     # text starts with words
     'Boston, November 25, 1851' => '1851',
     'd. 16 Feb. 1793' => '1793',
-    'le 22 juin 1794' => '1794',
-    'mis au jour le 26 juillet 1791' => '1791',
     'published the 30 of June 1799' => '1799',
     'Published the 1 of June 1799' => '1799',
     'Pub.d Nov.r 1st 1798' => '1798',
@@ -189,7 +182,6 @@ describe "date parsing methods" do
     'April 1. 1796' => '1796',
     'April 16, 1632' => '1632',
     'April 11th 1792' => '1792',
-    'April 12 sd 1794' => '1794',
     '[April 1 1795]' => '1795',
 
     'Aug. 1st 1797' => '1797',
@@ -203,7 +195,6 @@ describe "date parsing methods" do
     'August 1 1794' => '1794',
 
     'Dec. 1 1792' => '1792',
-    'Dec. 10 & 11, 1855' => '1855',
     'Dec.r 1 1792' => '1792',
     'Dec.r 8th 1798' => '1798',
     'Decb.r 1, 1789' => '1789',
@@ -224,7 +215,6 @@ describe "date parsing methods" do
     'Jan.y 15. 1795' => '1795',
     'Jan.y 12st 1793' => '1793',
     'Jan.y 18th 1790' => '1790',
-    'January 22th [1800]' => '1800',
 
     'July 1 1796' => '1796',
     'July 1. 1793' => '1793',
@@ -237,10 +227,8 @@ describe "date parsing methods" do
     'June 22, 1804' => '1804',
     'July 23d 1792' => '1792',
     'June 30th 1799' => '1799',
-    'June the 12, 1794' => '1794',
     '[June 2 1793]' => '1793',
 
-    'Mai 1st 1789' => '1789',
     'May 9, 1795' => '1795',
     'May 12 1792' => '1792',
     'May 21st 1798' => '1798',
@@ -252,11 +240,8 @@ describe "date parsing methods" do
     'March 1, 1793' => '1793',
     'March 1st 1797' => '1797',
     'March 6th 1798' => '1798',
-    'March 22 d. 1794' => '1794',
     '[March 16 1798]' => '1798',
 
-    'N. 7 1796' => '1796',
-    'N[ovember] 21st 1786' => '1786',
     'Nov. 1. 1796' => '1796',
     'Nov. 14th 1792' => '1792',
     'Nov. 20 1789' => '1789',
@@ -268,7 +253,6 @@ describe "date parsing methods" do
     'Oct 18th 1794' => '1794',
     'Oct. 29 1796' => '1796',
     'Oct. 11th 1794' => '1794',
-    'Oct. the 2.d 1793' => '1793',
     'Oct.er 1st 1786' => '1786',
     'Oct.r 25 1796' => '1796',
     'Oct.r 25th 1794' => '1794',
@@ -277,6 +261,27 @@ describe "date parsing methods" do
     'Sep.r 1, 1795' => '1795',
     'Sep.tr 15.th 1796' => '1796',
     'Sept.r 5th 1793' => '1793'
+  }
+  specific_day_ruby_parse_fail = {
+    # note ruby Date.parse only handles american or euro date order, not both ??
+    '1/30/1979' => '1979',
+    '10/20/1976' => '1976',
+    '5-18-2014' => '2014',
+    # year first
+    '1980-23-02' => '1980',
+    '1792 20 Dec' => '1792',
+    # text
+    'le 22 juin 1794' => '1794',
+    'mis au jour le 26 juillet 1791' => '1791',
+    'April 12 sd 1794' => '1794',
+    'Dec. 10 & 11, 1855' => '1855',
+    'January 22th [1800]' => '1800',
+    'June the 12, 1794' => '1794',
+    'Mai 1st 1789' => '1789',
+    'March 22 d. 1794' => '1794',
+    'N. 7 1796' => '1796',
+    'N[ovember] 21st 1786' => '1786',
+    'Oct. the 2.d 1793' => '1793',
   }
   # example string as key, expected parsed value as value
   specific_day_2_digit_year = {
@@ -373,6 +378,12 @@ describe "date parsing methods" do
       end
     end
 
+    specific_day_ruby_parse_fail.each do |example, expected|
+      it "gets #{expected} from #{example}" do
+        expect(Stanford::Mods::DateParsing.sortable_year_from_date_str(example)).to eq expected
+      end
+    end
+
     multiple_years_4_digits_once
       .merge(decade_only_4_digits).each do |example, expected|
       it "gets #{expected} from #{example}" do
@@ -395,26 +406,59 @@ describe "date parsing methods" do
   context '*year_via_ruby_parsing' do
     specific_day.each do |example, expected|
       it "gets #{expected} from #{example}" do
-        skip "to be coded"
         expect(Stanford::Mods::DateParsing.year_via_ruby_parsing(example)).to eq expected
       end
     end
-    single_year.each do |example, expected|
-      it "gets #{expected} from #{example}" do
-        skip "to be coded"
-        expect(Stanford::Mods::DateParsing.year_via_ruby_parsing(example)).to eq expected
-      end
-    end
-#    specific_month
-#    multiple_years
-#    decade_only
 
-    unparseable.push(*century_only.keys).push(*invalid_but_can_get_year.keys).each do |example|
+    multiple_years.keys
+      .push(*multiple_years_4_digits_once.keys)
+      .push(*decade_only_4_digits.keys)
+      .push(*century_only.keys)
+      .push(*invalid_but_can_get_year.keys).each do |example|
       it "nil for #{example}" do
-        skip "to be coded"
         expect(Stanford::Mods::DateParsing.year_via_ruby_parsing(example)).to eq nil
       end
     end
-  end
 
+    # data works via #sortable_year_from_date_str (and don't all work here):
+    #   single_year
+    #   specific_month
+    #   specific_day_ruby_parse_fail
+
+    # data fails *sortable_year_from_date_str AND for *year_via_ruby_parsing:
+    #   multiple_years
+    #   century_only
+
+    # data fails *sortable_year_from_date_str
+    # and partially works for *year_via_ruby_parsing:
+    skip 'parsed incorrectly' do
+      # assigns incorrect values to 13 out of 92 (rest with no val assigned)
+      unparseable.each do |example|
+        it "unparseable nil for #{example}" do
+          expect(Stanford::Mods::DateParsing.year_via_ruby_parsing(example)).to eq nil
+        end
+      end
+
+      # assigns incorrect values to 2 out of 2
+      brackets_in_middle_of_year.keys.each do |example|
+        it "brackets_in_middle_of_year nil for #{example}" do
+          expect(Stanford::Mods::DateParsing.year_via_ruby_parsing(example)).to eq nil
+        end
+      end
+
+      # assigns incorrect values to 3 out of 8 (5 with no val assigned)
+      specific_day_2_digit_year.keys.each do |example|
+        it "specific_day_2_digit_year nil for #{example}" do
+          expect(Stanford::Mods::DateParsing.year_via_ruby_parsing(example)).to eq nil
+        end
+      end
+
+      # assigns incorrect values to 8 out of 8
+      decade_only.keys.each do |example|
+        it "decade_only nil for #{example}" do
+          expect(Stanford::Mods::DateParsing.year_via_ruby_parsing(example)).to eq nil
+        end
+      end
+    end
+  end
 end

@@ -5,6 +5,17 @@ module Stanford
     class DateParsing
 
       # @param [String] date_str String containing date (we hope)
+      # @return [String, nil] 4 digit year (e.g. 1865, 0950) if date_str has one, nil otherwise
+      def self.sortable_year_from_date_str(date_str)
+        matches = date_str.scan(/\d{4}/) if date_str
+        return matches[0] if matches && matches.size == 1
+      end
+
+      # NOTE:  while Date.parse() works for many dates, the *sortable_year_from_date_str
+      #   actually works for nearly all those cases and a lot more besides.  Trial and error
+      #   with an extensive set of test data culled from actual date strings in our MODS records
+      #   has made this method bogus.
+      # @param [String] date_str String containing date (we hope)
       # @return [String, nil] sortable 4 digit year (e.g. 1865, 0950) if date_str is parseable via ruby Date, nil otherwise
       def self.year_via_ruby_parsing(date_str)
         return unless date_str.match(/\d\d/) # need at least 2 digits
@@ -15,13 +26,6 @@ module Stanford
         date_obj.year.to_s
       rescue
         nil # explicitly want nil if date won't parse
-      end
-
-      # @param [String] date_str String containing date (we hope)
-      # @return [String, nil] 4 digit year (e.g. 1865, 0950) if date_str has one, nil otherwise
-      def self.sortable_year_from_date_str(date_str)
-        matches = date_str.scan(/\d{4}/) if date_str
-        return matches[0] if matches && matches.size == 1
       end
 
     end
