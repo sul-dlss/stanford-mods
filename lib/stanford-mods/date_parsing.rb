@@ -38,8 +38,8 @@ module Stanford
       def self.sortable_year_from_decade(date_str)
         decade_matches = date_str.match(/\d{3}[u\-?x]/) if date_str
         if decade_matches
-          new_str = String.new(decade_matches.to_s).tr('u\-?x', '0')
-          return sortable_year_from_date_str(new_str)
+          changed_to_zero = decade_matches.to_s.tr('u\-?x', '0')
+          return sortable_year_from_date_str(changed_to_zero)
         end
         nil
       end
