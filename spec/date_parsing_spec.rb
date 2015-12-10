@@ -403,6 +403,28 @@ describe "date parsing methods" do
     end
   end
 
+  context '*sortable_year_from_yy' do
+    specific_day_2_digit_year.each do |example, expected|
+      it "gets #{expected} from #{example}" do
+        expect(Stanford::Mods::DateParsing.sortable_year_from_yy(example)).to eq expected
+      end
+    end
+    it '2000 for 12/25/00' do
+      expect(Stanford::Mods::DateParsing.sortable_year_from_yy('12/25/00')).to eq '2000'
+    end
+    it 'nil for yy/mm/dd' do
+      expect(Stanford::Mods::DateParsing.sortable_year_from_yy('92/1/31')).to eq nil
+    end
+    it 'nil for yy-dd-mm' do
+      expect(Stanford::Mods::DateParsing.sortable_year_from_yy('92-31-1')).to eq nil
+    end
+    decade_only.keys.each do |example|
+      it "gets nil from #{example}" do
+        expect(Stanford::Mods::DateParsing.sortable_year_from_yy(example)).to eq nil
+      end
+    end
+  end
+
   context '*year_via_ruby_parsing' do
     specific_day.each do |example, expected|
       it "gets #{expected} from #{example}" do
