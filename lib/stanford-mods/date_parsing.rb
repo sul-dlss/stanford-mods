@@ -13,8 +13,8 @@ module Stanford
 
       # get year if we have a x/x/yy or x-x-yy pattern
       #   note that these are the only 2 digit year patterns found in our actual date strings in MODS records
-      # @param [String] date_str String containing date (we hope)
-      # @return [String, nil] 4 digit year (e.g. 1865, 0950) if date_str has one, nil otherwise
+      # @param [String] date_str String containing x/x/yy or x-x-yy date pattern
+      # @return [String, nil] 4 digit year (e.g. 1865, 0950) if date_str matches pattern, nil otherwise
       def self.sortable_year_from_yy(date_str)
         slash_matches = date_str.match(/\d{1,2}\/\d{1,2}\/\d{2}/) if date_str
         if slash_matches
@@ -27,6 +27,20 @@ module Stanford
           date_obj = Date.new(date_obj.year - 100, date_obj.month, date_obj.mday)
         end
         date_obj.year.to_s if date_obj
+      rescue
+        nil # explicitly want nil if date won't parse
+      end
+
+      # get first year of decade if we have:  yyyu, yyy-, yyy? or yyyx pattern
+      #   note that these are the only non-year decade patterns found in our actual date strings in MODS records
+      # @param [String] date_str String containing yyyu, yyy-, yyy? or yyyx decade pattern
+      # @return [String, nil] 4 digit year (e.g. 1860, 1950) if date_str matches pattern, nil otherwise
+      def self.sortable_year_from_decade(date_str)
+        decade_matches = date_str.match(/\d{3}[u\-?x]/) if date_str
+        if decade_matches
+          new_str = String.new(decade_matches.to_s).tr('u\-?x', '0')
+          sortable_year_from_date_str(new_str)
+        end
       rescue
         nil # explicitly want nil if date won't parse
       end
