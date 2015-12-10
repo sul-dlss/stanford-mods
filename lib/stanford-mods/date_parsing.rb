@@ -13,14 +13,18 @@ module Stanford
 
       # get year if we have a x/x/yy or x-x-yy pattern
       #   note that these are the only 2 digit year patterns found in our actual date strings in MODS records
+      #   we use 20 as century digits unless it is greater than current year:
+      #   1/1/15  ->  2015
+      #   1/1/25  ->  1925
       # @param [String] date_str String containing x/x/yy or x-x-yy date pattern
       # @return [String, nil] 4 digit year (e.g. 1865, 0950) if date_str matches pattern, nil otherwise
       def self.sortable_year_from_yy(date_str)
-        slash_matches = date_str.match(/\d{1,2}\/\d{1,2}\/\d{2}/) if date_str
+        return unless date_str
+        slash_matches = date_str.match(/\d{1,2}\/\d{1,2}\/\d{2}/)
         if slash_matches
           date_obj = Date.strptime(date_str, '%m/%d/%y')
         else
-          hyphen_matches = date_str.match(/\d{1,2}-\d{1,2}-\d{2}/) if date_str
+          hyphen_matches = date_str.match(/\d{1,2}-\d{1,2}-\d{2}/)
           date_obj = Date.strptime(date_str, '%m-%d-%y') if hyphen_matches
         end
         if date_obj && date_obj > Date.today
