@@ -4,11 +4,11 @@ module Stanford
   module Mods
     class DateParsing
 
-      # @param [String] date_str String containing date (we hope)
-      # @return [String, nil] 4 digit year (e.g. 1865, 0950) if date_str has one, nil otherwise
+      # @param [String] date_str String containing four digit year (we hope)
+      # @return [String, nil] 4 digit year (e.g. 1865, 0950) if date_str has yyyy, nil otherwise
       def self.sortable_year_from_date_str(date_str)
-        matches = date_str.scan(/\d{4}/) if date_str
-        return matches[0] if matches && matches.size == 1
+        matches = date_str.match(/\d{4}/) if date_str
+        return matches.to_s if matches
       end
 
       # get year if we have a x/x/yy or x-x-yy pattern

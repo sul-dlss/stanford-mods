@@ -307,7 +307,7 @@ describe "date parsing methods" do
     '1965,1968' => ['1965', '1968'],  # revs
     '1965|1968' => ['1965', '1968'], # revs
     '1789 ou 1790]' => ['1789', '1790'],
-    '1689 [i.e. 1688-89]' => ['1688', '1689'],
+    '1689 [i.e. 1688-89]' => ['1689', '1688'],
     '1598 or 1599' => ['1598', '1599'],
     '1890 [c1884]' => ['1890', '1884'],  # pub date is one without the c
     '1873,c1868' => ['1873', '1868'], # # pub date is one without the c
@@ -322,7 +322,7 @@ describe "date parsing methods" do
     '[entre 1789 et 1791]' => ['1789', '1790', '1791'],
     '[Entre 1789 et 1791]' => ['1789', '1790', '1791'],
     '[entre 1789-1791]' => ['1789', '1790', '1791'],
-    '[entre 1799 et 1791 ?]' => ['1789', '1790', '1791'],
+    '[entre 1789 et 1791 ?]' => ['1789', '1790', '1791'],
     '[between 1882 and 1887]' => ['1882', '1883', '1884', '1885', '1886', '1887'],
     '[ca 1789-1791]' => ['1789', '1790', '1791'],
     '[ca 1790 et 1792]' => ['1790', '1791', '1792'],
@@ -330,7 +330,7 @@ describe "date parsing methods" do
 
     'Anno 1789-1790' => ['1789', '1790'],
     "L'an VII de la République [1798 or 1799]" => ['1798', '1799'],
-    'MDCXIII [1613] (v. 1); MDLXXXIII [1583] (v. 2); and MDCVI [1606] (v. 3).' => ['1583', '1613', '1606'],
+    'MDCXIII [1613] (v. 1); MDLXXXIII [1583] (v. 2); and MDCVI [1606] (v. 3).' => ['1613', '1583', '1606'],
     'entre 1793 et 1795' => ['1793', '1794', '1795'],
     'entre 1793 et 1795]' => ['1793', '1794', '1795'],
     'approximately 1600-1602.' => ['1600', '1601', '1602'],
@@ -378,6 +378,12 @@ describe "date parsing methods" do
       end
     end
 
+    multiple_years.each do |example, expected|
+      it "gets #{expected.first} from #{example}" do
+        expect(Stanford::Mods::DateParsing.sortable_year_from_date_str(example)).to eq expected.first
+      end
+    end
+
     specific_day_ruby_parse_fail.each do |example, expected|
       it "gets #{expected} from #{example}" do
         expect(Stanford::Mods::DateParsing.sortable_year_from_date_str(example)).to eq expected
@@ -395,7 +401,6 @@ describe "date parsing methods" do
       .push(*brackets_in_middle_of_year.keys)
       .push(*specific_day_2_digit_year.keys)
       .push(*decade_only.keys)
-      .push(*multiple_years.keys)
       .push(*century_only.keys).each do |example|
       it "nil for #{example}" do
         expect(Stanford::Mods::DateParsing.sortable_year_from_date_str(example)).to eq nil
@@ -421,6 +426,32 @@ describe "date parsing methods" do
     decade_only.keys.each do |example|
       it "gets nil from #{example}" do
         expect(Stanford::Mods::DateParsing.sortable_year_from_yy(example)).to eq nil
+      end
+    end
+  end
+
+  context '*sortable_year_from_decade' do
+    decade_only.each do |example, expected|
+      it "gets #{expected.first} from #{example}" do
+        expect(Stanford::Mods::DateParsing.sortable_year_from_decade(example)).to eq expected.first
+      end
+    end
+    it '1990 for 199u' do
+      expect(Stanford::Mods::DateParsing.sortable_year_from_decade('199u')).to eq '1990'
+    end
+    it '2000 for 200-' do
+      expect(Stanford::Mods::DateParsing.sortable_year_from_decade('200-')).to eq '2000'
+    end
+    it '2010 for 201?' do
+      expect(Stanford::Mods::DateParsing.sortable_year_from_decade('201?')).to eq '2010'
+    end
+    it '2020 for 202x' do
+      expect(Stanford::Mods::DateParsing.sortable_year_from_decade('202x')).to eq '2020'
+    end
+    decade_only_4_digits.keys
+      .push(*specific_day_2_digit_year.keys).each do |example|
+      it "gets nil from #{example}" do
+        expect(Stanford::Mods::DateParsing.sortable_year_from_decade(example)).to eq nil
       end
     end
   end
