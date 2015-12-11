@@ -98,12 +98,11 @@ module Stanford
         return ($1.to_i - 1000).to_s if bc_matches
       end
 
-      # get facet value for B.C. if we have  B.C. pattern
-      # @param [String] date_str String containing B.C.; nil otherwise
+      # get single facet value for B.C. if we have  B.C. pattern
+      # @param [String] date_str String containing B.C.
       # @return [String, nil] ddd B.C.  if ddd B.C. in pattern; nil otherwise
       def self.facet_string_for_bc(date_str)
-        return unless date_str
-        bc_matches = date_str.match(/\d{1,4}.*B\.C\./)
+        bc_matches = date_str.match(/\d{1,4}.*B\.C\./) if date_str
         return bc_matches.to_s if bc_matches
       end
 
