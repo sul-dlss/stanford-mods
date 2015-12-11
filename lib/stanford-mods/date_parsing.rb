@@ -85,6 +85,15 @@ module Stanford
         end
       end
 
+      # get facet value for B.C. if we have  B.C. pattern
+      # @param [String] date_str String containing B.C.; nil otherwise
+      # @return [String, nil] ddd B.C.  if ddd B.C. in pattern; nil otherwise
+      def self.facet_string_for_bc(date_str)
+        return unless date_str
+        bc_matches = date_str.match(/\d{1,4}.*B\.C\./)
+        return bc_matches.to_s if bc_matches
+      end
+
       # NOTE:  while Date.parse() works for many dates, the *sortable_year_from_date_str
       #   actually works for nearly all those cases and a lot more besides.  Trial and error
       #   with an extensive set of test data culled from actual date strings in our MODS records

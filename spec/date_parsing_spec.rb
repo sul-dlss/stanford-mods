@@ -498,6 +498,15 @@ describe "date parsing methods" do
     end
   end
 
+  context '*facet_string_for_bc' do
+    it '250 B.C. for 250 B.C.' do
+      expect(Stanford::Mods::DateParsing.facet_string_for_bc('250 B.C.')).to eq '250 B.C.'
+    end
+    it '199 B.C. for 199 B.C.' do
+      expect(Stanford::Mods::DateParsing.facet_string_for_bc('199 B.C.')).to eq '199 B.C.'
+    end
+  end
+
   context '*year_via_ruby_parsing' do
     specific_day.each do |example, expected|
       it "gets #{expected} from #{example}" do
