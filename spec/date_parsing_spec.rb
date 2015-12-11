@@ -498,6 +498,27 @@ describe "date parsing methods" do
     end
   end
 
+  context '*sortable_year_for_bc' do
+    it '-700 for 300 B.C. (so 300 B.C. lexically sorts before 200 B.C.)' do
+      expect(Stanford::Mods::DateParsing.sortable_year_for_bc('300 B.C.')).to eq '-700'
+    end
+    it '-750 for 250 B.C. (so 250 B.C. lexically sorts between 200 B.C. and 300 B.C.)' do
+      expect(Stanford::Mods::DateParsing.sortable_year_for_bc('250 B.C.')).to eq '-750'
+    end
+    it '-800 for 200 B.C. (so 200 B.C. lexically sorts after 300 B.C.)' do
+      expect(Stanford::Mods::DateParsing.sortable_year_for_bc('200 B.C.')).to eq '-800'
+    end
+    it '-801 for 199 B.C. (so 199 B.C. lexically sorts after 200 B.C.)' do
+      expect(Stanford::Mods::DateParsing.sortable_year_for_bc('199 B.C.')).to eq '-801'
+    end
+    it '-925 for 75 B.C.' do
+      expect(Stanford::Mods::DateParsing.sortable_year_for_bc('75 B.C.')).to eq '-925'
+    end
+    it '-992 for 8 B.C.' do
+      expect(Stanford::Mods::DateParsing.sortable_year_for_bc('8 B.C.')).to eq '-992'
+    end
+  end
+
   context '*facet_string_for_bc' do
     it '250 B.C. for 250 B.C.' do
       expect(Stanford::Mods::DateParsing.facet_string_for_bc('250 B.C.')).to eq '250 B.C.'

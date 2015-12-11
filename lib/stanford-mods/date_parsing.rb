@@ -85,6 +85,18 @@ module Stanford
         end
       end
 
+      # get sortable value for B.C. if we have  B.C. pattern
+      #  note that these values must *lexically* sort to create a chronological sort.
+      #  We know our data does not contain B.C. dates older than 999, so we can make them
+      #  lexically sort by subtracting 1000.  So we get:
+      #    -700 for 300 B.C., -750 for 250 B.C., -800 for 200 B.C., -801 for 199 B.C.
+      # @param [String] date_str String containing B.C.
+      # @return [String, nil] String sortable -ddd if B.C. in pattern; nil otherwise
+      def self.sortable_year_for_bc(date_str)
+        bc_matches = date_str.match(/(\d{1,4}).*B\.C\./) if date_str
+        return ($1.to_i - 1000).to_s if bc_matches
+      end
+
       # get facet value for B.C. if we have  B.C. pattern
       # @param [String] date_str String containing B.C.; nil otherwise
       # @return [String, nil] ddd B.C.  if ddd B.C. in pattern; nil otherwise
