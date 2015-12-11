@@ -1,7 +1,6 @@
 # encoding: utf-8
 describe "date parsing methods" do
 
-
   unparseable = [
     nil,
     '',
@@ -31,7 +30,7 @@ describe "date parsing methods" do
     'Undated'
   ]
   century_only = {
-    '17th century CE' => '17th century',
+    '18th century CE' => '18th century',
     '17uu' => '18th century',
     '17--?]' => '18th century',
     '17--]' => '18th century',
@@ -456,6 +455,32 @@ describe "date parsing methods" do
       it "gets nil from #{example}" do
         expect(Stanford::Mods::DateParsing.sortable_year_from_decade(example)).to eq nil
       end
+    end
+  end
+
+  context '*facet_string_for_century' do
+    century_only.each do |example, expected|
+      it "gets #{expected} from #{example}" do
+        expect(Stanford::Mods::DateParsing.facet_string_for_century(example)).to eq expected
+      end
+    end
+    it '17th century for 16--' do
+      expect(Stanford::Mods::DateParsing.facet_string_for_century('16--')).to eq '17th century'
+    end
+    it '8th century for 7--' do
+      expect(Stanford::Mods::DateParsing.facet_string_for_century('7--')).to eq '8th century'
+    end
+    it '21st century for 20--' do
+      expect(Stanford::Mods::DateParsing.facet_string_for_century('20--')).to eq '21st century'
+    end
+    it '2nd century for 1--' do
+      expect(Stanford::Mods::DateParsing.facet_string_for_century('1--')).to eq '2nd century'
+    end
+    it '3rd century for 2--' do
+      expect(Stanford::Mods::DateParsing.facet_string_for_century('2--')).to eq '3rd century'
+    end
+    it 'nil for 7th century B.C. (to be handled in different method)' do
+      expect(Stanford::Mods::DateParsing.facet_string_for_century('7th century B.C.')).to eq nil
     end
   end
 

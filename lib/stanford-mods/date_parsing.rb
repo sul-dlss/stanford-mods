@@ -46,7 +46,23 @@ module Stanford
           changed_to_zero = decade_matches.to_s.tr('u\-?x', '0')
           return sortable_year_from_date_str(changed_to_zero)
         end
-        nil
+      end
+
+      # get facet value for century (17th century) if we have:  yyuu, yy--, yy--? or xxth century pattern
+      #   note that these are the only century patterns found in our actual date strings in MODS records
+      # @param [String] date_str String containing yyuu, yy--, yy--? or xxth century pattern
+      # @return [String, nil] yy(th) Century if date_str matches pattern, nil otherwise; also nil if B.C. in pattern
+      def self.facet_string_for_century(date_str)
+        return unless date_str
+        return if date_str.match(/B\.C\./)
+        century_str_matches = date_str.match(/\d{1,2}.*century/)
+        return century_str_matches.to_s if century_str_matches
+
+        century_matches = date_str.match(/(\d{1,2})[u\-]{2}/)
+        if century_matches
+          require 'active_support/core_ext/integer/inflections'
+          return "#{($1.to_i + 1).ordinalize} century"
+        end
       end
 
       # NOTE:  while Date.parse() works for many dates, the *sortable_year_from_date_str
