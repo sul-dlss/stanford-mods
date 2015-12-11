@@ -17,6 +17,8 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
 
   gem.add_dependency 'mods', '~> 2.0.2'
+  # active_support for .ordinalize, eg. 1 -> 1st, 2 -> 2nd for centuries
+  gem.add_dependency 'activesupport'
 
   # Runtime dependencies
   # gem.add_runtime_dependency 'nokogiri'

@@ -155,6 +155,7 @@ module Stanford
 
       # get a single digit century like '9th century' from the date array
       # @param [Array<String>] dates an array of potential year strings
+      # @return [String] y--  if we identify century digit in string
       def get_single_digit_century dates
         dates.each do |f_date|
           matches = f_date.scan(/\d{1}th/)
@@ -180,6 +181,7 @@ module Stanford
 
       # get a double digit century like '12th century' from the date array
       # @param [Array<String>] dates an array of potential year strings
+      # @return [String] yy--  if we identify century digits in string
       def get_double_digit_century dates
         dates.each do |f_date|
           matches=f_date.scan(/\d{2}th/)
@@ -203,9 +205,10 @@ module Stanford
         nil
       end
 
-      # If a year has a "u" in it, replace instances of u with 0
-      # @param [String] dates
-      # @return String
+      # If a year has a "u" in it, replace u with 0 for yyyu (becomes yyy0)
+      #   and replace u with '-' for yyuu  (becomes yy--)
+      # @param [String] dates looking for matches on yyyu or yyuu in these strings
+      # @return [String, nil] String of format yyy0 or yy--, or nil
       def get_u_year dates
         dates.each do |f_date|
           # Single digit u notation
