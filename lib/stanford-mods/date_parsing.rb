@@ -106,6 +106,35 @@ module Stanford
         return bc_matches.to_s if bc_matches
       end
 
+      # get String sortable value from date String containing yyy, yy, y, -y, -yy, -yyy
+      #  note that these values must *lexically* sort to create a chronological sort.
+      #  We know our data does not contain negative dates older than -999, so we can make them
+      #  lexically sort by subtracting 1000.  So we get:
+      #    -983 for -17, -999 for -1, 0000 for 0, 0001 for 1, 0017 for 17
+      # @param [String] date_str String containing yyy, yy, y, -y, -yy, -yyy
+      # @return [String, nil] String sortable -ddd if date_str matches pattern; nil otherwise
+      def self.sortable_year_for_early_numeric(date_str)
+        return unless date_str.match(/^\-?\d{1,3}$/)
+        if date_str.match(/^\-/)
+          # negative number becomes x - 1000 for sorting; -005 for -995
+          num = date_str[1..-1].to_i - 1000
+          return '-' + num.to_s[1..-1].rjust(3, '0')
+        else
+          return date_str.rjust(4, '0')
+        end
+      end
+
+      # get single facet value for date String containing yyy, yy, y, -y, -yy, -yyy
+      #   negative number strings will be changed to B.C. strings
+      #   positive number strings will be left padded with zeros for clarity in the facet
+      # @param [String] date_str String containing yyy, yy, y, -y, -yy, -yyy
+      def self.facet_string_for_early_numeric(date_str)
+        return unless date_str.match(/^\-?\d{1,3}$/)
+        # negative number becomes B.C.
+        return date_str[1..-1] + " B.C." if date_str.match(/^\-/)
+        return date_str.rjust(4, '0')
+      end
+
       # NOTE:  while Date.parse() works for many dates, the *sortable_year_from_date_str
       #   actually works for nearly all those cases and a lot more besides.  Trial and error
       #   with an extensive set of test data culled from actual date strings in our MODS records
