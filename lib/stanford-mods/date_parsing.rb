@@ -36,7 +36,7 @@ module Stanford
       end
 
       # get first year of decade if we have:  yyyu, yyy-, yyy? or yyyx pattern
-      #   note that these are the only non-year decade patterns found in our actual date strings in MODS records
+      #   note that these are the only decade patterns found in our actual date strings in MODS records
       # @param [String] date_str String containing yyyu, yyy-, yyy? or yyyx decade pattern
       # @return [String, nil] 4 digit year (e.g. 1860, 1950) if date_str matches pattern, nil otherwise
       def self.sortable_year_from_decade(date_str)
