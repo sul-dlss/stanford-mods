@@ -1,10 +1,11 @@
 # Parsing date strings
-# TODO:  this should become its own gem
+# TODO:  this should become its own gem and/or become eclipsed by timetwister gem
 # These methods may be used by searchworks.rb file or by downstream apps
 module Stanford
   module Mods
     class DateParsing
 
+      # looks for dddd pattern in String and returns it if found
       # @param [String] date_str String containing four digit year (we hope)
       # @return [String, nil] 4 digit year (e.g. 1865, 0950) if date_str has yyyy, nil otherwise
       def self.sortable_year_from_date_str(date_str)
@@ -12,7 +13,7 @@ module Stanford
         return matches.to_s if matches
       end
 
-      # get year if we have a x/x/yy or x-x-yy pattern
+      # returns 4 digit year as String if we have a x/x/yy or x-x-yy pattern
       #   note that these are the only 2 digit year patterns found in our actual date strings in MODS records
       #   we use 20 as century digits unless it is greater than current year:
       #   1/1/15  ->  2015
@@ -36,7 +37,7 @@ module Stanford
         nil # explicitly want nil if date won't parse
       end
 
-      # get first year of decade if we have:  yyyu, yyy-, yyy? or yyyx pattern
+      # get first year of decade (as String) if we have:  yyyu, yyy-, yyy? or yyyx pattern
       #   note that these are the only decade patterns found in our actual date strings in MODS records
       # @param [String] date_str String containing yyyu, yyy-, yyy? or yyyx decade pattern
       # @return [String, nil] 4 digit year (e.g. 1860, 1950) if date_str matches pattern, nil otherwise
@@ -48,7 +49,7 @@ module Stanford
         end
       end
 
-      # get first year of century if we have:  yyuu, yy--, yy--? or xxth century pattern
+      # get first year of century (as String) if we have:  yyuu, yy--, yy--? or xxth century pattern
       #   note that these are the only century patterns found in our actual date strings in MODS records
       # @param [String] date_str String containing yyuu, yy--, yy--? or xxth century pattern
       # @return [String, nil] yy00 if date_str matches pattern, nil otherwise; also nil if B.C. in pattern
@@ -68,7 +69,7 @@ module Stanford
         end
       end
 
-      # get facet value for century (17th century) if we have:  yyuu, yy--, yy--? or xxth century pattern
+      # get single facet value for century (17th century) if we have:  yyuu, yy--, yy--? or xxth century pattern
       #   note that these are the only century patterns found in our actual date strings in MODS records
       # @param [String] date_str String containing yyuu, yy--, yy--? or xxth century pattern
       # @return [String, nil] yy(th) Century if date_str matches pattern, nil otherwise; also nil if B.C. in pattern
@@ -85,7 +86,7 @@ module Stanford
         end
       end
 
-      # get sortable value for B.C. if we have  B.C. pattern
+      # get String sortable value for B.C. if we have  B.C. pattern
       #  note that these values must *lexically* sort to create a chronological sort.
       #  We know our data does not contain B.C. dates older than 999, so we can make them
       #  lexically sort by subtracting 1000.  So we get:
