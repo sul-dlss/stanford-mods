@@ -48,6 +48,26 @@ module Stanford
         end
       end
 
+      # get first year of century if we have:  yyuu, yy--, yy--? or xxth century pattern
+      #   note that these are the only century patterns found in our actual date strings in MODS records
+      # @param [String] date_str String containing yyuu, yy--, yy--? or xxth century pattern
+      # @return [String, nil] yy00 if date_str matches pattern, nil otherwise; also nil if B.C. in pattern
+      def self.sortable_year_from_century(date_str)
+        return unless date_str
+        return if date_str.match(/B\.C\./)
+        century_matches = date_str.match(/(\d{1,2})[u\-]{2}/)
+        if century_matches
+          return $1 + '00' if $1.length == 2
+          return '0' + $1 + '00' if $1.length == 1
+        end
+        century_str_matches = date_str.match(/(\d{1,2}).*century/)
+        if century_str_matches
+          yy = ($1.to_i - 1).to_s
+          return yy + '00' if yy.length == 2
+          return '0' + yy + '00' if yy.length == 1
+        end
+      end
+
       # get facet value for century (17th century) if we have:  yyuu, yy--, yy--? or xxth century pattern
       #   note that these are the only century patterns found in our actual date strings in MODS records
       # @param [String] date_str String containing yyuu, yy--, yy--? or xxth century pattern

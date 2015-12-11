@@ -458,6 +458,20 @@ describe "date parsing methods" do
     end
   end
 
+  context '*sortable_year_from_century' do
+    century_only.keys.each do |example|
+      it "gets 1700 from #{example}" do
+        expect(Stanford::Mods::DateParsing.sortable_year_from_century(example)).to eq '1700'
+      end
+    end
+    it '0700 for 7--' do
+      expect(Stanford::Mods::DateParsing.sortable_year_from_century('7--')).to eq '0700'
+    end
+    it 'nil for 7th century B.C. (to be handled in different method)' do
+      expect(Stanford::Mods::DateParsing.sortable_year_from_century('7th century B.C.')).to eq nil
+    end
+  end
+
   context '*facet_string_for_century' do
     century_only.each do |example, expected|
       it "gets #{expected} from #{example}" do
