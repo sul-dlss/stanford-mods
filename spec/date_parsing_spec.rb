@@ -371,6 +371,17 @@ describe "date parsing methods" do
     '33' => '0033',
     '945' => '0945'
   }
+  bc_dates = {
+    # note that values must lexically sort to create a chronological sort (800 B.C. before 750 B.C.)
+    '801 B.C.' => '-199',
+    '800 B.C.' => '-200',
+    '750 B.C.' => '-250',
+    '700 B.C.' => '-300',
+    '699 B.C.' => '-301',
+    '75 B.C.' => '-925',
+    '8 B.C.' => '-992'
+  }
+
 
   context '*sortable_year_for_yyyy' do
     single_year
@@ -527,32 +538,18 @@ describe "date parsing methods" do
   end
 
   context '*sortable_year_for_bc' do
-    it '-700 for 300 B.C. (so 300 B.C. lexically sorts before 200 B.C.)' do
-      expect(Stanford::Mods::DateParsing.sortable_year_for_bc('300 B.C.')).to eq '-700'
-    end
-    it '-750 for 250 B.C. (so 250 B.C. lexically sorts between 200 B.C. and 300 B.C.)' do
-      expect(Stanford::Mods::DateParsing.sortable_year_for_bc('250 B.C.')).to eq '-750'
-    end
-    it '-800 for 200 B.C. (so 200 B.C. lexically sorts after 300 B.C.)' do
-      expect(Stanford::Mods::DateParsing.sortable_year_for_bc('200 B.C.')).to eq '-800'
-    end
-    it '-801 for 199 B.C. (so 199 B.C. lexically sorts after 200 B.C.)' do
-      expect(Stanford::Mods::DateParsing.sortable_year_for_bc('199 B.C.')).to eq '-801'
-    end
-    it '-925 for 75 B.C.' do
-      expect(Stanford::Mods::DateParsing.sortable_year_for_bc('75 B.C.')).to eq '-925'
-    end
-    it '-992 for 8 B.C.' do
-      expect(Stanford::Mods::DateParsing.sortable_year_for_bc('8 B.C.')).to eq '-992'
+    bc_dates.each do |example, expected|
+      it "#{expected} for #{example}" do
+        expect(Stanford::Mods::DateParsing.sortable_year_for_bc(example)).to eq expected
+      end
     end
   end
 
   context '*facet_string_for_bc' do
-    it '250 B.C. for 250 B.C.' do
-      expect(Stanford::Mods::DateParsing.facet_string_for_bc('250 B.C.')).to eq '250 B.C.'
-    end
-    it '199 B.C. for 199 B.C.' do
-      expect(Stanford::Mods::DateParsing.facet_string_for_bc('199 B.C.')).to eq '199 B.C.'
+    bc_dates.keys.each do |example|
+      it "#{example} for #{example}" do
+        expect(Stanford::Mods::DateParsing.facet_string_for_bc(example)).to eq example
+      end
     end
     it '1600 B.C. for 1600 B.C.' do
       expect(Stanford::Mods::DateParsing.facet_string_for_bc('1600 B.C.')).to eq '1600 B.C.'
