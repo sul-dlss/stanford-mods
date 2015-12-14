@@ -8,10 +8,10 @@ module Stanford
     #       or have an initialize method so we don't have to keep passing the date_str argument
     class DateParsing
 
-      # looks for dddd pattern in String and returns it if found
+      # looks for 4 consecutive digits in String and returns first occurence if found
       # @param [String] date_str String containing four digit year (we hope)
       # @return [String, nil] 4 digit year (e.g. 1865, 0950) if date_str has yyyy, nil otherwise
-      def self.sortable_year_from_date_str(date_str)
+      def self.sortable_year_for_yyyy(date_str)
         matches = date_str.match(/\d{4}/) if date_str
         return matches.to_s if matches
       end
@@ -23,7 +23,7 @@ module Stanford
       #   1/1/25  ->  1925
       # @param [String] date_str String containing x/x/yy or x-x-yy date pattern
       # @return [String, nil] 4 digit year (e.g. 1865, 0950) if date_str matches pattern, nil otherwise
-      def self.sortable_year_from_yy(date_str)
+      def self.sortable_year_for_yy(date_str)
         return unless date_str
         slash_matches = date_str.match(/\d{1,2}\/\d{1,2}\/\d{2}/)
         if slash_matches
@@ -44,11 +44,11 @@ module Stanford
       #   note that these are the only decade patterns found in our actual date strings in MODS records
       # @param [String] date_str String containing yyyu, yyy-, yyy? or yyyx decade pattern
       # @return [String, nil] 4 digit year (e.g. 1860, 1950) if date_str matches pattern, nil otherwise
-      def self.sortable_year_from_decade(date_str)
+      def self.sortable_year_for_decade(date_str)
         decade_matches = date_str.match(/\d{3}[u\-?x]/) if date_str
         if decade_matches
           changed_to_zero = decade_matches.to_s.tr('u\-?x', '0')
-          return sortable_year_from_date_str(changed_to_zero)
+          return sortable_year_for_yyyy(changed_to_zero)
         end
       end
 
@@ -59,7 +59,7 @@ module Stanford
       #   note that these are the only century patterns found in our actual date strings in MODS records
       # @param [String] date_str String containing yyuu, yy--, yy--? or xxth century pattern
       # @return [String, nil] yy00 if date_str matches pattern, nil otherwise; also nil if B.C. in pattern
-      def self.sortable_year_from_century(date_str)
+      def self.sortable_year_for_century(date_str)
         return unless date_str
         return if date_str.match(/B\.C\./)
         century_matches = date_str.match(CENTURY_4CHAR_REGEXP)
@@ -145,7 +145,7 @@ module Stanford
         date_str.rjust(4, '0')
       end
 
-      # NOTE:  while Date.parse() works for many dates, the *sortable_year_from_date_str
+      # NOTE:  while Date.parse() works for many dates, the *sortable_year_for_yyyy
       #   actually works for nearly all those cases and a lot more besides.  Trial and error
       #   with an extensive set of test data culled from actual date strings in our MODS records
       #   has made this method bogus.
