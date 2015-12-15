@@ -15,29 +15,38 @@ module Stanford
 
 # -- likely to be private or protected
 
-      # return all /originInfo/dateCreated elements in MODS records
-      # @return [Nokogiri::XML::NodeSet<Nokogiri::XML::Element>]
-      def date_created_nodeset
-        @mods_ng_xml.origin_info.dateCreated   # returns nokogiri element/node objects
+      # return /originInfo/dateCreated elements in MODS records
+      # @param [Boolean] ignore_approximate true if approximate dates (per qualifier attribute)
+      #   should be excluded; false approximate dates should be included
+      # @return [Array<Nokogiri::XML::Element>]
+      def date_created_elements(ignore_approximate=false)
+        date_created_nodeset = @mods_ng_xml.origin_info.dateCreated
+        return self.class.remove_approximate(date_created_nodeset) if ignore_approximate
+        date_created_nodeset.to_a
       end
 
-      # return all /originInfo/dateIssued elements in MODS records
-      # @return [Nokogiri::XML::NodeSet<Nokogiri::XML::Element>]
-      def date_issued_nodeset
-        @mods_ng_xml.origin_info.dateIssued   # returns nokogiri element/node objects
+      # return /originInfo/dateIssued elements in MODS records
+      # @param [Boolean] ignore_approximate true if approximate dates (per qualifier attribute)
+      #   should be excluded; false approximate dates should be included
+      # @return [Array<Nokogiri::XML::Element>]
+      def date_issued_elements(ignore_approximate=false)
+        date_issued_nodeset = @mods_ng_xml.origin_info.dateIssued
+        return self.class.remove_approximate(date_issued_nodeset) if ignore_approximate
+        date_issued_nodeset.to_a
       end
 
       # given a set of date elements, return the single element with attribute keyDate="yes"
       #  or return nil if no elements have attribute keyDate="yes", or if multiple elements have keyDate="yes"
-      # @param [Nokogiri::XML::NodeSet<Nokogiri::XML::Element>] nodeset set of date elements
+      # @param [Array<Nokogiri::XML::Element>] Array of date elements
       # @return [Nokogiri::XML::Element, nil] single date element with attribute keyDate="yes", or nil
-      def self.keyDate(nodeset)
-        keyDates = nodeset.select { |node| node["keyDate"] == 'yes' }
+      def self.keyDate(elements)
+        keyDates = elements.select { |node| node["keyDate"] == 'yes' }
         return keyDates.first if keyDates.size == 1
       end
 
+      # remove Elements from NodeSet if they have a qualifier attribute of 'approximate' or 'questionable'
       # @param [Nokogiri::XML::NodeSet<Nokogiri::XML::Element>] nodeset set of date elements
-      # @return [Nokogiri::XML::NodeSet<Nokogiri::XML::Element>] the set of date elements minus any that
+      # @return [Array<Nokogiri::XML::Element>] the set of date elements minus any that
       #   had a qualifier attribute of 'approximate' or 'questionable'
       def self.remove_approximate(nodeset)
         nodeset.select { |node| node unless date_is_approximate?(node) }

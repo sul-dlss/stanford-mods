@@ -6,12 +6,67 @@ module Stanford
     #     - we may want an integer or date sort field as well as lexical
     #     - we may want to either make this a module (a collection of methods another class can use)
     #       or have an initialize method so we don't have to keep passing the date_str argument
+    #       (e.g. we could have  my_date.bc? and my_date.sortable_year_for_dddd, esp for any method
+    #       with 'for' rather than 'from_date_str')
     class DateParsing
 
-      # looks for dddd pattern in String and returns it if found
+      # get single facet value for date, generally an explicit year or "17th century" or "5 B.C."
+      # @param [String] date_str String containing a date (we hope)
+      # @return [String, nil] String facet value for year if we could parse one, nil otherwise
+      def self.facet_string_from_date_str(date_str)
+        # B.C. first in case there are 4 digits, e.g. 1600 B.C.
+        return facet_string_for_bc(date_str) if date_str.match(BC_REGEX)
+        # most date strings have a four digit year
+        result ||= sortable_year_for_yyyy(date_str)
+        # 2 digit year will always be 19xx or 20xx; sortable version will make a good facet string
+        result ||= sortable_year_for_yy(date_str)
+        # decades are always 19xx or 20xx; sortable version will make a good facet string
+        result ||= sortable_year_for_decade(date_str)
+        result ||= facet_string_for_century(date_str)
+        result ||= facet_string_for_early_numeric(date_str)
+        unless result
+          # try removing brackets between digits in case we have 169[5] or [18]91
+          if date_str.match(/\d[\[\]]\d/)
+            no_brackets = date_str.delete('[]')
+            return facet_string_from_date_str(no_brackets)
+          end
+        end
+        result
+      end
+
+      # get String sortable value year if we can parse date_str to get a year.
+      #   SearchWorks currently uses a string field for pub date sorting; thus so does Spotlight.
+      #   The values returned must *lexically* sort in chronological order, so the B.C. dates are tricky
+      # @param [String] date_str String containing a date (we hope)
+      # @return [String, nil] String sortable year if we could parse one, nil otherwise
+      #  note that these values must *lexically* sort to create a chronological sort.
+      def self.sortable_year_string_from_date_str(date_str)
+        # B.C. first in case there are 4 digits, e.g. 1600 B.C.
+        return sortable_year_for_bc(date_str) if date_str.match(BC_REGEX)
+        # most date strings have a four digit year
+        result = sortable_year_for_yyyy(date_str)
+        result ||= sortable_year_for_yy(date_str)
+        result ||= sortable_year_for_decade(date_str)
+        result ||= sortable_year_for_century(date_str)
+        result ||= sortable_year_for_early_numeric(date_str)
+        unless result
+          # try removing brackets between digits in case we have 169[5] or [18]91
+          if date_str.match(/\d[\[\]]\d/)
+            no_brackets = date_str.delete('[]')
+            return sortable_year_string_from_date_str(no_brackets)
+          end
+        end
+        result
+      end
+
+      # TODO:  particularly for the methods below (xxx_for_zzz), we should probably
+      #   have an instance in play, rather than class methods.  This would allow the methods
+      #   above to avoid passing date_str in over and over.
+
+      # looks for 4 consecutive digits in String and returns first occurence if found
       # @param [String] date_str String containing four digit year (we hope)
       # @return [String, nil] 4 digit year (e.g. 1865, 0950) if date_str has yyyy, nil otherwise
-      def self.sortable_year_from_date_str(date_str)
+      def self.sortable_year_for_yyyy(date_str)
         matches = date_str.match(/\d{4}/) if date_str
         return matches.to_s if matches
       end
@@ -23,7 +78,7 @@ module Stanford
       #   1/1/25  ->  1925
       # @param [String] date_str String containing x/x/yy or x-x-yy date pattern
       # @return [String, nil] 4 digit year (e.g. 1865, 0950) if date_str matches pattern, nil otherwise
-      def self.sortable_year_from_yy(date_str)
+      def self.sortable_year_for_yy(date_str)
         return unless date_str
         slash_matches = date_str.match(/\d{1,2}\/\d{1,2}\/\d{2}/)
         if slash_matches
@@ -44,11 +99,11 @@ module Stanford
       #   note that these are the only decade patterns found in our actual date strings in MODS records
       # @param [String] date_str String containing yyyu, yyy-, yyy? or yyyx decade pattern
       # @return [String, nil] 4 digit year (e.g. 1860, 1950) if date_str matches pattern, nil otherwise
-      def self.sortable_year_from_decade(date_str)
+      def self.sortable_year_for_decade(date_str)
         decade_matches = date_str.match(/\d{3}[u\-?x]/) if date_str
         if decade_matches
           changed_to_zero = decade_matches.to_s.tr('u\-?x', '0')
-          return sortable_year_from_date_str(changed_to_zero)
+          return sortable_year_for_yyyy(changed_to_zero)
         end
       end
 
@@ -59,7 +114,7 @@ module Stanford
       #   note that these are the only century patterns found in our actual date strings in MODS records
       # @param [String] date_str String containing yyuu, yy--, yy--? or xxth century pattern
       # @return [String, nil] yy00 if date_str matches pattern, nil otherwise; also nil if B.C. in pattern
-      def self.sortable_year_from_century(date_str)
+      def self.sortable_year_for_century(date_str)
         return unless date_str
         return if date_str.match(/B\.C\./)
         century_matches = date_str.match(CENTURY_4CHAR_REGEXP)
@@ -145,7 +200,7 @@ module Stanford
         date_str.rjust(4, '0')
       end
 
-      # NOTE:  while Date.parse() works for many dates, the *sortable_year_from_date_str
+      # NOTE:  while Date.parse() works for many dates, the *sortable_year_for_yyyy
       #   actually works for nearly all those cases and a lot more besides.  Trial and error
       #   with an extensive set of test data culled from actual date strings in our MODS records
       #   has made this method bogus.
