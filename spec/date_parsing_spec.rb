@@ -428,6 +428,45 @@ describe "date parsing methods" do
     end
   end
 
+  context '*sortable_year_string_from_date_str' do
+    single_year
+      .merge(specific_month)
+      .merge(specific_day)
+      .merge(specific_day_2_digit_year)
+      .merge(specific_day_ruby_parse_fail)
+      .merge(early_numeric_dates)
+      .merge(bc_dates)
+      .merge(brackets_in_middle_of_year)
+      .merge(invalid_but_can_get_year).each do |example, expected|
+      it "#{expected} for single value #{example}" do
+        expect(Stanford::Mods::DateParsing.sortable_year_string_from_date_str(example)).to eq expected
+      end
+    end
+
+    multiple_years
+      .merge(multiple_years_4_digits_once)
+      .merge(decade_only)
+      .merge(decade_only_4_digits).each do |example, expected|
+      it "#{expected.first} for multi-value #{example}" do
+        expect(Stanford::Mods::DateParsing.sortable_year_string_from_date_str(example)).to eq expected.first
+      end
+    end
+
+    century_only.keys.each do |example|
+      it "1700 from #{example}" do
+        expect(Stanford::Mods::DateParsing.sortable_year_string_from_date_str(example)).to eq '1700'
+      end
+    end
+    it '0700 for 7--' do
+      expect(Stanford::Mods::DateParsing.sortable_year_string_from_date_str('7--')).to eq '0700'
+    end
+
+    it 'nil for 1600 B.C.' do
+      skip "code broken for dddd B.C. but no existing data for this yet"
+      expect(Stanford::Mods::DateParsing.sortable_year_string_from_date_str('1600 B.C.')).to eq nil
+    end
+  end
+
   context '*sortable_year_for_yyyy' do
     single_year
       .merge(specific_month)

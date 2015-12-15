@@ -32,6 +32,31 @@ module Stanford
         result
       end
 
+      # get String sortable value year if we can parse date_str to get a year.
+      #   SearchWorks currently uses a string field for pub date sorting; thus so does Spotlight.
+      #   The values returned must *lexically* sort in chronological order, so the B.C. dates are tricky
+      # @param [String] date_str String containing a date (we hope)
+      # @return [String, nil] String sortable year if we could parse one, nil otherwise
+      #  note that these values must *lexically* sort to create a chronological sort.
+      def self.sortable_year_string_from_date_str(date_str)
+        # B.C. first in case there are 4 digits, e.g. 1600 B.C.
+        return sortable_year_for_bc(date_str) if date_str.match(BC_REGEX)
+        # most date strings have a four digit year
+        result = sortable_year_for_yyyy(date_str)
+        result ||= sortable_year_for_yy(date_str)
+        result ||= sortable_year_for_decade(date_str)
+        result ||= sortable_year_for_century(date_str)
+        result ||= sortable_year_for_early_numeric(date_str)
+        unless result
+          # try removing brackets between digits in case we have 169[5] or [18]91
+          if date_str.match(/\d[\[\]]\d/)
+            no_brackets = date_str.delete('[]')
+            return sortable_year_string_from_date_str(no_brackets)
+          end
+        end
+        result
+      end
+
       # looks for 4 consecutive digits in String and returns first occurence if found
       # @param [String] date_str String containing four digit year (we hope)
       # @return [String, nil] 4 digit year (e.g. 1865, 0950) if date_str has yyyy, nil otherwise
