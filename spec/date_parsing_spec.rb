@@ -382,6 +382,51 @@ describe "date parsing methods" do
     '8 B.C.' => '-992'
   }
 
+  context '*facet_string_from_date_str' do
+    single_year
+      .merge(specific_month)
+      .merge(specific_day)
+      .merge(specific_day_2_digit_year)
+      .merge(specific_day_ruby_parse_fail)
+      .merge(century_only)
+      .merge(brackets_in_middle_of_year)
+      .merge(invalid_but_can_get_year).each do |example, expected|
+      it "#{expected} for single value #{example}" do
+        expect(Stanford::Mods::DateParsing.facet_string_from_date_str(example)).to eq expected
+      end
+    end
+
+    multiple_years
+      .merge(multiple_years_4_digits_once)
+      .merge(decade_only)
+      .merge(decade_only_4_digits).each do |example, expected|
+      it "#{expected.first} for multi-value #{example}" do
+        expect(Stanford::Mods::DateParsing.facet_string_from_date_str(example)).to eq expected.first
+      end
+    end
+
+    early_numeric_dates.each do |example, expected|
+      if example.start_with?('-')
+        exp = example[1..-1] + " B.C."
+        it "#{exp} for #{example}" do
+          expect(Stanford::Mods::DateParsing.facet_string_from_date_str(example)).to eq exp
+        end
+      else
+        it "#{expected} for #{example}" do
+          expect(Stanford::Mods::DateParsing.facet_string_from_date_str(example)).to eq expected
+        end
+      end
+    end
+
+    bc_dates.keys.each do |example|
+      it "#{example} for #{example}" do
+        expect(Stanford::Mods::DateParsing.facet_string_from_date_str(example)).to eq example
+      end
+    end
+    it '1600 B.C. for 1600 B.C.' do
+      expect(Stanford::Mods::DateParsing.facet_string_from_date_str('1600 B.C.')).to eq '1600 B.C.'
+    end
+  end
 
   context '*sortable_year_for_yyyy' do
     single_year

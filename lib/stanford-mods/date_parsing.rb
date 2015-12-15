@@ -8,6 +8,30 @@ module Stanford
     #       or have an initialize method so we don't have to keep passing the date_str argument
     class DateParsing
 
+      # get single facet value for date, generally an explicit year or "17th century" or "5 B.C."
+      # @param [String] date_str String containing a date (we hope)
+      # @return [String, nil] String facet value for year if we could parse one, nil otherwise
+      def self.facet_string_from_date_str(date_str)
+        # B.C. first in case there are 4 digits, e.g. 1600 B.C.
+        return facet_string_for_bc(date_str) if date_str.match(BC_REGEX)
+        # most date strings have a four digit year
+        result ||= sortable_year_for_yyyy(date_str)
+        # 2 digit year will always be 19xx or 20xx; sortable version will make a good facet string
+        result ||= sortable_year_for_yy(date_str)
+        # decades are always 19xx or 20xx; sortable version will make a good facet string
+        result ||= sortable_year_for_decade(date_str)
+        result ||= facet_string_for_century(date_str)
+        result ||= facet_string_for_early_numeric(date_str)
+        unless result
+          # try removing brackets between digits in case we have 169[5] or [18]91
+          if date_str.match(/\d[\[\]]\d/)
+            no_brackets = date_str.delete('[]')
+            return facet_string_from_date_str(no_brackets)
+          end
+        end
+        result
+      end
+
       # looks for 4 consecutive digits in String and returns first occurence if found
       # @param [String] date_str String containing four digit year (we hope)
       # @return [String, nil] 4 digit year (e.g. 1865, 0950) if date_str has yyyy, nil otherwise
