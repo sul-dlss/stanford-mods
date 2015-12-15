@@ -21,15 +21,18 @@ module Stanford
         # 2 digit year will always be 19xx or 20xx; sortable version will make a good facet string
         result ||= my_dpo.sortable_year_for_yy
         # decades are always 19xx or 20xx; sortable version will make a good facet string
-        result ||= my_dpo.sortable_year_for_decade
-        result ||= my_dpo.facet_string_for_century
-        result ||= my_dpo.facet_string_for_early_numeric
+        result ||= sortable_year_for_decade(date_str)
         unless result
           # try removing brackets between digits in case we have 169[5] or [18]91
           if date_str.match(BRACKETS_BETWEEN_DIGITS_REXEXP)
             no_brackets = date_str.delete('[]')
             return facet_string_from_date_str(no_brackets)
           end
+        end
+        # parsing below this line gives string inapprop for year_str_valid?
+        unless year_str_valid?(result)
+          result = facet_string_for_century(date_str)
+          result ||= facet_string_for_early_numeric(date_str)
         end
         result
       end
@@ -57,14 +60,14 @@ module Stanford
             return sortable_year_string_from_date_str(no_brackets)
           end
         end
-        result
+        result if year_str_valid?(result)
       end
 
       # @param [String] year_str String containing a date in format: -yyy, -yy, -y, y, yy, yyy, yyyy
       # @return [Boolean] true if the year is between -999 and (current year + 1); false otherwise
       def self.year_str_valid?(year_str)
-        return false unless year_str && year_str.match(/^\d{1,4}$/) || year_str.match(/^-\d{1,3}$/)
-        -1000 < year_str.to_i && year_str.to_i < Date.today.year + 2
+        return false unless year_str && (year_str.match(/^\d{1,4}$/) || year_str.match(/^-\d{1,3}$/))
+        (-1000 < year_str.to_i) && (year_str.to_i < Date.today.year + 2)
       end
 
       attr_reader :orig_date_str

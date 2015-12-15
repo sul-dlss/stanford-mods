@@ -30,8 +30,7 @@ describe "date parsing methods" do
     '1869-00-00' => '1869',
     '1862-01-00' => '1862',
     '1985-05-00' => '1985',
-    '0000-00-00' => '0000',  # needs to be identified as invalid downstream
-    '9999' => '9999' # needs to be identified as invalid downstream
+    '0000-00-00' => '0000'   # needs to be identified as invalid downstream
   }
   # example string as key, expected parsed value as value
   single_year = {
@@ -426,6 +425,13 @@ describe "date parsing methods" do
     it '1600 B.C. for 1600 B.C.' do
       expect(Stanford::Mods::DateParsing.facet_string_from_date_str('1600 B.C.')).to eq '1600 B.C.'
     end
+
+    it 'nil for 9999' do  # a common date seen in marc data meaning "indefinite end period"
+      expect(Stanford::Mods::DateParsing.facet_string_from_date_str('9999')).to eq nil
+    end
+    it 'nil for 2035' do
+      expect(Stanford::Mods::DateParsing.facet_string_from_date_str('2035')).to eq nil
+    end
   end
 
   context '*sortable_year_string_from_date_str' do
@@ -464,6 +470,13 @@ describe "date parsing methods" do
     it 'nil for 1600 B.C.' do
       skip "code broken for dddd B.C. but no existing data for this yet"
       expect(Stanford::Mods::DateParsing.sortable_year_string_from_date_str('1600 B.C.')).to eq nil
+    end
+
+    it 'nil for 9999' do  # a common date seen in marc data meaning "indefinite end period"
+      expect(Stanford::Mods::DateParsing.sortable_year_string_from_date_str('9999')).to eq nil
+    end
+    it 'nil for 2035' do
+      expect(Stanford::Mods::DateParsing.sortable_year_string_from_date_str('2035')).to eq nil
     end
   end
 
@@ -511,6 +524,9 @@ describe "date parsing methods" do
     end
     it 'false for 198-' do
       expect(Stanford::Mods::DateParsing.year_str_valid?('198-')).to eq false
+    end
+    it 'false for nil' do
+      expect(Stanford::Mods::DateParsing.year_str_valid?(nil)).to eq false
     end
   end
 
