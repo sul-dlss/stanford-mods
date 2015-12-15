@@ -6,6 +6,8 @@ module Stanford
     #     - we may want an integer or date sort field as well as lexical
     #     - we may want to either make this a module (a collection of methods another class can use)
     #       or have an initialize method so we don't have to keep passing the date_str argument
+    #       (e.g. we could have  my_date.bc? and my_date.sortable_year_for_dddd, esp for any method
+    #       with 'for' rather than 'from_date_str')
     class DateParsing
 
       # get single facet value for date, generally an explicit year or "17th century" or "5 B.C."
@@ -56,6 +58,10 @@ module Stanford
         end
         result
       end
+
+      # TODO:  particularly for the methods below (xxx_for_zzz), we should probably
+      #   have an instance in play, rather than class methods.  This would allow the methods
+      #   above to avoid passing date_str in over and over.
 
       # looks for 4 consecutive digits in String and returns first occurence if found
       # @param [String] date_str String containing four digit year (we hope)
