@@ -1,8 +1,11 @@
-# Parsing date strings
-# TODO:  this should become its own gem and/or become eclipsed by timetwister gem
-# These methods may be used by searchworks.rb file or by downstream apps
 module Stanford
   module Mods
+    # Parsing date strings
+    # TODO:  this should become its own gem and/or become eclipsed by/merged with timetwister gem
+    #   When this is "gemified":
+    #     - we may want an integer or date sort field as well as lexical
+    #     - we may want to either make this a module (a collection of methods another class can use)
+    #       or have an initialize method so we don't have to keep passing the date_str argument
     class DateParsing
 
       # looks for dddd pattern in String and returns it if found
@@ -139,7 +142,7 @@ module Stanford
         return unless date_str.match(EARLY_NUMERIC)
         # negative number becomes B.C.
         return date_str[1..-1] + " B.C." if date_str.match(/^\-/)
-        return date_str.rjust(4, '0')
+        date_str.rjust(4, '0')
       end
 
       # NOTE:  while Date.parse() works for many dates, the *sortable_year_from_date_str
