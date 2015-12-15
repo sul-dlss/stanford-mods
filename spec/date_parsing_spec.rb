@@ -467,7 +467,54 @@ describe "date parsing methods" do
     end
   end
 
-  context '#sortable_year_for_yyyy' do
+  context '*year_str_valid?' do
+    it 'false for -1000' do
+      expect(Stanford::Mods::DateParsing.year_str_valid?('-1000')).to eq false
+    end
+    it 'true for -999' do
+      expect(Stanford::Mods::DateParsing.year_str_valid?('-999')).to eq true
+    end
+    it 'true for -35' do
+      expect(Stanford::Mods::DateParsing.year_str_valid?('-35')).to eq true
+    end
+    it 'true for -3' do
+      expect(Stanford::Mods::DateParsing.year_str_valid?('-3')).to eq true
+    end
+    it 'true for 0000' do
+      expect(Stanford::Mods::DateParsing.year_str_valid?('0000')).to eq true
+    end
+    it 'true for 0' do
+      expect(Stanford::Mods::DateParsing.year_str_valid?('0')).to eq true
+    end
+    it 'true for 5' do
+      expect(Stanford::Mods::DateParsing.year_str_valid?('5')).to eq true
+    end
+    it 'true for 33' do
+      expect(Stanford::Mods::DateParsing.year_str_valid?('33')).to eq true
+    end
+    it 'true for 150' do
+      expect(Stanford::Mods::DateParsing.year_str_valid?('150')).to eq true
+    end
+    it 'true for current year + 1' do
+      year_str = (Date.today.year + 1).to_s
+      expect(Stanford::Mods::DateParsing.year_str_valid?(year_str)).to eq true
+    end
+    it 'false for current year + 2' do
+      year_str = (Date.today.year + 2).to_s
+      expect(Stanford::Mods::DateParsing.year_str_valid?(year_str)).to eq false
+    end
+    it 'false for 9999' do
+      expect(Stanford::Mods::DateParsing.year_str_valid?('9999')).to eq false
+    end
+    it 'false for 165x' do
+      expect(Stanford::Mods::DateParsing.year_str_valid?('165x')).to eq false
+    end
+    it 'false for 198-' do
+      expect(Stanford::Mods::DateParsing.year_str_valid?('198-')).to eq false
+    end
+  end
+
+  context '*sortable_year_for_yyyy' do
     single_year
       .merge(specific_month)
       .merge(specific_day)
@@ -699,4 +746,5 @@ describe "date parsing methods" do
       end
     end
   end
+
 end

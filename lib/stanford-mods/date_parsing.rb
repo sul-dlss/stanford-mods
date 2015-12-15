@@ -60,6 +60,12 @@ module Stanford
         result
       end
 
+      # @param [String] year_str String containing a date in format: -yyy, -yy, -y, y, yy, yyy, yyyy
+      # @return [Boolean] true if the year is between -999 and (current year + 1); false otherwise
+      def self.year_str_valid?(year_str)
+        return false unless year_str && year_str.match(/^\d{1,4}$/) || year_str.match(/^-\d{1,3}$/)
+        -1000 < year_str.to_i && year_str.to_i < Date.today.year + 2
+      end
 
       attr_reader :orig_date_str
 
