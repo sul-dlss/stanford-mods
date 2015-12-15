@@ -49,6 +49,9 @@ module Stanford
         end
       end
 
+      CENTURY_WORD_REGEXP = Regexp.new('(\d{1,2}).*century')
+      CENTURY_4CHAR_REGEXP = Regexp.new('(\d{1,2})[u\-]{2}')
+
       # get first year of century (as String) if we have:  yyuu, yy--, yy--? or xxth century pattern
       #   note that these are the only century patterns found in our actual date strings in MODS records
       # @param [String] date_str String containing yyuu, yy--, yy--? or xxth century pattern
@@ -56,12 +59,12 @@ module Stanford
       def self.sortable_year_from_century(date_str)
         return unless date_str
         return if date_str.match(/B\.C\./)
-        century_matches = date_str.match(/(\d{1,2})[u\-]{2}/)
+        century_matches = date_str.match(CENTURY_4CHAR_REGEXP)
         if century_matches
           return $1 + '00' if $1.length == 2
           return '0' + $1 + '00' if $1.length == 1
         end
-        century_str_matches = date_str.match(/(\d{1,2}).*century/)
+        century_str_matches = date_str.match(CENTURY_WORD_REGEXP)
         if century_str_matches
           yy = ($1.to_i - 1).to_s
           return yy + '00' if yy.length == 2
@@ -76,15 +79,17 @@ module Stanford
       def self.facet_string_for_century(date_str)
         return unless date_str
         return if date_str.match(/B\.C\./)
-        century_str_matches = date_str.match(/\d{1,2}.*century/)
+        century_str_matches = date_str.match(CENTURY_WORD_REGEXP)
         return century_str_matches.to_s if century_str_matches
 
-        century_matches = date_str.match(/(\d{1,2})[u\-]{2}/)
+        century_matches = date_str.match(CENTURY_4CHAR_REGEXP)
         if century_matches
           require 'active_support/core_ext/integer/inflections'
           return "#{($1.to_i + 1).ordinalize} century"
         end
       end
+
+      BC_REGEX = Regexp.new('(\d{1,4}).*' + Regexp.escape('B.C.'))
 
       # get String sortable value for B.C. if we have  B.C. pattern
       #  note that these values must *lexically* sort to create a chronological sort.
@@ -94,7 +99,7 @@ module Stanford
       # @param [String] date_str String containing B.C.
       # @return [String, nil] String sortable -ddd if B.C. in pattern; nil otherwise
       def self.sortable_year_for_bc(date_str)
-        bc_matches = date_str.match(/(\d{1,4}).*B\.C\./) if date_str
+        bc_matches = date_str.match(BC_REGEX) if date_str
         return ($1.to_i - 1000).to_s if bc_matches
       end
 
@@ -102,9 +107,11 @@ module Stanford
       # @param [String] date_str String containing B.C.
       # @return [String, nil] ddd B.C.  if ddd B.C. in pattern; nil otherwise
       def self.facet_string_for_bc(date_str)
-        bc_matches = date_str.match(/\d{1,4}.*B\.C\./) if date_str
+        bc_matches = date_str.match(BC_REGEX) if date_str
         return bc_matches.to_s if bc_matches
       end
+
+      EARLY_NUMERIC = Regexp.new('^\-?\d{1,3}$')
 
       # get String sortable value from date String containing yyy, yy, y, -y, -yy, -yyy
       #  note that these values must *lexically* sort to create a chronological sort.
@@ -114,7 +121,7 @@ module Stanford
       # @param [String] date_str String containing yyy, yy, y, -y, -yy, -yyy
       # @return [String, nil] String sortable -ddd if date_str matches pattern; nil otherwise
       def self.sortable_year_for_early_numeric(date_str)
-        return unless date_str.match(/^\-?\d{1,3}$/)
+        return unless date_str.match(EARLY_NUMERIC)
         if date_str.match(/^\-/)
           # negative number becomes x - 1000 for sorting; -005 for -995
           num = date_str[1..-1].to_i - 1000
@@ -129,7 +136,7 @@ module Stanford
       #   positive number strings will be left padded with zeros for clarity in the facet
       # @param [String] date_str String containing yyy, yy, y, -y, -yy, -yyy
       def self.facet_string_for_early_numeric(date_str)
-        return unless date_str.match(/^\-?\d{1,3}$/)
+        return unless date_str.match(EARLY_NUMERIC)
         # negative number becomes B.C.
         return date_str[1..-1] + " B.C." if date_str.match(/^\-/)
         return date_str.rjust(4, '0')
