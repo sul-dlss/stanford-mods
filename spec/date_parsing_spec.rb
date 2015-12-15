@@ -467,194 +467,194 @@ describe "date parsing methods" do
     end
   end
 
-  context '*sortable_year_for_yyyy' do
+  context '#sortable_year_for_yyyy' do
     single_year
       .merge(specific_month)
       .merge(specific_day)
       .merge(invalid_but_can_get_year).each do |example, expected|
       it "#{expected} for #{example}" do
-        expect(Stanford::Mods::DateParsing.sortable_year_for_yyyy(example)).to eq expected
-      end
-    end
-
-    multiple_years.each do |example, expected|
-      it "#{expected.first} for #{example}" do
-        expect(Stanford::Mods::DateParsing.sortable_year_for_yyyy(example)).to eq expected.first
+        expect(Stanford::Mods::DateParsing.new(example).sortable_year_for_yyyy).to eq expected
       end
     end
 
     specific_day_ruby_parse_fail.each do |example, expected|
       it "#{expected} for #{example}" do
-        expect(Stanford::Mods::DateParsing.sortable_year_for_yyyy(example)).to eq expected
+        expect(Stanford::Mods::DateParsing.new(example).sortable_year_for_yyyy).to eq expected
+      end
+    end
+
+    multiple_years.each do |example, expected|
+      it "#{expected.first} for #{example}" do
+        expect(Stanford::Mods::DateParsing.new(example).sortable_year_for_yyyy).to eq expected.first
       end
     end
 
     multiple_years_4_digits_once
       .merge(decade_only_4_digits).each do |example, expected|
       it "#{expected} for #{example}" do
-        expect(Stanford::Mods::DateParsing.sortable_year_for_yyyy(example)).to eq expected.first
+        expect(Stanford::Mods::DateParsing.new(example).sortable_year_for_yyyy).to eq expected.first
       end
     end
 
-    # some strings this method cannot handle (and must be parsed with other class methods)
+    # some of the strings this method cannot handle (and must be parsed with other instance methods)
     unparseable
       .push(*brackets_in_middle_of_year.keys)
       .push(*specific_day_2_digit_year.keys)
       .push(*decade_only.keys)
       .push(*century_only.keys).each do |example|
       it "nil for #{example}" do
-        expect(Stanford::Mods::DateParsing.sortable_year_for_yyyy(example)).to eq nil
+        expect(Stanford::Mods::DateParsing.new(example).sortable_year_for_yyyy).to eq nil
       end
     end
   end
 
-  context '*sortable_year_for_yy' do
+  context '#sortable_year_for_yy' do
     specific_day_2_digit_year.each do |example, expected|
       it "#{expected} for #{example}" do
-        expect(Stanford::Mods::DateParsing.sortable_year_for_yy(example)).to eq expected
+        expect(Stanford::Mods::DateParsing.new(example).sortable_year_for_yy).to eq expected
       end
     end
     it '2000 for 12/25/00' do
-      expect(Stanford::Mods::DateParsing.sortable_year_for_yy('12/25/00')).to eq '2000'
+      expect(Stanford::Mods::DateParsing.new('12/25/00').sortable_year_for_yy).to eq '2000'
     end
-    # some strings this method cannot handle (and must be parsed with other class methods)
+    # some of the strings this method cannot handle (and must be parsed with other instance methods)
     it 'nil for yy/mm/dd' do
-      expect(Stanford::Mods::DateParsing.sortable_year_for_yy('92/1/31')).to eq nil
+      expect(Stanford::Mods::DateParsing.new('92/1/31').sortable_year_for_yy).to eq nil
     end
     it 'nil for yy-dd-mm' do
-      expect(Stanford::Mods::DateParsing.sortable_year_for_yy('92-31-1')).to eq nil
+      expect(Stanford::Mods::DateParsing.new('92-31-1').sortable_year_for_yy).to eq nil
     end
     decade_only.keys.each do |example|
       it "nil for #{example}" do
-        expect(Stanford::Mods::DateParsing.sortable_year_for_yy(example)).to eq nil
+        expect(Stanford::Mods::DateParsing.new(example).sortable_year_for_yy).to eq nil
       end
     end
   end
 
-  context '*sortable_year_for_decade' do
+  context '#sortable_year_for_decade' do
     decade_only.each do |example, expected|
       it "#{expected.first} for #{example}" do
-        expect(Stanford::Mods::DateParsing.sortable_year_for_decade(example)).to eq expected.first
+        expect(Stanford::Mods::DateParsing.new(example).sortable_year_for_decade).to eq expected.first
       end
     end
     it '1990 for 199u' do
-      expect(Stanford::Mods::DateParsing.sortable_year_for_decade('199u')).to eq '1990'
+      expect(Stanford::Mods::DateParsing.new('199u').sortable_year_for_decade).to eq '1990'
     end
     it '2000 for 200-' do
-      expect(Stanford::Mods::DateParsing.sortable_year_for_decade('200-')).to eq '2000'
+      expect(Stanford::Mods::DateParsing.new('200-').sortable_year_for_decade).to eq '2000'
     end
     it '2010 for 201?' do
-      expect(Stanford::Mods::DateParsing.sortable_year_for_decade('201?')).to eq '2010'
+      expect(Stanford::Mods::DateParsing.new('201?').sortable_year_for_decade).to eq '2010'
     end
     it '2020 for 202x' do
-      expect(Stanford::Mods::DateParsing.sortable_year_for_decade('202x')).to eq '2020'
+      expect(Stanford::Mods::DateParsing.new('202x').sortable_year_for_decade).to eq '2020'
     end
-    # some strings this method cannot handle (and must be parsed with other class methods)
+    # some of the strings this method cannot handle (and must be parsed with other instance methods)
     decade_only_4_digits.keys
       .push(*specific_day_2_digit_year.keys).each do |example|
       it "nil for #{example}" do
-        expect(Stanford::Mods::DateParsing.sortable_year_for_decade(example)).to eq nil
+        expect(Stanford::Mods::DateParsing.new(example).sortable_year_for_decade).to eq nil
       end
     end
   end
 
-  context '*sortable_year_for_century' do
+  context '#sortable_year_for_century' do
     century_only.keys.each do |example|
       it "1700 from #{example}" do
-        expect(Stanford::Mods::DateParsing.sortable_year_for_century(example)).to eq '1700'
+        expect(Stanford::Mods::DateParsing.new(example).sortable_year_for_century).to eq '1700'
       end
     end
     it '0700 for 7--' do
-      expect(Stanford::Mods::DateParsing.sortable_year_for_century('7--')).to eq '0700'
+      expect(Stanford::Mods::DateParsing.new('7--').sortable_year_for_century).to eq '0700'
     end
     it 'nil for 7th century B.C. (to be handled in different method)' do
-      expect(Stanford::Mods::DateParsing.sortable_year_for_century('7th century B.C.')).to eq nil
+      expect(Stanford::Mods::DateParsing.new('7th century B.C.').sortable_year_for_century).to eq nil
     end
   end
 
-  context '*facet_string_for_century' do
+  context '#facet_string_for_century' do
     century_only.each do |example, expected|
       it "#{expected} for #{example}" do
-        expect(Stanford::Mods::DateParsing.facet_string_for_century(example)).to eq expected
+        expect(Stanford::Mods::DateParsing.new(example).facet_string_for_century).to eq expected
       end
     end
     it '17th century for 16--' do
-      expect(Stanford::Mods::DateParsing.facet_string_for_century('16--')).to eq '17th century'
+      expect(Stanford::Mods::DateParsing.new('16--').facet_string_for_century).to eq '17th century'
     end
     it '8th century for 7--' do
-      expect(Stanford::Mods::DateParsing.facet_string_for_century('7--')).to eq '8th century'
+      expect(Stanford::Mods::DateParsing.new('7--').facet_string_for_century).to eq '8th century'
     end
     it '21st century for 20--' do
-      expect(Stanford::Mods::DateParsing.facet_string_for_century('20--')).to eq '21st century'
+      expect(Stanford::Mods::DateParsing.new('20--').facet_string_for_century).to eq '21st century'
     end
     it '2nd century for 1--' do
-      expect(Stanford::Mods::DateParsing.facet_string_for_century('1--')).to eq '2nd century'
+      expect(Stanford::Mods::DateParsing.new('1--').facet_string_for_century).to eq '2nd century'
     end
     it '3rd century for 2--' do
-      expect(Stanford::Mods::DateParsing.facet_string_for_century('2--')).to eq '3rd century'
+      expect(Stanford::Mods::DateParsing.new('2--').facet_string_for_century).to eq '3rd century'
     end
     it 'nil for 7th century B.C. (to be handled in different method)' do
-      expect(Stanford::Mods::DateParsing.facet_string_for_century('7th century B.C.')).to eq nil
+      expect(Stanford::Mods::DateParsing.new('7th century B.C.').facet_string_for_century).to eq nil
     end
   end
 
-  context '*sortable_year_for_early_numeric' do
+  context '#sortable_year_for_early_numeric' do
     early_numeric_dates.each do |example, expected|
       it "#{expected} for #{example}" do
-        expect(Stanford::Mods::DateParsing.sortable_year_for_early_numeric(example)).to eq expected
+        expect(Stanford::Mods::DateParsing.new(example).sortable_year_for_early_numeric).to eq expected
       end
     end
   end
 
-  context '*facet_string_for_early_numeric' do
+  context '#facet_string_for_early_numeric' do
     early_numeric_dates.each do |example, expected|
       if example.start_with?('-')
         exp = example[1..-1] + " B.C."
         it "#{exp} for #{example}" do
-          expect(Stanford::Mods::DateParsing.facet_string_for_early_numeric(example)).to eq exp
+          expect(Stanford::Mods::DateParsing.new(example).facet_string_for_early_numeric).to eq exp
         end
       else
         it "#{expected} for #{example}" do
-          expect(Stanford::Mods::DateParsing.facet_string_for_early_numeric(example)).to eq expected
+          expect(Stanford::Mods::DateParsing.new(example).facet_string_for_early_numeric).to eq expected
         end
       end
     end
   end
 
-  context '*sortable_year_for_bc' do
+  context '#sortable_year_for_bc' do
     bc_dates.each do |example, expected|
       it "#{expected} for #{example}" do
-        expect(Stanford::Mods::DateParsing.sortable_year_for_bc(example)).to eq expected
+        expect(Stanford::Mods::DateParsing.new(example).sortable_year_for_bc).to eq expected
       end
     end
   end
 
-  context '*facet_string_for_bc' do
+  context '#facet_string_for_bc' do
     bc_dates.keys.each do |example|
       it "#{example} for #{example}" do
-        expect(Stanford::Mods::DateParsing.facet_string_for_bc(example)).to eq example
+        expect(Stanford::Mods::DateParsing.new(example).facet_string_for_bc).to eq example
       end
     end
     it '1600 B.C. for 1600 B.C.' do
-      expect(Stanford::Mods::DateParsing.facet_string_for_bc('1600 B.C.')).to eq '1600 B.C.'
+      expect(Stanford::Mods::DateParsing.new('1600 B.C.').facet_string_for_bc).to eq '1600 B.C.'
     end
   end
 
-  context '*year_via_ruby_parsing' do
+  context '#year_via_ruby_parsing' do
     specific_day.each do |example, expected|
       it "#{expected} for #{example}" do
-        expect(Stanford::Mods::DateParsing.year_via_ruby_parsing(example)).to eq expected
+        expect(Stanford::Mods::DateParsing.new(example).year_via_ruby_parsing).to eq expected
       end
     end
 
-    # some strings this method cannot handle (and must be parsed with other class methods)
+    # some of the strings this method cannot handle (and must be parsed with other instance methods)
     multiple_years.keys
       .push(*multiple_years_4_digits_once.keys)
       .push(*decade_only_4_digits.keys)
       .push(*century_only.keys)
       .push(*invalid_but_can_get_year.keys).each do |example|
       it "nil for #{example}" do
-        expect(Stanford::Mods::DateParsing.year_via_ruby_parsing(example)).to eq nil
+        expect(Stanford::Mods::DateParsing.new(example).year_via_ruby_parsing).to eq nil
       end
     end
 
@@ -673,28 +673,28 @@ describe "date parsing methods" do
       # assigns incorrect values to 13 out of 92 (rest with no val assigned)
       unparseable.each do |example|
         it "nil for unparseable: #{example}" do
-          expect(Stanford::Mods::DateParsing.year_via_ruby_parsing(example)).to eq nil
+          expect(Stanford::Mods::DateParsing.new(example).year_via_ruby_parsing).to eq nil
         end
       end
 
       # assigns incorrect values to 2 out of 2
       brackets_in_middle_of_year.keys.each do |example|
         it "nil for brackets_in_middle_of_year: #{example}" do
-          expect(Stanford::Mods::DateParsing.year_via_ruby_parsing(example)).to eq nil
+          expect(Stanford::Mods::DateParsing.new(example).year_via_ruby_parsing).to eq nil
         end
       end
 
       # assigns incorrect values to 3 out of 8 (5 with no val assigned)
       specific_day_2_digit_year.keys.each do |example|
         it "nil for specific_day_2_digit_year: #{example}" do
-          expect(Stanford::Mods::DateParsing.year_via_ruby_parsing(example)).to eq nil
+          expect(Stanford::Mods::DateParsing.new(example).year_via_ruby_parsing).to eq nil
         end
       end
 
       # assigns incorrect values to 8 out of 8
       decade_only.keys.each do |example|
         it "nil for decade_only: #{example}" do
-          expect(Stanford::Mods::DateParsing.year_via_ruby_parsing(example)).to eq nil
+          expect(Stanford::Mods::DateParsing.new(example).year_via_ruby_parsing).to eq nil
         end
       end
     end
