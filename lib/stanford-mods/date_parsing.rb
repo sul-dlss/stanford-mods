@@ -13,6 +13,7 @@ module Stanford
       # @param [String] date_str String containing a date (we hope)
       # @return [String, nil] String facet value for year if we could parse one, nil otherwise
       def self.facet_string_from_date_str(date_str)
+        return if date_str == '0000-00-00' # shpc collection has these useless dates
         my_dpo = DateParsing.new(date_str)
         # B.C. first in case there are 4 digits, e.g. 1600 B.C.
         return my_dpo.facet_string_for_bc if date_str.match(BC_REGEX)
@@ -44,6 +45,7 @@ module Stanford
       # @return [String, nil] String sortable year if we could parse one, nil otherwise
       #  note that these values must *lexically* sort to create a chronological sort.
       def self.sortable_year_string_from_date_str(date_str)
+        return if date_str == '0000-00-00' # shpc collection has these useless dates
         my_dpo = DateParsing.new(date_str)
         # B.C. first in case there are 4 digits, e.g. 1600 B.C.
         return my_dpo.sortable_year_for_bc if date_str.match(BC_REGEX)
@@ -63,6 +65,7 @@ module Stanford
         result if year_str_valid?(result)
       end
 
+      # true if the year is between -999 and (current year + 1)
       # @param [String] year_str String containing a date in format: -yyy, -yy, -y, y, yy, yyy, yyyy
       # @return [Boolean] true if the year is between -999 and (current year + 1); false otherwise
       def self.year_str_valid?(year_str)
