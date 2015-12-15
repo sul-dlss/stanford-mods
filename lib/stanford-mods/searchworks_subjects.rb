@@ -176,7 +176,7 @@ module Stanford
         vals.empty? ? nil : vals
       end
 
-# protected ----------------------------------------------------------
+      protected #----------------------------------------------------------
 
       # convenience method for subject/name/namePart values (to avoid parsing the mods for the same thing multiple times)
       def subject_names
