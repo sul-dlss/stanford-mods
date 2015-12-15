@@ -208,110 +208,11 @@ module Stanford
       # ---- end TITLE ----
 
       # ---- SUBJECT ----
-
       # see searchworks_subjects.rb
-
       # ---- end SUBJECT ----
 
       # ---- PUBLICATION (place, year) ----
-      def place
-        vals = self.term_values([:origin_info, :place, :placeTerm])
-        vals
-      end
-
-      # For the date display only, the first place to look is in the dates without encoding=marc array.
-      # If no such dates, select the first date in the dates_marc_encoding array.  Otherwise return nil
-      # @return [String] value for the pub_date_display Solr field for this document or nil if none
-      def pub_date_display
-        return dates_no_marc_encoding.first unless dates_no_marc_encoding.empty?
-        return dates_marc_encoding.first unless dates_marc_encoding.empty?
-        nil
-      end
-
-      # For the date indexing, sorting and faceting, the first place to look is in the dates with encoding=marc array.
-      # If that doesn't exist, look in the dates without encoding=marc array.  Otherwise return nil
-      # @return [Array<String>] values for the date Solr field for this document or nil if none
-      def pub_dates
-        return dates_marc_encoding unless dates_marc_encoding.empty?
-        return dates_no_marc_encoding unless dates_no_marc_encoding.empty?
-        nil
-      end
-
-      # Get the publish year from mods
-      # @return [String] 4 character year or nil if no valid date was found
-      def pub_year
-        # use the cached year if there is one
-        if @pub_year
-          return nil if @pub_year == ''
-          return @pub_year
-        end
-
-        dates = pub_dates
-        if dates
-          pruned_dates = []
-          dates.each do |f_date|
-            # remove ? and []
-            if f_date.length == 4 && f_date.end_with?('?')
-              pruned_dates << f_date.tr('?', '0')
-            else
-              pruned_dates << f_date.delete('?[]')
-            end
-          end
-          #try to find a date starting with the most normal date formats and progressing to more wonky ones
-          @pub_year = get_plain_four_digit_year pruned_dates
-          return @pub_year if @pub_year
-          # Check for years in u notation, e.g., 198u
-          @pub_year = get_u_year pruned_dates
-          return @pub_year if @pub_year
-          @pub_year = get_double_digit_century pruned_dates
-          return @pub_year if @pub_year
-          @pub_year = get_bc_year pruned_dates
-          return @pub_year if @pub_year
-          @pub_year = get_three_digit_year pruned_dates
-          return @pub_year if @pub_year
-          @pub_year = get_single_digit_century pruned_dates
-          return @pub_year if @pub_year
-        end
-        @pub_year = ''
-        return nil
-      end
-
-      # creates a date suitable for sorting. Guarnteed to be 4 digits or nil
-      def pub_date_sort
-        if pub_date
-          pd = pub_date
-          pd = '0' + pd if pd.length == 3
-          pd = pd.gsub('--', '00')
-        end
-        raise "pub_date_sort was about to return a non 4 digit value #{pd}!" if pd && pd.length != 4
-        pd
-      end
-
-      # The year the object was published, filtered based on max_pub_date and min_pub_date from the config file
-      # @return [String] 4 character year or nil
-      def pub_date
-        pub_year || nil
-      end
-
-      # Values for the pub date facet. This is less strict than the 4 year date requirements for pub_date
-      # @return <Array[String]> with values for the pub date facet
-      def pub_date_facet
-        if pub_date
-          if pub_date.start_with?('-')
-            return (pub_date.to_i + 1000).to_s + ' B.C.'
-          end
-          if pub_date.include? '--'
-            cent = pub_date[0, 2].to_i
-            cent += 1
-            cent = cent.to_s + 'th century'
-            return cent
-          else
-            return pub_date
-          end
-        end
-        nil
-      end
-
+      # see origin_info.rb  (as all this information comes from top level originInfo element)
       # ---- end PUBLICATION (place, year) ----
 
       def sw_logger
