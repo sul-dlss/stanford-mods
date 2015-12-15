@@ -6,9 +6,6 @@ describe "date parsing methods" do
     '',
     '[]',
     '?',
-    '-1',
-    '-15',
-    '0',
     'uuuu',
     'Aug',
     'publiée le 26 germinal an VI',
@@ -23,10 +20,6 @@ describe "date parsing methods" do
     'M. D. LXI',
     '[An 4]',
     '[s.d.]',
-    '100 B.C.',
-    '11',
-    '13',
-    '20',
     'Undated'
   ]
   century_only = {
@@ -366,6 +359,18 @@ describe "date parsing methods" do
     '169[5]' => '1695',
     'October 3, [18]91' => '1891'
   }
+  # we have data like this for our Roman coins collection
+  early_numeric_dates = {
+    # note that these values must lexically sort to create a chronological sort.
+    '-999' => '-001',
+    '-914' => '-086',
+    '-18' => '-982',
+    '-1' => '-999',
+    '0' => '0000',
+    '5' => '0005',
+    '33' => '0033',
+    '945' => '0945'
+  }
 
   context '*sortable_year_from_date_str' do
     single_year
@@ -495,6 +500,62 @@ describe "date parsing methods" do
     end
     it 'nil for 7th century B.C. (to be handled in different method)' do
       expect(Stanford::Mods::DateParsing.facet_string_for_century('7th century B.C.')).to eq nil
+    end
+  end
+
+  context '*sortable_year_for_early_numeric' do
+    early_numeric_dates.each do |example, expected|
+      it "gets #{expected} from #{example}" do
+        expect(Stanford::Mods::DateParsing.sortable_year_for_early_numeric(example)).to eq expected
+      end
+    end
+  end
+
+  context '*facet_string_for_early_numeric' do
+    early_numeric_dates.each do |example, expected|
+      if example.start_with?('-')
+        exp = example[1..-1] + " B.C."
+        it "gets #{exp} from #{example}" do
+          expect(Stanford::Mods::DateParsing.facet_string_for_early_numeric(example)).to eq exp
+        end
+      else
+        it "gets #{expected} from #{example}" do
+          expect(Stanford::Mods::DateParsing.facet_string_for_early_numeric(example)).to eq expected
+        end
+      end
+    end
+  end
+
+  context '*sortable_year_for_bc' do
+    it '-700 for 300 B.C. (so 300 B.C. lexically sorts before 200 B.C.)' do
+      expect(Stanford::Mods::DateParsing.sortable_year_for_bc('300 B.C.')).to eq '-700'
+    end
+    it '-750 for 250 B.C. (so 250 B.C. lexically sorts between 200 B.C. and 300 B.C.)' do
+      expect(Stanford::Mods::DateParsing.sortable_year_for_bc('250 B.C.')).to eq '-750'
+    end
+    it '-800 for 200 B.C. (so 200 B.C. lexically sorts after 300 B.C.)' do
+      expect(Stanford::Mods::DateParsing.sortable_year_for_bc('200 B.C.')).to eq '-800'
+    end
+    it '-801 for 199 B.C. (so 199 B.C. lexically sorts after 200 B.C.)' do
+      expect(Stanford::Mods::DateParsing.sortable_year_for_bc('199 B.C.')).to eq '-801'
+    end
+    it '-925 for 75 B.C.' do
+      expect(Stanford::Mods::DateParsing.sortable_year_for_bc('75 B.C.')).to eq '-925'
+    end
+    it '-992 for 8 B.C.' do
+      expect(Stanford::Mods::DateParsing.sortable_year_for_bc('8 B.C.')).to eq '-992'
+    end
+  end
+
+  context '*facet_string_for_bc' do
+    it '250 B.C. for 250 B.C.' do
+      expect(Stanford::Mods::DateParsing.facet_string_for_bc('250 B.C.')).to eq '250 B.C.'
+    end
+    it '199 B.C. for 199 B.C.' do
+      expect(Stanford::Mods::DateParsing.facet_string_for_bc('199 B.C.')).to eq '199 B.C.'
+    end
+    it '1600 B.C. for 1600 B.C.' do
+      expect(Stanford::Mods::DateParsing.facet_string_for_bc('1600 B.C.')).to eq '1600 B.C.'
     end
   end
 
