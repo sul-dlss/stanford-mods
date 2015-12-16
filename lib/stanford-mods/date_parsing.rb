@@ -22,7 +22,7 @@ module Stanford
         # 2 digit year will always be 19xx or 20xx; sortable version will make a good facet string
         result ||= my_dpo.sortable_year_for_yy
         # decades are always 19xx or 20xx; sortable version will make a good facet string
-        result ||= sortable_year_for_decade(date_str)
+        result ||= my_dpo.sortable_year_for_decade
         unless result
           # try removing brackets between digits in case we have 169[5] or [18]91
           if date_str.match(BRACKETS_BETWEEN_DIGITS_REXEXP)
@@ -32,8 +32,8 @@ module Stanford
         end
         # parsing below this line gives string inapprop for year_str_valid?
         unless year_str_valid?(result)
-          result = facet_string_for_century(date_str)
-          result ||= facet_string_for_early_numeric(date_str)
+          result = my_dpo.facet_string_for_century
+          result ||= my_dpo.facet_string_for_early_numeric
         end
         result
       end
