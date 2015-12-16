@@ -523,7 +523,7 @@ describe "date parsing methods" do
     end
   end
 
-  context '*sortable_year_for_yyyy' do
+  context '#sortable_year_for_yyyy' do
     single_year
       .merge(specific_month)
       .merge(specific_day)
