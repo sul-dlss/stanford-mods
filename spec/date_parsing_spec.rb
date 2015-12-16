@@ -29,9 +29,7 @@ describe "date parsing methods" do
     '2/31/1950' => '1950',   # no 31 of Feb
     '1869-00-00' => '1869',
     '1862-01-00' => '1862',
-    '1985-05-00' => '1985',
-    '0000-00-00' => '0000',  # needs to be identified as invalid downstream
-    '9999' => '9999' # needs to be identified as invalid downstream
+    '1985-05-00' => '1985'
   }
   # example string as key, expected parsed value as value
   single_year = {
@@ -426,6 +424,16 @@ describe "date parsing methods" do
     it '1600 B.C. for 1600 B.C.' do
       expect(Stanford::Mods::DateParsing.facet_string_from_date_str('1600 B.C.')).to eq '1600 B.C.'
     end
+
+    it 'nil for 9999' do  # a common date seen in marc data meaning "indefinite end period"
+      expect(Stanford::Mods::DateParsing.facet_string_from_date_str('9999')).to eq nil
+    end
+    it 'nil for 2035' do
+      expect(Stanford::Mods::DateParsing.facet_string_from_date_str('2035')).to eq nil
+    end
+    it 'nil for 0000-00-00' do  # shpc:  <mods:dateCreated encoding="w3cdtf" keyDate="yes" qualifier="">0000-00-00</mods:dateCreated>
+      expect(Stanford::Mods::DateParsing.facet_string_from_date_str('0000-00-00')).to eq nil
+    end
   end
 
   context '*sortable_year_string_from_date_str' do
@@ -465,9 +473,69 @@ describe "date parsing methods" do
       skip "code broken for dddd B.C. but no existing data for this yet"
       expect(Stanford::Mods::DateParsing.sortable_year_string_from_date_str('1600 B.C.')).to eq nil
     end
+
+    it 'nil for 9999' do  # a common date seen in marc data meaning "indefinite end period"
+      expect(Stanford::Mods::DateParsing.sortable_year_string_from_date_str('9999')).to eq nil
+    end
+    it 'nil for 2035' do
+      expect(Stanford::Mods::DateParsing.sortable_year_string_from_date_str('2035')).to eq nil
+    end
+    it 'nil for 0000-00-00' do  # shpc:  <mods:dateCreated encoding="w3cdtf" keyDate="yes" qualifier="">0000-00-00</mods:dateCreated>
+      expect(Stanford::Mods::DateParsing.sortable_year_string_from_date_str('0000-00-00')).to eq nil
+    end
   end
 
-  context '#sortable_year_for_yyyy' do
+  context '*year_str_valid?' do
+    it 'false for -1000' do
+      expect(Stanford::Mods::DateParsing.year_str_valid?('-1000')).to eq false
+    end
+    it 'true for -999' do
+      expect(Stanford::Mods::DateParsing.year_str_valid?('-999')).to eq true
+    end
+    it 'true for -35' do
+      expect(Stanford::Mods::DateParsing.year_str_valid?('-35')).to eq true
+    end
+    it 'true for -3' do
+      expect(Stanford::Mods::DateParsing.year_str_valid?('-3')).to eq true
+    end
+    it 'true for 0000' do
+      expect(Stanford::Mods::DateParsing.year_str_valid?('0000')).to eq true
+    end
+    it 'true for 0' do
+      expect(Stanford::Mods::DateParsing.year_str_valid?('0')).to eq true
+    end
+    it 'true for 5' do
+      expect(Stanford::Mods::DateParsing.year_str_valid?('5')).to eq true
+    end
+    it 'true for 33' do
+      expect(Stanford::Mods::DateParsing.year_str_valid?('33')).to eq true
+    end
+    it 'true for 150' do
+      expect(Stanford::Mods::DateParsing.year_str_valid?('150')).to eq true
+    end
+    it 'true for current year + 1' do
+      year_str = (Date.today.year + 1).to_s
+      expect(Stanford::Mods::DateParsing.year_str_valid?(year_str)).to eq true
+    end
+    it 'false for current year + 2' do
+      year_str = (Date.today.year + 2).to_s
+      expect(Stanford::Mods::DateParsing.year_str_valid?(year_str)).to eq false
+    end
+    it 'false for 9999' do
+      expect(Stanford::Mods::DateParsing.year_str_valid?('9999')).to eq false
+    end
+    it 'false for 165x' do
+      expect(Stanford::Mods::DateParsing.year_str_valid?('165x')).to eq false
+    end
+    it 'false for 198-' do
+      expect(Stanford::Mods::DateParsing.year_str_valid?('198-')).to eq false
+    end
+    it 'false for nil' do
+      expect(Stanford::Mods::DateParsing.year_str_valid?(nil)).to eq false
+    end
+  end
+
+  context '*sortable_year_for_yyyy' do
     single_year
       .merge(specific_month)
       .merge(specific_day)
@@ -699,4 +767,5 @@ describe "date parsing methods" do
       end
     end
   end
+
 end
