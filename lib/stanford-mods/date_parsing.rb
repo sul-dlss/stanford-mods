@@ -7,35 +7,11 @@ module Stanford
     #     - we could add methods like my_date.bc?
     class DateParsing
 
-      BRACKETS_BETWEEN_DIGITS_REXEXP = Regexp.new('\d[' + Regexp.escape('[]') + ']\d')
-
       # get single facet value for date, generally an explicit year or "17th century" or "5 B.C."
       # @param [String] date_str String containing a date (we hope)
       # @return [String, nil] String facet value for year if we could parse one, nil otherwise
       def self.facet_string_from_date_str(date_str)
-        return if date_str == '0000-00-00' # shpc collection has these useless dates
-        my_dpo = DateParsing.new(date_str)
-        # B.C. first in case there are 4 digits, e.g. 1600 B.C.
-        return my_dpo.facet_string_for_bc if date_str.match(BC_REGEX)
-        # most date strings have a four digit year
-        result ||= my_dpo.sortable_year_for_yyyy
-        # 2 digit year will always be 19xx or 20xx; sortable version will make a good facet string
-        result ||= my_dpo.sortable_year_for_yy
-        # decades are always 19xx or 20xx; sortable version will make a good facet string
-        result ||= my_dpo.sortable_year_for_decade
-        unless result
-          # try removing brackets between digits in case we have 169[5] or [18]91
-          if date_str.match(BRACKETS_BETWEEN_DIGITS_REXEXP)
-            no_brackets = date_str.delete('[]')
-            return facet_string_from_date_str(no_brackets)
-          end
-        end
-        # parsing below this line gives string inapprop for year_str_valid?
-        unless year_str_valid?(result)
-          result = my_dpo.facet_string_for_century
-          result ||= my_dpo.facet_string_for_early_numeric
-        end
-        result
+        return DateParsing.new(date_str).facet_string_from_date_str
       end
 
       # get String sortable value year if we can parse date_str to get a year.
@@ -45,24 +21,7 @@ module Stanford
       # @return [String, nil] String sortable year if we could parse one, nil otherwise
       #  note that these values must *lexically* sort to create a chronological sort.
       def self.sortable_year_string_from_date_str(date_str)
-        return if date_str == '0000-00-00' # shpc collection has these useless dates
-        my_dpo = DateParsing.new(date_str)
-        # B.C. first in case there are 4 digits, e.g. 1600 B.C.
-        return my_dpo.sortable_year_for_bc if date_str.match(BC_REGEX)
-        # most date strings have a four digit year
-        result = my_dpo.sortable_year_for_yyyy
-        result ||= my_dpo.sortable_year_for_yy
-        result ||= my_dpo.sortable_year_for_decade
-        result ||= my_dpo.sortable_year_for_century
-        result ||= my_dpo.sortable_year_for_early_numeric
-        unless result
-          # try removing brackets between digits in case we have 169[5] or [18]91
-          if date_str.match(BRACKETS_BETWEEN_DIGITS_REXEXP)
-            no_brackets = date_str.delete('[]')
-            return sortable_year_string_from_date_str(no_brackets)
-          end
-        end
-        result if year_str_valid?(result)
+        return DateParsing.new(date_str).facet_string_from_date_str
       end
 
       # true if the year is between -999 and (current year + 1)
@@ -77,6 +36,60 @@ module Stanford
 
       def initialize(date_str)
         @orig_date_str = date_str
+      end
+
+      BRACKETS_BETWEEN_DIGITS_REXEXP = Regexp.new('\d[' + Regexp.escape('[]') + ']\d')
+
+      # get single facet value for date, generally an explicit year or "17th century" or "5 B.C."
+      # @return [String, nil] String facet value for year if we could parse one, nil otherwise
+      def facet_string_from_date_str
+        return if orig_date_str == '0000-00-00' # shpc collection has these useless dates
+        # B.C. first in case there are 4 digits, e.g. 1600 B.C.
+        return facet_string_for_bc if orig_date_str.match(BC_REGEX)
+        # most date strings have a four digit year
+        result ||= sortable_year_for_yyyy
+        # 2 digit year will always be 19xx or 20xx; sortable version will make a good facet string
+        result ||= sortable_year_for_yy
+        # decades are always 19xx or 20xx; sortable version will make a good facet string
+        result ||= sortable_year_for_decade
+        unless result
+          # try removing brackets between digits in case we have 169[5] or [18]91
+          if orig_date_str.match(BRACKETS_BETWEEN_DIGITS_REXEXP)
+            no_brackets = orig_date_str.delete('[]')
+            return DateParsing.new(no_brackets).facet_string_from_date_str
+          end
+        end
+        # parsing below this line gives string inapprop for year_str_valid?
+        unless self.class.year_str_valid?(result)
+          result = facet_string_for_century
+          result ||= facet_string_for_early_numeric
+        end
+        result
+      end
+
+      # get String sortable value year if we can parse date_str to get a year.
+      #   SearchWorks currently uses a string field for pub date sorting; thus so does Spotlight.
+      #   The values returned must *lexically* sort in chronological order, so the B.C. dates are tricky
+      # @return [String, nil] String sortable year if we could parse one, nil otherwise
+      #  note that these values must *lexically* sort to create a chronological sort.
+      def sortable_year_string_from_date_str
+        return if orig_date_str == '0000-00-00' # shpc collection has these useless dates
+        # B.C. first in case there are 4 digits, e.g. 1600 B.C.
+        return sortable_year_for_bc if orig_date_str.match(BC_REGEX)
+        # most date strings have a four digit year
+        result = sortable_year_for_yyyy
+        result ||= sortable_year_for_yy
+        result ||= sortable_year_for_decade
+        result ||= sortable_year_for_century
+        result ||= sortable_year_for_early_numeric
+        unless result
+          # try removing brackets between digits in case we have 169[5] or [18]91
+          if orig_date_str.match(BRACKETS_BETWEEN_DIGITS_REXEXP)
+            no_brackets = orig_date_str.delete('[]')
+            return DateParsing.new(no_brackets).sortable_year_string_from_date_str
+          end
+        end
+        result if self.class.year_str_valid?(result)
       end
 
       # looks for 4 consecutive digits in orig_date_str and returns first occurrence if found
