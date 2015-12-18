@@ -48,7 +48,6 @@ describe "date parsing methods" do
     '1797 goda' => '1797',
     "1616: Con licenza de'svperiori" => '1616',
 
-    '[ ?] 10 1793' => '1793',
     '[1789]' => '1789',
     '[1968?-' => '1968',
     '[1860?]' => '1860',
