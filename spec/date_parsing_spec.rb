@@ -402,6 +402,7 @@ describe "date parsing methods" do
       .merge(century_only)
       .merge(brackets_in_middle_of_year)
       .merge(invalid_but_can_get_year).each do |example, expected|
+      expected = expected.to_i.to_s if expected.match(/^\d+$/)
       it "#{expected} for single value #{example}" do
         expect(Stanford::Mods::DateParsing.new(example).facet_string_from_date_str).to eq expected
       end
@@ -423,6 +424,7 @@ describe "date parsing methods" do
           expect(Stanford::Mods::DateParsing.new(example).facet_string_from_date_str).to eq exp
         end
       else
+        expected = expected.to_i.to_s if expected.match(/^\d+$/)
         it "#{expected} for #{example}" do
           expect(Stanford::Mods::DateParsing.new(example).facet_string_from_date_str).to eq expected
         end
@@ -649,6 +651,7 @@ describe "date parsing methods" do
 
   context '#facet_string_for_early_numeric' do
     early_numeric_dates.each do |example, expected|
+      expected = expected.to_i.to_s if expected.match(/^\d+$/)
       if example.start_with?('-')
         exp = example[1..-1] + " B.C."
         it "#{exp} for #{example}" do
