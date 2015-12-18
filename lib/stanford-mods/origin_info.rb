@@ -197,6 +197,9 @@ module Stanford
         nil
       end
 
+# ----   old date parsing methods will be deprecated/replaced with new date parsing methods
+
+    protected
 
       # @return [Array<String>] dates from dateIssued and dateCreated tags from origin_info with encoding="marc"
       def dates_marc_encoding
@@ -235,7 +238,6 @@ module Stanford
         }
       end
 
-    protected
 
       def is_number?(object)
         true if Integer(object) rescue false
