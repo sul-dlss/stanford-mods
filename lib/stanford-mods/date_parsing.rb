@@ -8,6 +8,7 @@ module Stanford
     class DateParsing
 
       # get single facet value for date, generally an explicit year or "17th century" or "5 B.C."
+      #   returns '845', not 0845
       # @param [String] date_str String containing a date (we hope)
       # @return [String, nil] String facet value for year if we could parse one, nil otherwise
       def self.facet_string_from_date_str(date_str)
@@ -21,7 +22,7 @@ module Stanford
       # @return [String, nil] String sortable year if we could parse one, nil otherwise
       #  note that these values must *lexically* sort to create a chronological sort.
       def self.sortable_year_string_from_date_str(date_str)
-        return DateParsing.new(date_str).facet_string_from_date_str
+        return DateParsing.new(date_str).sortable_year_string_from_date_str
       end
 
       # true if the year is between -999 and (current year + 1)
@@ -64,6 +65,8 @@ module Stanford
           result = facet_string_for_century
           result ||= facet_string_for_early_numeric
         end
+        # remove leading 0s from early dates
+        result = result.to_i.to_s if result && result.match(/^\d+$/)
         result
       end
 
@@ -212,12 +215,12 @@ module Stanford
 
       # get single facet value for date String containing yyy, yy, y, -y, -yy, -yyy
       #   negative number strings will be changed to B.C. strings
-      #   positive number strings will be left padded with zeros for clarity in the facet
       def facet_string_for_early_numeric
         return unless orig_date_str.match(EARLY_NUMERIC)
         # negative number becomes B.C.
         return orig_date_str[1..-1] + " B.C." if orig_date_str.match(/^\-/)
-        orig_date_str.rjust(4, '0')
+        # remove leading 0s from early dates
+        orig_date_str.to_i.to_s
       end
 
       # NOTE:  while Date.parse() works for many dates, the *sortable_year_for_yyyy
