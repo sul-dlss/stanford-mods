@@ -37,6 +37,7 @@ module Stanford
 
       def initialize(date_str)
         @orig_date_str = date_str
+        @orig_date_str.freeze
       end
 
       BRACKETS_BETWEEN_DIGITS_REXEXP = Regexp.new('\d[' + Regexp.escape('[]') + ']\d')
