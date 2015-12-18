@@ -12,8 +12,41 @@ module Stanford
   module Mods
     class Record < ::Mods::Record
 
+      # prefer dateIssued (any) before dateCreated (any) before dateCaptured (any)
+      #  look for a keyDate and use it if there is one;  otherwise pick earliest date
+      # @param [Boolean] ignore_approximate true if approximate dates (per qualifier attribute)
+      #   should be ignored; false approximate dates should be included
+      # @return [String] single String containing publication year for facet use
+      def pub_date_facet_single_value(ignore_approximate = false)
+        # prefer dateIssued
+        result = pub_date_best_single_facet_value(date_issued_elements(ignore_approximate))
+        result ||= pub_date_best_single_facet_value(date_created_elements(ignore_approximate))
+        # dateCaptured for web archive seed records
+        result ||= pub_date_best_single_facet_value(@mods_ng_xml.origin_info.dateCaptured.to_a)
+        result
+      end
 
-# -- likely to be private or protected
+# -- new methods:  likely to become private or protected
+
+      # given the passed date elements, look for a single keyDate and use it if there is one;
+      #    otherwise pick earliest parseable date
+      # @param [Array<Nokogiri::XML::Element>] date_el_array the elements from which to select a pub_date
+      # @return [String] single String containing publication year for facet use
+      def pub_date_best_single_facet_value(date_el_array)
+        return if date_el_array.empty?
+        # prefer keyDate
+        desired_el = self.class.keyDate(date_el_array)
+        result = DateParsing.facet_string_from_date_str(desired_el.content) if desired_el
+        return result if result
+        # settle for earliest parseable date -- should we care about encoding?
+        poss_results = {}
+        date_el_array.each { |el|
+          result = DateParsing.sortable_year_string_from_date_str(el.content)
+          poss_results[result] = el.content if result
+        }
+        earliest = poss_results.keys.sort.first if poss_results.present?
+        return DateParsing.facet_string_from_date_str(poss_results[earliest]) if earliest
+      end
 
       # return /originInfo/dateCreated elements in MODS records
       # @param [Boolean] ignore_approximate true if approximate dates (per qualifier attribute)
@@ -52,7 +85,6 @@ module Stanford
         nodeset.select { |node| node unless date_is_approximate?(node) }
       end
 
-
       # NOTE: legal values for MODS date elements with attribute qualifier are
       #   'approximate', 'inferred' or 'questionable'
       # @param [Nokogiri::XML::Element] date_element MODS date element
@@ -64,12 +96,12 @@ module Stanford
       end
 
 
+# ----   old date parsing methods used downstream of gem;  will be deprecated/replaced with new date parsing methods
+
       def place
         vals = self.term_values([:origin_info, :place, :placeTerm])
         vals
       end
-
-# ----   old date parsing methods;  will be deprecated/replaced with new date parsing methods
 
       # For the date display only, the first place to look is in the dates without encoding=marc array.
       # If no such dates, select the first date in the dates_marc_encoding array.  Otherwise return nil
@@ -109,7 +141,7 @@ module Stanford
               pruned_dates << f_date.delete('?[]')
             end
           end
-          #try to find a date starting with the most normal date formats and progressing to more wonky ones
+          # try to find a date starting with the most normal date formats and progressing to more wonky ones
           @pub_year = get_plain_four_digit_year pruned_dates
           return @pub_year if @pub_year
           # Check for years in u notation, e.g., 198u
@@ -125,7 +157,7 @@ module Stanford
           return @pub_year if @pub_year
         end
         @pub_year = ''
-        return nil
+        nil
       end
 
       # creates a date suitable for sorting. Guarnteed to be 4 digits or nil
@@ -135,7 +167,7 @@ module Stanford
           pd = '0' + pd if pd.length == 3
           pd = pd.gsub('--', '00')
         end
-        raise "pub_date_sort was about to return a non 4 digit value #{pd}!" if pd && pd.length != 4
+        fail "pub_date_sort was about to return a non 4 digit value #{pd}!" if pd && pd.length != 4
         pd
       end
 
@@ -164,6 +196,9 @@ module Stanford
         nil
       end
 
+# ----   old date parsing methods will be deprecated/replaced with new date parsing methods
+
+    protected
 
       # @return [Array<String>] dates from dateIssued and dateCreated tags from origin_info with encoding="marc"
       def dates_marc_encoding
@@ -202,7 +237,6 @@ module Stanford
         }
       end
 
-    protected
 
       def is_number?(object)
         true if Integer(object) rescue false
@@ -216,7 +250,7 @@ module Stanford
 
       # get a 4 digit year like 1865 from array of dates
       # @param [Array<String>] dates an array of potential year strings
-      def get_plain_four_digit_year dates
+      def get_plain_four_digit_year(dates)
         dates.each do |f_date|
           matches = f_date.scan(/\d{4}/)
           if matches.length == 1
@@ -225,23 +259,23 @@ module Stanford
           else
             # when there are multiple matches, check for ones with CE after them
             matches.each do |match|
-              #look for things like '1865-6 CE'
-              pos = f_date.index(Regexp.new(match+'...CE'))
+              # look for things like '1865-6 CE'
+              pos = f_date.index(Regexp.new(match + '...CE'))
               pos = pos ? pos.to_i : 0
               if f_date.include?(match+' CE') or pos > 0
-                @pub_year=match
+                @pub_year = match
                 return match
               end
             end
             return matches.first
           end
         end
-        return nil
+        nil
       end
 
       # get a 3 digit year like 965 from the date array
       # @param [Array<String>] dates an array of potential year strings
-      def get_three_digit_year dates
+      def get_three_digit_year(dates)
         dates.each do |f_date|
           matches = f_date.scan(/\d{3}/)
           return matches.first if matches.length > 0
@@ -249,9 +283,10 @@ module Stanford
         nil
       end
 
-      #get the 3 digit BC year, return it as a negative, so -700 for 300 BC. Other methods will translate it to proper display, this is good for sorting.
+      # get the 3 digit BC year, return it as a negative, so -700 for 300 BC.
+      #  Other methods will translate it to proper display, this is good for sorting.
       # @param [Array<String>] dates an array of potential year strings
-      def get_bc_year dates
+      def get_bc_year(dates)
         dates.each do |f_date|
           matches = f_date.scan(/\d{3} B.C./)
           if matches.length > 0
@@ -265,7 +300,7 @@ module Stanford
       # get a single digit century like '9th century' from the date array
       # @param [Array<String>] dates an array of potential year strings
       # @return [String] y--  if we identify century digit in string
-      def get_single_digit_century dates
+      def get_single_digit_century(dates)
         dates.each do |f_date|
           matches = f_date.scan(/\d{1}th/)
           next if matches.length == 0
@@ -291,17 +326,17 @@ module Stanford
       # get a double digit century like '12th century' from the date array
       # @param [Array<String>] dates an array of potential year strings
       # @return [String] yy--  if we identify century digits in string
-      def get_double_digit_century dates
+      def get_double_digit_century(dates)
         dates.each do |f_date|
-          matches=f_date.scan(/\d{2}th/)
+          matches = f_date.scan(/\d{2}th/)
           next if matches.length == 0
           if matches.length == 1
-            @pub_year=((matches.first[0,2].to_i)-1).to_s+'--'
+            @pub_year=((matches.first[0, 2].to_i) - 1).to_s + '--'
             return @pub_year
           else
             # when there are multiple matches, check for ones with CE after them
             matches.each do |match|
-              pos = f_date.index(Regexp.new(match+'...CE'))
+              pos = f_date.index(Regexp.new(match + '...CE'))
               pos = pos ? pos.to_i : f_date.index(Regexp.new(match + ' century CE'))
               pos = pos ? pos.to_i : 0
               if f_date.include?(match+' CE') or pos > 0
@@ -318,7 +353,7 @@ module Stanford
       #   and replace u with '-' for yyuu  (becomes yy--)
       # @param [String] dates looking for matches on yyyu or yyuu in these strings
       # @return [String, nil] String of format yyy0 or yy--, or nil
-      def get_u_year dates
+      def get_u_year(dates)
         dates.each do |f_date|
           # Single digit u notation
           matches = f_date.scan(/\d{3}u/)
@@ -329,7 +364,6 @@ module Stanford
         end
         nil
       end
-
     end # class Record
   end
 end
