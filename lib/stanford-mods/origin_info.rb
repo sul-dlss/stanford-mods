@@ -26,7 +26,7 @@ module Stanford
         result
       end
 
-# -- likely to be private or protected
+# -- new methods:  likely to become private or protected
 
       # given the passed date elements, look for a single keyDate and use it if there is one;
       #    otherwise pick earliest parseable date
@@ -86,7 +86,6 @@ module Stanford
         nodeset.select { |node| node unless date_is_approximate?(node) }
       end
 
-
       # NOTE: legal values for MODS date elements with attribute qualifier are
       #   'approximate', 'inferred' or 'questionable'
       # @param [Nokogiri::XML::Element] date_element MODS date element
@@ -98,12 +97,12 @@ module Stanford
       end
 
 
+# ----   old date parsing methods used downstream of gem;  will be deprecated/replaced with new date parsing methods
+
       def place
         vals = self.term_values([:origin_info, :place, :placeTerm])
         vals
       end
-
-# ----   old date parsing methods;  will be deprecated/replaced with new date parsing methods
 
       # For the date display only, the first place to look is in the dates without encoding=marc array.
       # If no such dates, select the first date in the dates_marc_encoding array.  Otherwise return nil
