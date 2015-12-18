@@ -12,8 +12,42 @@ module Stanford
   module Mods
     class Record < ::Mods::Record
 
+      # prefer dateIssued (any) before dateCreated (any) before dateCaptured (any)
+      #  look for a keyDate and use it if there is one;  otherwise pick earliest date
+      # @param [Boolean] ignore_approximate true if approximate dates (per qualifier attribute)
+      #   should be ignored; false approximate dates should be included
+      # @return [String] single String containing publication year for facet use
+      def pub_date_facet_single_value(ignore_approximate = false)
+        # prefer dateIssued
+        result = pub_date_best_single_facet_value(date_issued_elements(ignore_approximate))
+        result ||= pub_date_best_single_facet_value(date_created_elements(ignore_approximate))
+        # dateCaptured for web archive seed records
+        result ||= pub_date_best_single_facet_value(@mods_ng_xml.origin_info.dateCaptured.to_a)
+        result
+      end
 
 # -- likely to be private or protected
+
+      # given the passed date elements, look for a single keyDate and use it if there is one;
+      #    otherwise pick earliest parseable date
+      # @param [Array<Nokogiri::XML::Element>] date_el_array the elements from which to select a pub_date
+      # @return [String] single String containing publication year for facet use
+      def pub_date_best_single_facet_value(date_el_array)
+        if date_el_array.size > 0
+          # prefer keyDate
+          desired_el = self.class.keyDate(date_el_array)
+          result = DateParsing.facet_string_from_date_str(desired_el.content) if desired_el
+          return result if result
+          # settle for earliest parseable date -- should we care about encoding?
+          poss_results = {}
+          date_el_array.each { |el|
+            result = DateParsing.sortable_year_string_from_date_str(el.content)
+            poss_results[result] = el.content if result
+          }
+          earliest = poss_results.keys.sort.first if poss_results.present?
+          return DateParsing.facet_string_from_date_str(poss_results[earliest]) if earliest
+        end
+      end
 
       # return /originInfo/dateCreated elements in MODS records
       # @param [Boolean] ignore_approximate true if approximate dates (per qualifier attribute)
