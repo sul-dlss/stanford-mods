@@ -382,13 +382,13 @@ describe "date parsing methods" do
   context '*facet_string_from_date_str' do
     it 'calls instance method facet_string_from_date_str' do
       expect_any_instance_of(Stanford::Mods::DateParsing).to receive(:facet_string_from_date_str)
-      Stanford::Mods::DateParsing.new('1666').facet_string_from_date_str
+      Stanford::Mods::DateParsing.facet_string_from_date_str('1666')
     end
   end
   context '*sortable_year_string_from_date_str' do
     it 'calls instance method sortable_year_string_from_date_str' do
       expect_any_instance_of(Stanford::Mods::DateParsing).to receive(:sortable_year_string_from_date_str)
-      Stanford::Mods::DateParsing.new('1666').sortable_year_string_from_date_str
+      Stanford::Mods::DateParsing.sortable_year_string_from_date_str('1666')
     end
   end
 

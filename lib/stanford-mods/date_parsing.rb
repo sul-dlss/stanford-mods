@@ -22,7 +22,7 @@ module Stanford
       # @return [String, nil] String sortable year if we could parse one, nil otherwise
       #  note that these values must *lexically* sort to create a chronological sort.
       def self.sortable_year_string_from_date_str(date_str)
-        return DateParsing.new(date_str).facet_string_from_date_str
+        return DateParsing.new(date_str).sortable_year_string_from_date_str
       end
 
       # true if the year is between -999 and (current year + 1)
