@@ -15,7 +15,7 @@ describe "computations from /originInfo field" do
     EOF
   end
 
-  context '#pub_date_facet_single_value' do
+  RSpec.shared_examples "single pub date value" do |method_sym, exp_val_position|
     it 'prefers dateIssued to dateCreated' do
       mods_str = mods_origin_info_start_str +
           '<dateIssued>2005</dateIssued>' +
@@ -24,7 +24,7 @@ describe "computations from /originInfo field" do
           <dateCreated>1999</dateCreated>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_date_facet_single_value).to eq '2005'
+      expect(smods_rec.send(method_sym)).to eq '2005'
     end
     it 'respects ignore_approximate param' do
       mods_str = mods_origin_info_start_str +
@@ -32,7 +32,8 @@ describe "computations from /originInfo field" do
         '<dateCreated point="end">1599</dateCreated>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_date_facet_single_value(true)).to eq '1599'
+      expect(smods_rec.send(method_sym, true)).to eq '1599'
+      expect(smods_rec.send(method_sym, false)).to eq '1000'
     end
     it 'nil if ignore_approximate and all dates are approximate' do
       mods_str = mods_origin_info_start_str +
@@ -40,7 +41,8 @@ describe "computations from /originInfo field" do
         '<dateCreated point="end" qualifier="questionable">1599</dateCreated>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_date_facet_single_value(true)).to eq nil
+      expect(smods_rec.send(method_sym, true)).to eq nil
+      expect(smods_rec.send(method_sym, false)).to eq '1000'
     end
     it 'respects ignore_approximate even for keyDate' do
       mods_str = mods_origin_info_start_str +
@@ -48,7 +50,8 @@ describe "computations from /originInfo field" do
         '<dateCreated point="end">1599</dateCreated>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_date_facet_single_value(true)).to eq '1599'
+      expect(smods_rec.send(method_sym, true)).to eq '1599'
+      expect(smods_rec.send(method_sym, false)).to eq '1000'
     end
     it 'uses dateCaptured if no dateIssued or dateCreated' do
       # for web archive seed files
@@ -57,30 +60,38 @@ describe "computations from /originInfo field" do
         '<dateCaptured encoding="w3cdtf" point="end">20151218111111</dateCaptured>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_date_facet_single_value).to eq '2015'
+      expect(smods_rec.send(method_sym)).to eq '2015'
     end
     context 'spotlight actual data' do
       require 'fixtures/spotlight_pub_date_data'
       SPOTLIGHT_PUB_DATE_DATA.each_pair.each do |coll_name, coll_data|
         coll_data.each_pair do |mods_str, exp_vals|
-          expected = exp_vals[1]
+          expected = exp_vals[exp_val_position]
           it "#{expected} for rec in #{coll_name}" do
             smods_rec.from_str(mods_str)
-            expect(smods_rec.pub_date_facet_single_value).to eq expected
+            expect(smods_rec.send(method_sym)).to eq expected
           end
         end
       end
     end
   end
 
-  context '#pub_date_best_single_facet_value' do
+  context '#pub_date_facet_single_value' do
+    it_behaves_like "single pub date value", :pub_date_facet_single_value, 1
+  end
+
+  context '#pub_date_sortable_string' do
+    it_behaves_like "single pub date value", :pub_date_sortable_string, 0
+  end
+
+  RSpec.shared_examples "pub date best single value" do |method_sym|
     it 'uses keyDate value if specified' do
       mods_str = mods_origin_info_start_str +
         '<dateIssued>1666</dateIssued>' +
         '<dateIssued keyDate="yes">2014</dateIssued>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_date_best_single_facet_value(smods_rec.date_issued_elements)).to eq '2014'
+      expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq '2014'
     end
     it 'ignores invalid keyDate value' do
       mods_str = mods_origin_info_start_str +
@@ -88,7 +99,7 @@ describe "computations from /originInfo field" do
         '<dateIssued>1499</dateIssued>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_date_best_single_facet_value(smods_rec.date_issued_elements)).to eq '1499'
+      expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq '1499'
     end
     it 'chooses earliest value if multiple keyDates present' do
       mods_str = mods_origin_info_start_str +
@@ -96,7 +107,7 @@ describe "computations from /originInfo field" do
         '<dateCreated keyDate="yes">2001</dateCreated>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_date_best_single_facet_value(smods_rec.date_created_elements)).to eq '2001'
+      expect(smods_rec.send(method_sym, smods_rec.date_created_elements)).to eq '2001'
     end
     it 'selects earliest (valid) parseable date from multiple options if no keyDate' do
       mods_str = mods_origin_info_start_str +
@@ -105,8 +116,36 @@ describe "computations from /originInfo field" do
         '<dateIssued point="end" qualifier="questionable">uuuu</dateIssued>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_date_best_single_facet_value(smods_rec.date_issued_elements)).to eq '1753'
+      expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq '1753'
     end
+    it 'ignores encoding' do
+      # encoding matters for choosing display, not for parsing year
+      mods_str = mods_origin_info_start_str +
+        '<dateIssued>1100</dateIssued>' +
+        '<dateIssued encoding="marc">1200</dateIssued>' +
+        '<dateIssued encoding="w3cdtf">1300</dateIssued>' +
+        mods_origin_info_end_str
+      smods_rec.from_str(mods_str)
+      expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq '1100'
+      mods_str = mods_origin_info_start_str +
+        '<dateIssued>1200</dateIssued>' +
+        '<dateIssued encoding="marc">1300</dateIssued>' +
+        '<dateIssued encoding="w3cdtf">1100</dateIssued>' +
+        mods_origin_info_end_str
+      smods_rec.from_str(mods_str)
+      expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq '1100'
+      mods_str = mods_origin_info_start_str +
+        '<dateIssued>1300</dateIssued>' +
+        '<dateIssued encoding="marc">1100</dateIssued>' +
+        '<dateIssued encoding="w3cdtf">1200</dateIssued>' +
+        mods_origin_info_end_str
+      smods_rec.from_str(mods_str)
+      expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq '1100'
+    end
+  end
+
+  context '#pub_date_best_single_facet_value' do
+    it_behaves_like "pub date best single value", :pub_date_best_single_facet_value
     it 'uses facet value, not sorting value' do
       mods_str = mods_origin_info_start_str +
         '<dateCreated keyDate="yes">180 B.C.</dateCreated>' +
@@ -114,29 +153,16 @@ describe "computations from /originInfo field" do
       smods_rec.from_str(mods_str)
       expect(smods_rec.pub_date_best_single_facet_value(smods_rec.date_created_elements)).to eq '180 B.C.'
     end
-    it 'ignores encoding' do
-      # encoding matters for choosing display, not for parsing year
+  end
+
+  context '#pub_date_best_sort_str_value' do
+    it_behaves_like "pub date best single value", :pub_date_best_sort_str_value
+    it 'uses string sorting value, not facet value' do
       mods_str = mods_origin_info_start_str +
-        '<dateIssued>1</dateIssued>' +
-        '<dateIssued encoding="marc">2</dateIssued>' +
-        '<dateIssued encoding="w3cdtf">3</dateIssued>' +
+        '<dateCreated keyDate="yes">180 B.C.</dateCreated>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_date_best_single_facet_value(smods_rec.date_issued_elements)).to eq '1'
-      mods_str = mods_origin_info_start_str +
-        '<dateIssued>2</dateIssued>' +
-        '<dateIssued encoding="marc">3</dateIssued>' +
-        '<dateIssued encoding="w3cdtf">1</dateIssued>' +
-        mods_origin_info_end_str
-      smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_date_best_single_facet_value(smods_rec.date_issued_elements)).to eq '1'
-      mods_str = mods_origin_info_start_str +
-        '<dateIssued>3</dateIssued>' +
-        '<dateIssued encoding="marc">1</dateIssued>' +
-        '<dateIssued encoding="w3cdtf">2</dateIssued>' +
-        mods_origin_info_end_str
-      smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_date_best_single_facet_value(smods_rec.date_issued_elements)).to eq '1'
+      expect(smods_rec.pub_date_best_sort_str_value(smods_rec.date_created_elements)).to eq '-820'
     end
   end
 
