@@ -50,8 +50,8 @@ module Stanford
       def pub_date_best_single_facet_value(date_el_array)
         return if date_el_array.empty?
         # prefer keyDate
-        desired_el = self.class.keyDate(date_el_array)
-        result = DateParsing.facet_string_from_date_str(desired_el.content) if desired_el
+        key_date_el = self.class.keyDate(date_el_array)
+        result = DateParsing.facet_string_from_date_str(key_date_el.content) if key_date_el
         return result if result
         # settle for earliest parseable date
         _ignore, orig_str_to_parse = self.class.earliest_date(date_el_array)
@@ -65,8 +65,8 @@ module Stanford
       def pub_date_best_sort_str_value(date_el_array)
         return if date_el_array.empty?
         # prefer keyDate
-        desired_el = self.class.keyDate(date_el_array)
-        result = DateParsing.sortable_year_string_from_date_str(desired_el.content) if desired_el
+        key_date_el = self.class.keyDate(date_el_array)
+        result = DateParsing.sortable_year_string_from_date_str(key_date_el.content) if key_date_el
         return result if result
         # settle for earliest parseable date
         sortable_str, _ignore = self.class.earliest_date(date_el_array)
@@ -101,7 +101,7 @@ module Stanford
       # @return [Nokogiri::XML::Element, nil] single date element with attribute keyDate="yes", or nil
       def self.keyDate(elements)
         keyDates = elements.select { |node| node["keyDate"] == 'yes' }
-        return keyDates.first if keyDates.size == 1
+        keyDates.first if keyDates.size == 1
       end
 
       # remove Elements from NodeSet if they have a qualifier attribute of 'approximate' or 'questionable'
