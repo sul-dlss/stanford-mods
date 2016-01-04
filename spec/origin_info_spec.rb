@@ -84,6 +84,52 @@ describe "computations from /originInfo field" do
     it_behaves_like "single pub date value", :pub_date_sortable_string, 0
   end
 
+  context '*earliest_date' do
+    it 'selects earliest (valid) parseable date from multiple options' do
+      mods_str = mods_origin_info_start_str +
+        '<dateIssued point="start" qualifier="questionable">1758</dateIssued>' +
+        '<dateIssued point="end" qualifier="questionable">uuuu</dateIssued>' +
+        '<dateIssued>1753]</dateIssued>' +
+        mods_origin_info_end_str
+      smods_rec.from_str(mods_str)
+      expect(Stanford::Mods::Record.earliest_date(smods_rec.date_issued_elements)).to eq ['1753', '1753]']
+    end
+    it 'ignores encoding' do
+      # encoding matters for choosing display, not for parsing year
+      mods_str = mods_origin_info_start_str +
+        '<dateIssued>1100</dateIssued>' +
+        '<dateIssued encoding="marc">1200</dateIssued>' +
+        '<dateIssued encoding="w3cdtf">1300</dateIssued>' +
+        mods_origin_info_end_str
+      smods_rec.from_str(mods_str)
+      expect(Stanford::Mods::Record.earliest_date(smods_rec.date_issued_elements)).to eq ['1100', '1100']
+      mods_str = mods_origin_info_start_str +
+        '<dateIssued>1200</dateIssued>' +
+        '<dateIssued encoding="marc">1300</dateIssued>' +
+        '<dateIssued encoding="w3cdtf">1100</dateIssued>' +
+        mods_origin_info_end_str
+      smods_rec.from_str(mods_str)
+      expect(Stanford::Mods::Record.earliest_date(smods_rec.date_issued_elements)).to eq ['1100', '1100']
+      mods_str = mods_origin_info_start_str +
+        '<dateIssued>1300</dateIssued>' +
+        '<dateIssued encoding="marc">1100</dateIssued>' +
+        '<dateIssued encoding="w3cdtf">1200</dateIssued>' +
+        mods_origin_info_end_str
+      smods_rec.from_str(mods_str)
+      expect(Stanford::Mods::Record.earliest_date(smods_rec.date_issued_elements)).to eq ['1100', '1100']
+    end
+    it 'calls DateParsing.sortable_year_string_from_date_str for each element value' do
+      mods_str = mods_origin_info_start_str +
+        '<dateIssued>1100</dateIssued>' +
+        '<dateIssued encoding="marc">1200</dateIssued>' +
+        '<dateIssued encoding="w3cdtf">1300</dateIssued>' +
+        mods_origin_info_end_str
+      smods_rec.from_str(mods_str)
+      expect(Stanford::Mods::DateParsing).to receive(:sortable_year_string_from_date_str).exactly(3).times
+      Stanford::Mods::Record.earliest_date(smods_rec.date_issued_elements)
+    end
+  end
+
   RSpec.shared_examples "pub date best single value" do |method_sym|
     it 'uses keyDate value if specified' do
       mods_str = mods_origin_info_start_str +
@@ -101,27 +147,29 @@ describe "computations from /originInfo field" do
       smods_rec.from_str(mods_str)
       expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq '1499'
     end
-    it 'chooses earliest value if multiple keyDates present' do
+    it 'calls earliest_date if multiple keyDates present' do
       mods_str = mods_origin_info_start_str +
         '<dateCreated keyDate="yes">2003</dateCreated>' +
         '<dateCreated keyDate="yes">2001</dateCreated>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.send(method_sym, smods_rec.date_created_elements)).to eq '2001'
+      expect(Stanford::Mods::Record).to receive(:earliest_date).with(smods_rec.date_created_elements)
+      expect(smods_rec.send(method_sym, smods_rec.date_created_elements))
     end
-    it 'selects earliest (valid) parseable date from multiple options if no keyDate' do
+    it 'calls earliest_date if no keyDate' do
       mods_str = mods_origin_info_start_str +
         '<dateIssued>1753]</dateIssued>' +
         '<dateIssued point="start" qualifier="questionable">1758</dateIssued>' +
         '<dateIssued point="end" qualifier="questionable">uuuu</dateIssued>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq '1753'
+      expect(Stanford::Mods::Record).to receive(:earliest_date).with(smods_rec.date_issued_elements)
+      smods_rec.send(method_sym, smods_rec.date_issued_elements)
     end
     it 'ignores encoding' do
       # encoding matters for choosing display, not for parsing year
       mods_str = mods_origin_info_start_str +
-        '<dateIssued>1100</dateIssued>' +
+        '<dateIssued keyDate="yes">1100</dateIssued>' +
         '<dateIssued encoding="marc">1200</dateIssued>' +
         '<dateIssued encoding="w3cdtf">1300</dateIssued>' +
         mods_origin_info_end_str
@@ -130,13 +178,13 @@ describe "computations from /originInfo field" do
       mods_str = mods_origin_info_start_str +
         '<dateIssued>1200</dateIssued>' +
         '<dateIssued encoding="marc">1300</dateIssued>' +
-        '<dateIssued encoding="w3cdtf">1100</dateIssued>' +
+        '<dateIssued encoding="w3cdtf" keyDate="yes">1100</dateIssued>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
       expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq '1100'
       mods_str = mods_origin_info_start_str +
         '<dateIssued>1300</dateIssued>' +
-        '<dateIssued encoding="marc">1100</dateIssued>' +
+        '<dateIssued encoding="marc" keyDate="yes">1100</dateIssued>' +
         '<dateIssued encoding="w3cdtf">1200</dateIssued>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
