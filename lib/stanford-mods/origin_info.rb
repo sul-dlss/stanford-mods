@@ -12,10 +12,11 @@ module Stanford
   module Mods
     class Record < ::Mods::Record
 
+      # return a single string intended for facet use for pub date
       # prefer dateIssued (any) before dateCreated (any) before dateCaptured (any)
       #  look for a keyDate and use it if there is one;  otherwise pick earliest date
       # @param [Boolean] ignore_approximate true if approximate dates (per qualifier attribute)
-      #   should be ignored; false approximate dates should be included
+      #   should be ignored; false if approximate dates should be included
       # @return [String] single String containing publication year for facet use
       def pub_date_facet_single_value(ignore_approximate = false)
         # prefer dateIssued
@@ -38,7 +39,7 @@ module Stanford
         desired_el = self.class.keyDate(date_el_array)
         result = DateParsing.facet_string_from_date_str(desired_el.content) if desired_el
         return result if result
-        # settle for earliest parseable date -- should we care about encoding?
+        # settle for earliest parseable date
         poss_results = {}
         date_el_array.each { |el|
           result = DateParsing.sortable_year_string_from_date_str(el.content)
