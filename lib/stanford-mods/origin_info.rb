@@ -12,10 +12,11 @@ module Stanford
   module Mods
     class Record < ::Mods::Record
 
+      # return a single string intended for facet use for pub date
       # prefer dateIssued (any) before dateCreated (any) before dateCaptured (any)
       #  look for a keyDate and use it if there is one;  otherwise pick earliest date
       # @param [Boolean] ignore_approximate true if approximate dates (per qualifier attribute)
-      #   should be ignored; false approximate dates should be included
+      #   should be ignored; false if approximate dates should be included
       # @return [String] single String containing publication year for facet use
       def pub_date_facet_single_value(ignore_approximate = false)
         # prefer dateIssued
@@ -26,27 +27,53 @@ module Stanford
         result
       end
 
-# -- new methods:  likely to become private or protected
+      # return a single string intended for lexical sorting for pub date
+      # prefer dateIssued (any) before dateCreated (any) before dateCaptured (any)
+      #  look for a keyDate and use it if there is one;  otherwise pick earliest date
+      # @param [Boolean] ignore_approximate true if approximate dates (per qualifier attribute)
+      #   should be ignored; false if approximate dates should be included
+      # @return [String] single String containing publication year for lexical sorting
+      #   note that for string sorting  5 B.C. = -5  => -995;  6 B.C. => -994  so 6 B.C. sorts before 5 B.C.
+      def pub_date_sortable_string(ignore_approximate = false)
+        # prefer dateIssued
+        result = pub_date_best_sort_str_value(date_issued_elements(ignore_approximate))
+        result ||= pub_date_best_sort_str_value(date_created_elements(ignore_approximate))
+        # dateCaptured for web archive seed records
+        result ||= pub_date_best_sort_str_value(@mods_ng_xml.origin_info.dateCaptured.to_a)
+        result
+      end
 
       # given the passed date elements, look for a single keyDate and use it if there is one;
       #    otherwise pick earliest parseable date
-      # @param [Array<Nokogiri::XML::Element>] date_el_array the elements from which to select a pub_date
+      # @param [Array<Nokogiri::XML::Element>] date_el_array the elements from which to select a pub date
       # @return [String] single String containing publication year for facet use
       def pub_date_best_single_facet_value(date_el_array)
         return if date_el_array.empty?
         # prefer keyDate
-        desired_el = self.class.keyDate(date_el_array)
-        result = DateParsing.facet_string_from_date_str(desired_el.content) if desired_el
+        key_date_el = self.class.keyDate(date_el_array)
+        result = DateParsing.facet_string_from_date_str(key_date_el.content) if key_date_el
         return result if result
-        # settle for earliest parseable date -- should we care about encoding?
-        poss_results = {}
-        date_el_array.each { |el|
-          result = DateParsing.sortable_year_string_from_date_str(el.content)
-          poss_results[result] = el.content if result
-        }
-        earliest = poss_results.keys.sort.first if poss_results.present?
-        return DateParsing.facet_string_from_date_str(poss_results[earliest]) if earliest
+        # settle for earliest parseable date
+        _ignore, orig_str_to_parse = self.class.earliest_date(date_el_array)
+        DateParsing.facet_string_from_date_str(orig_str_to_parse) if orig_str_to_parse
       end
+
+      # given the passed date elements, look for a single keyDate and use it if there is one;
+      #    otherwise pick earliest parseable date
+      # @param [Array<Nokogiri::XML::Element>] date_el_array the elements from which to select a pub date
+      # @return [String] single String containing publication year for lexical sorting
+      def pub_date_best_sort_str_value(date_el_array)
+        return if date_el_array.empty?
+        # prefer keyDate
+        key_date_el = self.class.keyDate(date_el_array)
+        result = DateParsing.sortable_year_string_from_date_str(key_date_el.content) if key_date_el
+        return result if result
+        # settle for earliest parseable date
+        sortable_str, _ignore = self.class.earliest_date(date_el_array)
+        sortable_str if sortable_str
+      end
+
+      protected :pub_date_best_single_facet_value, :pub_date_best_sort_str_value
 
       # return /originInfo/dateCreated elements in MODS records
       # @param [Boolean] ignore_approximate true if approximate dates (per qualifier attribute)
@@ -74,7 +101,7 @@ module Stanford
       # @return [Nokogiri::XML::Element, nil] single date element with attribute keyDate="yes", or nil
       def self.keyDate(elements)
         keyDates = elements.select { |node| node["keyDate"] == 'yes' }
-        return keyDates.first if keyDates.size == 1
+        keyDates.first if keyDates.size == 1
       end
 
       # remove Elements from NodeSet if they have a qualifier attribute of 'approximate' or 'questionable'
@@ -93,6 +120,21 @@ module Stanford
       def self.date_is_approximate?(date_element)
         qualifier = date_element["qualifier"] if date_element.respond_to?('[]')
         qualifier == 'approximate' || qualifier == 'questionable'
+      end
+
+      # get earliest parseable date from the passed date elements
+      # @param [Array<Nokogiri::XML::Element>] date_el_array the elements from which to select a pub date
+      # @return two String values:
+      #   the first is the lexically sortable String value of the earliest date;
+      #   the second is the original String value of the chosen element
+      def self.earliest_date(date_el_array)
+        poss_results = {}
+        date_el_array.each { |el|
+          result = DateParsing.sortable_year_string_from_date_str(el.content)
+          poss_results[result] = el.content if result
+        }
+        earliest = poss_results.keys.sort.first if poss_results.present?
+        return earliest, poss_results[earliest] if earliest
       end
 
 
