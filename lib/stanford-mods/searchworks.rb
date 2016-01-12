@@ -223,6 +223,7 @@ module Stanford
       #   http://searchworks-solr-lb.stanford.edu:8983/solr/select?facet.field=format&rows=0&facet.sort=index
       # @return <Array[String]> value in the SearchWorks controlled vocabulary
       # @deprecated - kept for backwards compatibility but not part of SW UI redesign work Summer 2014
+      # @deprecated:  this is no longer used in SW, Revs or Spotlight Jan 2016
       def format
         val = []
         types = self.term_values(:typeOfResource)
