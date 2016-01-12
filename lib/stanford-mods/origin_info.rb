@@ -73,8 +73,6 @@ module Stanford
         sortable_str if sortable_str
       end
 
-      protected :pub_date_best_single_facet_value, :pub_date_best_sort_str_value
-
       # return /originInfo/dateCreated elements in MODS records
       # @param [Boolean] ignore_approximate true if approximate dates (per qualifier attribute)
       #   should be excluded; false approximate dates should be included

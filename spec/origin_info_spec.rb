@@ -199,7 +199,7 @@ describe "computations from /originInfo field" do
         '<dateCreated keyDate="yes">180 B.C.</dateCreated>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.send(:pub_date_best_single_facet_value, smods_rec.date_created_elements)).to eq '180 B.C.'
+      expect(smods_rec.pub_date_best_single_facet_value(smods_rec.date_created_elements)).to eq '180 B.C.'
     end
   end
 
@@ -210,7 +210,7 @@ describe "computations from /originInfo field" do
         '<dateCreated keyDate="yes">180 B.C.</dateCreated>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.send(:pub_date_best_sort_str_value, smods_rec.date_created_elements)).to eq '-820'
+      expect(smods_rec.pub_date_best_sort_str_value(smods_rec.date_created_elements)).to eq '-820'
     end
   end
 
