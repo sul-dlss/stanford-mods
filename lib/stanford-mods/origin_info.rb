@@ -146,6 +146,7 @@ module Stanford
       # For the date display only, the first place to look is in the dates without encoding=marc array.
       # If no such dates, select the first date in the dates_marc_encoding array.  Otherwise return nil
       # @return [String] value for the pub_date_display Solr field for this document or nil if none
+      # @deprecated:  this is no longer used in SW, Revs or Spotlight Jan 2016
       def pub_date_display
         return dates_no_marc_encoding.first unless dates_no_marc_encoding.empty?
         return dates_marc_encoding.first unless dates_marc_encoding.empty?
@@ -236,7 +237,7 @@ module Stanford
         nil
       end
 
-# ----   old date parsing methods will be deprecated/replaced with new date parsing methods
+# ----   old date parsing methods will be deprecated/replaced with new date parsing methods (see also DateParsing)
 
     protected
 

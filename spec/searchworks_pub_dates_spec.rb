@@ -125,22 +125,20 @@ describe "Date methods (searchworks.rb)" do
       expect(smods_rec.pub_date_sort).to eq('0800')
       expect(smods_rec.pub_date_facet).to eq('9th century')
     end
-    it 'uses dateIssued without marc encoding for pub_date_display and the one with marc encoding for indexing, sorting and faceting' do
+    it 'uses dateIssued with marc encoding for indexing, sorting and faceting' do
       m = "<mods #{ns_decl}><originInfo>
           <dateIssued>[186-?]</dateIssued><dateIssued encoding=\"marc\">1860</dateIssued>
         </originInfo></mods>"
       smods_rec.from_str(m)
-      expect(smods_rec.pub_date_display).to eq('[186-?]')
       expect(smods_rec.pub_date).to eq('1860')
       expect(smods_rec.pub_date_sort).to eq('1860')
       expect(smods_rec.pub_date_facet).to eq('1860')
     end
-    it 'uses dateIssued without marc encoding for pub_date_display and the one with marc encoding for indexing, sorting and faceting' do
+    it 'uses dateIssued with marc encoding for indexing, sorting and faceting' do
       m = "<mods #{ns_decl}><originInfo>
           <dateIssued>1860?]</dateIssued><dateIssued encoding=\"marc\">186?</dateIssued>
         </originInfo></mods>"
       smods_rec.from_str(m)
-      expect(smods_rec.pub_date_display).to eq('1860?]')
       expect(smods_rec.pub_date).to eq('1860')
       expect(smods_rec.pub_date_sort).to eq('1860')
       expect(smods_rec.pub_date_facet).to eq('1860')
