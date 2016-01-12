@@ -24,7 +24,7 @@ describe "computations from /originInfo field" do
           <dateCreated>1999</dateCreated>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.send(method_sym)).to eq '2005'
+      expect(smods_rec.send(method_sym)).to eq method_sym.to_s.match(/int/) ? 2005 : '2005'
     end
     it 'respects ignore_approximate param' do
       mods_str = mods_origin_info_start_str +
@@ -32,8 +32,8 @@ describe "computations from /originInfo field" do
         '<dateCreated point="end">1599</dateCreated>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.send(method_sym, true)).to eq '1599'
-      expect(smods_rec.send(method_sym, false)).to eq '1000'
+      expect(smods_rec.send(method_sym, true)).to eq method_sym.to_s.match(/int/) ? 1599 : '1599'
+      expect(smods_rec.send(method_sym, false)).to eq method_sym.to_s.match(/int/) ? 1000 : '1000'
     end
     it 'nil if ignore_approximate and all dates are approximate' do
       mods_str = mods_origin_info_start_str +
@@ -42,7 +42,7 @@ describe "computations from /originInfo field" do
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
       expect(smods_rec.send(method_sym, true)).to eq nil
-      expect(smods_rec.send(method_sym, false)).to eq '1000'
+      expect(smods_rec.send(method_sym, false)).to eq method_sym.to_s.match(/int/) ? 1000 : '1000'
     end
     it 'respects ignore_approximate even for keyDate' do
       mods_str = mods_origin_info_start_str +
@@ -50,8 +50,8 @@ describe "computations from /originInfo field" do
         '<dateCreated point="end">1599</dateCreated>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.send(method_sym, true)).to eq '1599'
-      expect(smods_rec.send(method_sym, false)).to eq '1000'
+      expect(smods_rec.send(method_sym, true)).to eq method_sym.to_s.match(/int/) ? 1599 : '1599'
+      expect(smods_rec.send(method_sym, false)).to eq method_sym.to_s.match(/int/) ? 1000 : '1000'
     end
     it 'uses dateCaptured if no dateIssued or dateCreated' do
       # for web archive seed files
@@ -60,16 +60,19 @@ describe "computations from /originInfo field" do
         '<dateCaptured encoding="w3cdtf" point="end">20151218111111</dateCaptured>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.send(method_sym)).to eq '2015'
+      expect(smods_rec.send(method_sym)).to eq method_sym.to_s.match(/int/) ? 2015 : '2015'
     end
     context 'spotlight actual data' do
       require 'fixtures/spotlight_pub_date_data'
       SPOTLIGHT_PUB_DATE_DATA.each_pair.each do |coll_name, coll_data|
-        coll_data.each_pair do |mods_str, exp_vals|
-          expected = exp_vals[exp_val_position]
-          it "#{expected} for rec in #{coll_name}" do
-            smods_rec.from_str(mods_str)
-            expect(smods_rec.send(method_sym)).to eq expected
+        # papyri - the only Spotlight data with BC dates
+        unless coll_name == 'papyri' && method_sym == :pub_year_int
+          coll_data.each_pair do |mods_str, exp_vals|
+            expected = exp_vals[exp_val_position]
+            it "#{expected} for rec in #{coll_name}" do
+              smods_rec.from_str(mods_str)
+              expect(smods_rec.send(method_sym)).to eq((method_sym.to_s.match(/int/) ? expected.to_i : expected)) if expected
+            end
           end
         end
       end
@@ -84,7 +87,30 @@ describe "computations from /originInfo field" do
     it_behaves_like "single pub date value", :pub_date_sortable_string, 0
   end
 
-  context '*earliest_date' do
+  context '#pub_year_int' do
+    it_behaves_like "single pub date value", :pub_year_int, 0
+    # papyri - the only Spotlight data with BC dates
+    it '-200 for 200 B.C.' do
+      # hd778hw9236
+      mods_str = mods_origin_info_start_str +
+        '<dateCreated encoding="w3cdtf" keyDate="yes" point="start" qualifier="approximate">200 B.C.</dateCreated>' +
+        '<dateCreated encoding="w3cdtf" keyDate="yes" point="end" qualifier="approximate">180 B.C.</dateCreated>' +
+        mods_origin_info_end_str
+      smods_rec.from_str(mods_str)
+      expect(smods_rec.pub_year_int).to eq(-200)
+    end
+    it '-211 for 211 B.C.' do
+      # ww728rz0477
+      mods_str = mods_origin_info_start_str +
+        '<dateCreated encoding="w3cdtf" keyDate="yes" point="start" qualifier="approximate">211 B.C.</dateCreated>' +
+        '<dateCreated encoding="w3cdtf" keyDate="yes" point="end" qualifier="approximate">150 B.C.</dateCreated>' +
+        mods_origin_info_end_str
+      smods_rec.from_str(mods_str)
+      expect(smods_rec.pub_year_int).to eq(-211)
+    end
+  end
+
+  context '*earliest_year_str' do
     it 'selects earliest (valid) parseable date from multiple options' do
       mods_str = mods_origin_info_start_str +
         '<dateIssued point="start" qualifier="questionable">1758</dateIssued>' +
@@ -92,7 +118,7 @@ describe "computations from /originInfo field" do
         '<dateIssued>1753]</dateIssued>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(Stanford::Mods::Record.earliest_date(smods_rec.date_issued_elements)).to eq ['1753', '1753]']
+      expect(Stanford::Mods::Record.earliest_year_str(smods_rec.date_issued_elements)).to eq ['1753', '1753]']
     end
     it 'ignores encoding' do
       # encoding matters for choosing display, not for parsing year
@@ -102,21 +128,21 @@ describe "computations from /originInfo field" do
         '<dateIssued encoding="w3cdtf">1300</dateIssued>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(Stanford::Mods::Record.earliest_date(smods_rec.date_issued_elements)).to eq ['1100', '1100']
+      expect(Stanford::Mods::Record.earliest_year_str(smods_rec.date_issued_elements)).to eq ['1100', '1100']
       mods_str = mods_origin_info_start_str +
         '<dateIssued>1200</dateIssued>' +
         '<dateIssued encoding="marc">1300</dateIssued>' +
         '<dateIssued encoding="w3cdtf">1100</dateIssued>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(Stanford::Mods::Record.earliest_date(smods_rec.date_issued_elements)).to eq ['1100', '1100']
+      expect(Stanford::Mods::Record.earliest_year_str(smods_rec.date_issued_elements)).to eq ['1100', '1100']
       mods_str = mods_origin_info_start_str +
         '<dateIssued>1300</dateIssued>' +
         '<dateIssued encoding="marc">1100</dateIssued>' +
         '<dateIssued encoding="w3cdtf">1200</dateIssued>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(Stanford::Mods::Record.earliest_date(smods_rec.date_issued_elements)).to eq ['1100', '1100']
+      expect(Stanford::Mods::Record.earliest_year_str(smods_rec.date_issued_elements)).to eq ['1100', '1100']
     end
     it 'calls DateParsing.sortable_year_string_from_date_str for each element value' do
       mods_str = mods_origin_info_start_str +
@@ -126,7 +152,7 @@ describe "computations from /originInfo field" do
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
       expect(Stanford::Mods::DateParsing).to receive(:sortable_year_string_from_date_str).exactly(3).times
-      Stanford::Mods::Record.earliest_date(smods_rec.date_issued_elements)
+      Stanford::Mods::Record.earliest_year_str(smods_rec.date_issued_elements)
     end
   end
 
@@ -137,7 +163,7 @@ describe "computations from /originInfo field" do
         '<dateIssued keyDate="yes">2014</dateIssued>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq '2014'
+      expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq method_sym.to_s.match(/int/) ? 2014 : '2014'
     end
     it 'ignores invalid keyDate value' do
       mods_str = mods_origin_info_start_str +
@@ -145,25 +171,33 @@ describe "computations from /originInfo field" do
         '<dateIssued>1499</dateIssued>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq '1499'
+      expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq method_sym.to_s.match(/int/) ? 1499 : '1499'
     end
-    it 'calls earliest_date if multiple keyDates present' do
+    it 'calls earliest_year_str if multiple keyDates present' do
       mods_str = mods_origin_info_start_str +
         '<dateCreated keyDate="yes">2003</dateCreated>' +
         '<dateCreated keyDate="yes">2001</dateCreated>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(Stanford::Mods::Record).to receive(:earliest_date).with(smods_rec.date_created_elements)
+      if method_sym.to_s.match(/int/)
+        expect(Stanford::Mods::Record).to receive(:earliest_year_int).with(smods_rec.date_created_elements)
+      else
+        expect(Stanford::Mods::Record).to receive(:earliest_year_str).with(smods_rec.date_created_elements)
+      end
       expect(smods_rec.send(method_sym, smods_rec.date_created_elements))
     end
-    it 'calls earliest_date if no keyDate' do
+    it 'calls earliest_year_str if no keyDate' do
       mods_str = mods_origin_info_start_str +
         '<dateIssued>1753]</dateIssued>' +
         '<dateIssued point="start" qualifier="questionable">1758</dateIssued>' +
         '<dateIssued point="end" qualifier="questionable">uuuu</dateIssued>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(Stanford::Mods::Record).to receive(:earliest_date).with(smods_rec.date_issued_elements)
+      if method_sym.to_s.match(/int/)
+        expect(Stanford::Mods::Record).to receive(:earliest_year_int).with(smods_rec.date_issued_elements)
+      else
+        expect(Stanford::Mods::Record).to receive(:earliest_year_str).with(smods_rec.date_issued_elements)
+      end
       smods_rec.send(method_sym, smods_rec.date_issued_elements)
     end
     it 'ignores encoding' do
@@ -174,21 +208,21 @@ describe "computations from /originInfo field" do
         '<dateIssued encoding="w3cdtf">1300</dateIssued>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq '1100'
+      expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq method_sym.to_s.match(/int/) ? 1100 : '1100'
       mods_str = mods_origin_info_start_str +
         '<dateIssued>1200</dateIssued>' +
         '<dateIssued encoding="marc">1300</dateIssued>' +
         '<dateIssued encoding="w3cdtf" keyDate="yes">1100</dateIssued>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq '1100'
+      expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq method_sym.to_s.match(/int/) ? 1100 : '1100'
       mods_str = mods_origin_info_start_str +
         '<dateIssued>1300</dateIssued>' +
         '<dateIssued encoding="marc" keyDate="yes">1100</dateIssued>' +
         '<dateIssued encoding="w3cdtf">1200</dateIssued>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq '1100'
+      expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq method_sym.to_s.match(/int/) ? 1100 : '1100'
     end
   end
 
@@ -211,6 +245,17 @@ describe "computations from /originInfo field" do
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
       expect(smods_rec.pub_date_best_sort_str_value(smods_rec.date_created_elements)).to eq '-820'
+    end
+  end
+
+  context '#pub_date_best_sort_int_value' do
+    it_behaves_like "pub date best single value", :pub_date_best_sort_int_value
+    it 'uses integer sorting value, not string or facet value' do
+      mods_str = mods_origin_info_start_str +
+        '<dateCreated keyDate="yes">180 B.C.</dateCreated>' +
+        mods_origin_info_end_str
+      smods_rec.from_str(mods_str)
+      expect(smods_rec.pub_date_best_sort_int_value(smods_rec.date_created_elements)).to eq(-180)
     end
   end
 
