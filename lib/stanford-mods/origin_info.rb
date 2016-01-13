@@ -201,6 +201,12 @@ module Stanford
       end
 
       # Values for the pub date facet. This is less strict than the 4 year date requirements for pub_date
+      # Jan 2016:  used to populate Solr pub_date field for Spotlight and SearchWorks
+      #   Spotlight:  pub_date field should be replaced by pub_year_w_approx_isi and pub_year_no_approx_isi
+      #   SearchWorks:  pub_date field used for display in search results and show view; for sorting nearby-on-shelf
+      #      these could be done with more approp fields/methods (pub_year_int for sorting;  new pub year methods to populate field)
+      # TODO:  prob should deprecated this in favor of pub_date_facet_single_value;
+      #    need head-to-head testing with pub_date_facet_single_value
       # @return <Array[String]> with values for the pub date facet
       def pub_date_facet
         if pub_date
