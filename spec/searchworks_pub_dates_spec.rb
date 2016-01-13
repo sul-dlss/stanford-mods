@@ -101,13 +101,13 @@ describe "Date methods (searchworks.rb)" do
     end
   end # pub_date
 
-  context '#pub_year' do
+  context '#pub_year (protected)' do
     it '-700 for 300 B.C.' do
       m = "<mods #{ns_decl}><originInfo>
           <dateCreated>300 B.C.</dateCreated>
         </originInfo></mods>"
       smods_rec.from_str(m)
-      expect(smods_rec.pub_year).to eq('-700')
+      expect(smods_rec.send(:pub_year)).to eq('-700')
     end
   end
 

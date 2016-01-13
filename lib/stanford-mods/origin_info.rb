@@ -219,45 +219,6 @@ module Stanford
         nil
       end
 
-      # Get the publish year from mods
-      # @return [String] 4 character year or nil if no valid date was found
-      def pub_year
-        # use the cached year if there is one
-        if @pub_year
-          return nil if @pub_year == ''
-          return @pub_year
-        end
-
-        dates = pub_dates
-        if dates
-          pruned_dates = []
-          dates.each do |f_date|
-            # remove ? and []
-            if f_date.length == 4 && f_date.end_with?('?')
-              pruned_dates << f_date.tr('?', '0')
-            else
-              pruned_dates << f_date.delete('?[]')
-            end
-          end
-          # try to find a date starting with the most normal date formats and progressing to more wonky ones
-          @pub_year = get_plain_four_digit_year pruned_dates
-          return @pub_year if @pub_year
-          # Check for years in u notation, e.g., 198u
-          @pub_year = get_u_year pruned_dates
-          return @pub_year if @pub_year
-          @pub_year = get_double_digit_century pruned_dates
-          return @pub_year if @pub_year
-          @pub_year = get_bc_year pruned_dates
-          return @pub_year if @pub_year
-          @pub_year = get_three_digit_year pruned_dates
-          return @pub_year if @pub_year
-          @pub_year = get_single_digit_century pruned_dates
-          return @pub_year if @pub_year
-        end
-        @pub_year = ''
-        nil
-      end
-
       # creates a date suitable for sorting. Guarnteed to be 4 digits or nil
       # @deprecated:  use pub_year_int, or pub_date_sortable_string if you must have a string (why?)
       def pub_date_sort
@@ -298,6 +259,45 @@ module Stanford
 # ----   old date parsing methods will be deprecated/replaced with new date parsing methods (see also DateParsing)
 
     protected
+
+      # Get the publish year from mods
+      # @return [String] 4 character year or nil if no valid date was found
+      def pub_year
+        # use the cached year if there is one
+        if @pub_year
+          return nil if @pub_year == ''
+          return @pub_year
+        end
+
+        dates = pub_dates
+        if dates
+          pruned_dates = []
+          dates.each do |f_date|
+            # remove ? and []
+            if f_date.length == 4 && f_date.end_with?('?')
+              pruned_dates << f_date.tr('?', '0')
+            else
+              pruned_dates << f_date.delete('?[]')
+            end
+          end
+          # try to find a date starting with the most normal date formats and progressing to more wonky ones
+          @pub_year = get_plain_four_digit_year pruned_dates
+          return @pub_year if @pub_year
+          # Check for years in u notation, e.g., 198u
+          @pub_year = get_u_year pruned_dates
+          return @pub_year if @pub_year
+          @pub_year = get_double_digit_century pruned_dates
+          return @pub_year if @pub_year
+          @pub_year = get_bc_year pruned_dates
+          return @pub_year if @pub_year
+          @pub_year = get_three_digit_year pruned_dates
+          return @pub_year if @pub_year
+          @pub_year = get_single_digit_century pruned_dates
+          return @pub_year if @pub_year
+        end
+        @pub_year = ''
+        nil
+      end
 
       # @return [Array<String>] dates from dateIssued and dateCreated tags from origin_info with encoding="marc"
       def dates_marc_encoding
