@@ -210,15 +210,6 @@ module Stanford
         nil
       end
 
-      # For the date indexing, sorting and faceting, the first place to look is in the dates with encoding=marc array.
-      # If that doesn't exist, look in the dates without encoding=marc array.  Otherwise return nil
-      # @return [Array<String>] values for the date Solr field for this document or nil if none
-      def pub_dates
-        return dates_marc_encoding unless dates_marc_encoding.empty?
-        return dates_no_marc_encoding unless dates_no_marc_encoding.empty?
-        nil
-      end
-
       # creates a date suitable for sorting. Guarnteed to be 4 digits or nil
       # @deprecated:  use pub_year_int, or pub_date_sortable_string if you must have a string (why?)
       def pub_date_sort
@@ -296,6 +287,15 @@ module Stanford
           return @pub_year if @pub_year
         end
         @pub_year = ''
+        nil
+      end
+
+      # For the date indexing, sorting and faceting, the first place to look is in the dates with encoding=marc array.
+      # If that doesn't exist, look in the dates without encoding=marc array.  Otherwise return nil
+      # @return [Array<String>] values for the date Solr field for this document or nil if none
+      def pub_dates
+        return dates_marc_encoding unless dates_marc_encoding.empty?
+        return dates_no_marc_encoding unless dates_no_marc_encoding.empty?
         nil
       end
 

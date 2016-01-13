@@ -14,19 +14,6 @@ describe "Date methods (searchworks.rb)" do
   # dateCreated:  4 digit year
   #   and they should go in spec/fixtures searchworks_pub_date_data.rb
 
-  context "pub_dates" do
-    it "puts dateIssued values before dateCreated values" do
-      m = "<mods #{ns_decl}><originInfo>
-          <dateCreated>1904</dateCreated>
-          <dateCreated>1904</dateCreated>
-          <dateIssued>1906</dateIssued>
-        </originInfo></mods>"
-      smods_rec = Stanford::Mods::Record.new
-      smods_rec.from_str(m)
-      expect(smods_rec.pub_dates).to eq(['1906', '1904', '1904'])
-    end
-  end
-
   context "#pub_date" do
     it "uses dateCreated if no dateIssued" do
       m = "<mods #{ns_decl}><originInfo>
@@ -100,39 +87,6 @@ describe "Date methods (searchworks.rb)" do
       expect(smods_rec.pub_date).to eq('8--')
     end
   end # pub_date
-
-  context '#pub_year (protected)' do
-    it '-700 for 300 B.C.' do
-      m = "<mods #{ns_decl}><originInfo>
-          <dateCreated>300 B.C.</dateCreated>
-        </originInfo></mods>"
-      smods_rec.from_str(m)
-      expect(smods_rec.send(:pub_year)).to eq('-700')
-    end
-  end
-
-  context 'uses dateIssued with marc encoding for indexing, sorting and faceting' do
-    it '1860' do
-      m = "<mods #{ns_decl}><originInfo>
-          <dateIssued>1844</dateIssued>
-          <dateIssued encoding=\"marc\">1860</dateIssued>
-        </originInfo></mods>"
-      smods_rec.from_str(m)
-      expect(smods_rec.pub_date).to eq('1860')
-      expect(smods_rec.pub_date_sort).to eq('1860') # @deprecated:  need to switch to pub_year_int, or pub_date_sortable_string if you must have a string (why?)
-      expect(smods_rec.pub_date_facet).to eq('1860')
-    end
-    it '186?' do
-      m = "<mods #{ns_decl}><originInfo>
-          <dateIssued>1844</dateIssued>
-          <dateIssued encoding=\"marc\">186?</dateIssued>
-        </originInfo></mods>"
-      smods_rec.from_str(m)
-      expect(smods_rec.pub_date).to eq('1860')
-      expect(smods_rec.pub_date_sort).to eq('1860') # @deprecated:  need to switch to pub_year_int, or pub_date_sortable_string if you must have a string (why?)
-      expect(smods_rec.pub_date_facet).to eq('1860')
-    end
-  end
 
   # @deprecated:  need to switch to pub_year_int, or pub_date_sortable_string if you must have a string (why?)
   context '#pub_date_sort (deprecated)' do
@@ -228,6 +182,52 @@ describe "Date methods (searchworks.rb)" do
         </originInfo></mods>"
       smods_rec.from_str(m)
       expect(smods_rec.pub_date_facet).to eq('9th century')
+    end
+  end
+
+  context 'uses dateIssued with marc encoding for indexing, sorting and faceting' do
+    it '1860' do
+      m = "<mods #{ns_decl}><originInfo>
+          <dateIssued>1844</dateIssued>
+          <dateIssued encoding=\"marc\">1860</dateIssued>
+        </originInfo></mods>"
+      smods_rec.from_str(m)
+      expect(smods_rec.pub_date).to eq('1860')
+      expect(smods_rec.pub_date_sort).to eq('1860') # @deprecated:  need to switch to pub_year_int, or pub_date_sortable_string if you must have a string (why?)
+      expect(smods_rec.pub_date_facet).to eq('1860')
+    end
+    it '186?' do
+      m = "<mods #{ns_decl}><originInfo>
+          <dateIssued>1844</dateIssued>
+          <dateIssued encoding=\"marc\">186?</dateIssued>
+        </originInfo></mods>"
+      smods_rec.from_str(m)
+      expect(smods_rec.pub_date).to eq('1860')
+      expect(smods_rec.pub_date_sort).to eq('1860') # @deprecated:  need to switch to pub_year_int, or pub_date_sortable_string if you must have a string (why?)
+      expect(smods_rec.pub_date_facet).to eq('1860')
+    end
+  end
+
+  context '#pub_year (protected)' do
+    it '-700 for 300 B.C.' do
+      m = "<mods #{ns_decl}><originInfo>
+          <dateCreated>300 B.C.</dateCreated>
+        </originInfo></mods>"
+      smods_rec.from_str(m)
+      expect(smods_rec.send(:pub_year)).to eq('-700')
+    end
+  end
+
+  context "pub_dates (protected)" do
+    it "puts dateIssued values before dateCreated values" do
+      m = "<mods #{ns_decl}><originInfo>
+          <dateCreated>1904</dateCreated>
+          <dateCreated>1904</dateCreated>
+          <dateIssued>1906</dateIssued>
+        </originInfo></mods>"
+      smods_rec = Stanford::Mods::Record.new
+      smods_rec.from_str(m)
+      expect(smods_rec.send(:pub_dates)).to eq(['1906', '1904', '1904'])
     end
   end
 
