@@ -378,6 +378,15 @@ describe "date parsing methods" do
     '75 B.C.' => '-925',
     '8 B.C.' => '-992'
   }
+  bc_dates_to_int = {
+    '801 B.C.' => -801,
+    '800 B.C.' => -800,
+    '750 B.C.' => -750,
+    '700 B.C.' => -700,
+    '699 B.C.' => -699,
+    '75 B.C.' => -75,
+    '8 B.C.' => -8
+  }
 
   context '*facet_string_from_date_str' do
     it 'calls instance method facet_string_from_date_str' do
@@ -389,6 +398,12 @@ describe "date parsing methods" do
     it 'calls instance method sortable_year_string_from_date_str' do
       expect_any_instance_of(Stanford::Mods::DateParsing).to receive(:sortable_year_string_from_date_str)
       Stanford::Mods::DateParsing.sortable_year_string_from_date_str('1666')
+    end
+  end
+  context '*year_int_from_date_str' do
+    it 'calls instance method year_int_from_date_str' do
+      expect_any_instance_of(Stanford::Mods::DateParsing).to receive(:year_int_from_date_str)
+      Stanford::Mods::DateParsing.year_int_from_date_str('1666')
     end
   end
 
@@ -442,10 +457,66 @@ describe "date parsing methods" do
     [ # bad dates
       '9999',
       '2035',
-      '0000-00-00'
+      '0000-00-00',
+      'uuuu'
     ].each do |example|
       it "nil for #{example}" do
         expect(Stanford::Mods::DateParsing.new(example).facet_string_from_date_str).to eq nil
+      end
+    end
+  end
+
+  context '#year_int_from_date_str' do
+    single_year
+      .merge(specific_month)
+      .merge(specific_day)
+      .merge(specific_day_2_digit_year)
+      .merge(bc_dates_to_int)
+      .merge(specific_day_ruby_parse_fail)
+      .merge(brackets_in_middle_of_year)
+      .merge(invalid_but_can_get_year).each do |example, expected|
+      it "#{expected} for single value #{example}" do
+        expect(Stanford::Mods::DateParsing.new(example).year_int_from_date_str).to eq expected.to_i
+      end
+    end
+
+    multiple_years
+      .merge(multiple_years_4_digits_once)
+      .merge(decade_only)
+      .merge(decade_only_4_digits).each do |example, expected|
+      it "#{expected.first} for multi-value #{example}" do
+        expect(Stanford::Mods::DateParsing.new(example).year_int_from_date_str).to eq expected.first.to_i
+      end
+    end
+
+    century_only.keys.each do |example|
+      it "1700 from #{example}" do
+        expect(Stanford::Mods::DateParsing.new(example).year_int_from_date_str).to eq 1700
+      end
+    end
+
+    early_numeric_dates.each do |example, _expected|
+      it "#{example} for #{example}" do
+        expect(Stanford::Mods::DateParsing.new(example).year_int_from_date_str).to eq example.to_i
+      end
+    end
+
+    it 'nil for -1666' do
+      skip("code broken for -yyyy dates but no existing data for this yet")
+      expect(Stanford::Mods::DateParsing.new('-1666').year_int_from_date_str).to eq nil
+    end
+    it '-1666 for 1666 B.C.' do
+      expect(Stanford::Mods::DateParsing.new('1666 B.C.').year_int_from_date_str).to eq(-1666)
+    end
+
+    [ # bad dates
+      '9999',
+      '2035',
+      '0000-00-00',
+      'uuuu'
+    ].each do |example|
+      it "nil for #{example}" do
+        expect(Stanford::Mods::DateParsing.new(example).year_int_from_date_str).to eq nil
       end
     end
   end
@@ -491,7 +562,8 @@ describe "date parsing methods" do
     [ # bad dates
       '9999',
       '2035',
-      '0000-00-00'
+      '0000-00-00',
+      'uuuu'
     ].each do |example|
       it "nil for #{example}" do
         expect(Stanford::Mods::DateParsing.new(example).sortable_year_string_from_date_str).to eq nil
@@ -521,6 +593,33 @@ describe "date parsing methods" do
         it "#{expected} for #{example}" do
           expect(Stanford::Mods::DateParsing.year_str_valid?(example)).to eq expected
         end
+    end
+  end
+
+  context '*year_int_valid?' do
+    { # example int as key, expected result as value
+      -1666 => false,
+      -999 => true,
+      -35 => true,
+      -3 => true,
+      0 => true,
+      5 => true,
+      33 => true,
+      150 => true,
+      (Date.today.year + 1) => true, # current year + 1
+      (Date.today.year + 2) => false, # current year + 2
+      9999 => false,
+      '165x' => false,
+      '198-' => false,
+      'random text' => false,
+      nil => false
+    }.each do |example, expected|
+        it "#{expected} for #{example}" do
+          expect(Stanford::Mods::DateParsing.year_int_valid?(example)).to eq expected
+        end
+    end
+    it 'true for 0000' do
+      expect(Stanford::Mods::DateParsing.year_int_valid?(0000)).to eq true
     end
   end
 
@@ -640,10 +739,18 @@ describe "date parsing methods" do
     end
   end
 
-  context '#sortable_year_for_early_numeric' do
+  context '#sortable_year_int_for_early_numeric' do
+    early_numeric_dates.each do |example, _expected|
+      it "#{example} for #{example}" do
+        expect(Stanford::Mods::DateParsing.new(example).sortable_year_int_for_early_numeric).to eq example.to_i
+      end
+    end
+  end
+
+  context '#sortable_year_str_for_early_numeric' do
     early_numeric_dates.each do |example, expected|
       it "#{expected} for #{example}" do
-        expect(Stanford::Mods::DateParsing.new(example).sortable_year_for_early_numeric).to eq expected
+        expect(Stanford::Mods::DateParsing.new(example).sortable_year_str_for_early_numeric).to eq expected
       end
     end
   end
@@ -664,10 +771,18 @@ describe "date parsing methods" do
     end
   end
 
-  context '#sortable_year_for_bc' do
+  context '#sortable_year_int_for_bc' do
+    bc_dates_to_int.each do |example, expected|
+      it "#{expected} for #{example}" do
+        expect(Stanford::Mods::DateParsing.new(example).sortable_year_int_for_bc).to eq expected
+      end
+    end
+  end
+
+  context '#sortable_year_str_for_bc' do
     bc_dates.each do |example, expected|
       it "#{expected} for #{example}" do
-        expect(Stanford::Mods::DateParsing.new(example).sortable_year_for_bc).to eq expected
+        expect(Stanford::Mods::DateParsing.new(example).sortable_year_str_for_bc).to eq expected
       end
     end
   end

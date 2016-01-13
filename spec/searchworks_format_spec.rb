@@ -8,6 +8,7 @@ describe "Format fields (searchworks.rb)" do
     @ns_decl = "xmlns='#{Mods::MODS_NS}'"
   end
 
+  # @deprecated:  this is no longer used in SW, Revs or Spotlight Jan 2016
   context "format" do
     context "Book:" do
       context "typeOfResource text," do
