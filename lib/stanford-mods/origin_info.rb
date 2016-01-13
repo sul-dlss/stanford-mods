@@ -19,7 +19,7 @@ module Stanford
       #   should be ignored; false if approximate dates should be included
       # @return [String] single String containing publication year for facet use
       def pub_date_facet_single_value(ignore_approximate = false)
-        single_pub_year(ignore_approximate, :pub_date_best_single_facet_value)
+        single_pub_year(ignore_approximate, :date_best_str_facet_value)
       end
 
       # return pub year as an Integer
@@ -30,7 +30,7 @@ module Stanford
       # @return [Integer] publication year as an Integer
       #   note that for sorting  5 B.C. => -5;  666 B.C. => -666
       def pub_year_int(ignore_approximate = false)
-        single_pub_year(ignore_approximate, :pub_date_best_sort_int_value)
+        single_pub_year(ignore_approximate, :date_best_sort_int)
       end
 
       # return a single string intended for lexical sorting for pub date
@@ -42,14 +42,14 @@ module Stanford
       #   note that for string sorting  5 B.C. = -5  => -995;  6 B.C. => -994  so 6 B.C. sorts before 5 B.C.
       # @deprecated  use pub_year_int
       def pub_date_sortable_string(ignore_approximate = false)
-        single_pub_year(ignore_approximate, :pub_date_best_sort_str_value)
+        single_pub_year(ignore_approximate, :date_best_sort_str)
       end
 
       # given the passed date elements, look for a single keyDate and use it if there is one;
       #    otherwise pick earliest parseable date
       # @param [Array<Nokogiri::XML::Element>] date_el_array the elements from which to select a pub date
       # @return [String] single String containing publication year for facet use
-      def pub_date_best_single_facet_value(date_el_array)
+      def date_best_str_facet_value(date_el_array)
         result = date_parsing_result(date_el_array, :facet_string_from_date_str)
         return result if result
         _ignore, orig_str_to_parse = self.class.earliest_year_str(date_el_array)
@@ -60,7 +60,7 @@ module Stanford
       #    otherwise pick earliest parseable date
       # @param [Array<Nokogiri::XML::Element>] date_el_array the elements from which to select a pub date
       # @return [Integer] publication year as an Integer
-      def pub_date_best_sort_int_value(date_el_array)
+      def date_best_sort_int(date_el_array)
         result = date_parsing_result(date_el_array, :year_int_from_date_str)
         return result if result
         year_int, _ignore = self.class.earliest_year_int(date_el_array)
@@ -71,7 +71,7 @@ module Stanford
       #    otherwise pick earliest parseable date
       # @param [Array<Nokogiri::XML::Element>] date_el_array the elements from which to select a pub date
       # @return [String] single String containing publication year for lexical sorting
-      def pub_date_best_sort_str_value(date_el_array)
+      def date_best_sort_str(date_el_array)
         result = date_parsing_result(date_el_array, :sortable_year_string_from_date_str)
         return result if result
         sortable_str, _ignore = self.class.earliest_year_str(date_el_array)
