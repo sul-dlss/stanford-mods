@@ -259,6 +259,7 @@ module Stanford
       end
 
       # creates a date suitable for sorting. Guarnteed to be 4 digits or nil
+      # @deprecated:  use pub_year_int, or pub_date_sortable_string if you must have a string (why?)
       def pub_date_sort
         if pub_date
           pd = pub_date
