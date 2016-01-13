@@ -83,8 +83,8 @@ describe "computations from /originInfo field" do
     it_behaves_like "single pub date value", :pub_date_facet_single_value, 1
   end
 
-  context '#pub_date_sortable_string' do
-    it_behaves_like "single pub date value", :pub_date_sortable_string, 0
+  context '#pub_year_sort_str' do
+    it_behaves_like "single pub date value", :pub_year_sort_str, 0
   end
 
   context '#pub_year_int' do

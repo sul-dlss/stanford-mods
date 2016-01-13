@@ -41,7 +41,7 @@ module Stanford
       # @return [String] single String containing publication year for lexical sorting
       #   note that for string sorting  5 B.C. = -5  => -995;  6 B.C. => -994  so 6 B.C. sorts before 5 B.C.
       # @deprecated  use pub_year_int
-      def pub_date_sortable_string(ignore_approximate = false)
+      def pub_year_sort_str(ignore_approximate = false)
         single_pub_year(ignore_approximate, :date_best_sort_str)
       end
 
@@ -226,7 +226,7 @@ module Stanford
       end
 
       # creates a date suitable for sorting. Guarnteed to be 4 digits or nil
-      # @deprecated:  use pub_year_int, or pub_date_sortable_string if you must have a string (why?)
+      # @deprecated:  use pub_year_int, or pub_year_sort_str if you must have a string (why?)
       def pub_date_sort
         if pub_date
           pd = pub_date
