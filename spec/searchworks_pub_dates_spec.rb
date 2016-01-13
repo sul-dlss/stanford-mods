@@ -14,79 +14,6 @@ describe "Date methods (searchworks.rb)" do
   # dateCreated:  4 digit year
   #   and they should go in spec/fixtures searchworks_pub_date_data.rb
 
-  context "#pub_date" do
-    it "uses dateCreated if no dateIssued" do
-      m = "<mods #{ns_decl}><originInfo>
-          <dateCreated>1904</dateCreated>
-        </originInfo></mods>"
-      smods_rec.from_str(m)
-      expect(smods_rec.pub_date).to eq('1904')
-    end
-    it "gets year from text date" do
-      m = "<mods #{ns_decl}><originInfo>
-          <dateCreated>Aug. 3rd, 1886</dateCreated>
-        </originInfo></mods>"
-      smods_rec.from_str(m)
-      expect(smods_rec.pub_date).to eq('1886')
-    end
-    it "ignores question marks and square brackets" do
-      m = "<mods #{ns_decl}><originInfo>
-          <dateCreated>Aug. 3rd, [18]86?</dateCreated>
-        </originInfo></mods>"
-      smods_rec.from_str(m)
-      expect(smods_rec.pub_date).to eq('1886')
-    end
-    it '1890 for 1890s' do
-      m = "<mods #{ns_decl}><originInfo>
-          <dateCreated>early 1890s</dateCreated>
-        </originInfo></mods>"
-      smods_rec.from_str(m)
-      expect(smods_rec.pub_date).to eq('1890')
-    end
-    it 'takes first occurring 4 digit date in string' do
-      m = "<mods #{ns_decl}><originInfo>
-          <dateCreated>Text dated June 4, 1594; miniatures added by 1596</dateCreated>
-        </originInfo></mods>"
-      smods_rec.from_str(m)
-      expect(smods_rec.pub_date).to eq('1594')
-    end
-    it '1980 for 198u' do
-      m = "<mods #{ns_decl}><originInfo>
-          <dateIssued >198u</dateIssued>
-        </originInfo></mods>"
-      smods_rec.from_str(m)
-      expect(smods_rec.pub_date).to eq('1980')
-    end
-    it '19-- for 19uu' do
-      m = "<mods #{ns_decl}>
-      <originInfo>
-        <dateIssued>19uu</dateIssued>
-      </originInfo></mods>"
-      smods_rec.from_str(m)
-      expect(smods_rec.pub_date).to eq('19--')
-    end
-    it '-700 for 300 B.C.' do
-      m = "<mods #{ns_decl}><originInfo>
-          <dateCreated>300 B.C.</dateCreated>
-        </originInfo></mods>"
-      smods_rec.from_str(m)
-      expect(smods_rec.pub_date).to eq('-700')
-    end
-    it '966 for 966' do
-      m = "<mods #{ns_decl}><originInfo>
-          <dateIssued>966</dateIssued>
-        </originInfo></mods>"
-      smods_rec.from_str(m)
-      expect(smods_rec.pub_date).to eq('966')
-    end
-    it '8-- for 9th century' do
-      m = "<mods #{ns_decl}><originInfo>
-          <dateIssued>9th century</dateIssued>
-        </originInfo></mods>"
-      smods_rec.from_str(m)
-      expect(smods_rec.pub_date).to eq('8--')
-    end
-  end # pub_date
 
   # @deprecated:  need to switch to pub_year_int, or pub_date_sortable_string if you must have a string (why?)
   context '#pub_date_sort (deprecated)' do
@@ -185,14 +112,13 @@ describe "Date methods (searchworks.rb)" do
     end
   end
 
-  context 'uses dateIssued with marc encoding for indexing, sorting and faceting' do
+  context 'uses dateIssued with marc encoding for sorting and faceting' do
     it '1860' do
       m = "<mods #{ns_decl}><originInfo>
           <dateIssued>1844</dateIssued>
           <dateIssued encoding=\"marc\">1860</dateIssued>
         </originInfo></mods>"
       smods_rec.from_str(m)
-      expect(smods_rec.pub_date).to eq('1860')
       expect(smods_rec.pub_date_sort).to eq('1860') # @deprecated:  need to switch to pub_year_int, or pub_date_sortable_string if you must have a string (why?)
       expect(smods_rec.pub_date_facet).to eq('1860')
     end
@@ -202,7 +128,6 @@ describe "Date methods (searchworks.rb)" do
           <dateIssued encoding=\"marc\">186?</dateIssued>
         </originInfo></mods>"
       smods_rec.from_str(m)
-      expect(smods_rec.pub_date).to eq('1860')
       expect(smods_rec.pub_date_sort).to eq('1860') # @deprecated:  need to switch to pub_year_int, or pub_date_sortable_string if you must have a string (why?)
       expect(smods_rec.pub_date_facet).to eq('1860')
     end
@@ -218,6 +143,79 @@ describe "Date methods (searchworks.rb)" do
     end
   end
 
+  context "#pub_date (protected)" do
+    it "uses dateCreated if no dateIssued" do
+      m = "<mods #{ns_decl}><originInfo>
+          <dateCreated>1904</dateCreated>
+        </originInfo></mods>"
+      smods_rec.from_str(m)
+      expect(smods_rec.send(:pub_date)).to eq('1904')
+    end
+    it "gets year from text date" do
+      m = "<mods #{ns_decl}><originInfo>
+          <dateCreated>Aug. 3rd, 1886</dateCreated>
+        </originInfo></mods>"
+      smods_rec.from_str(m)
+      expect(smods_rec.send(:pub_date)).to eq('1886')
+    end
+    it "ignores question marks and square brackets" do
+      m = "<mods #{ns_decl}><originInfo>
+          <dateCreated>Aug. 3rd, [18]86?</dateCreated>
+        </originInfo></mods>"
+      smods_rec.from_str(m)
+      expect(smods_rec.send(:pub_date)).to eq('1886')
+    end
+    it '1890 for 1890s' do
+      m = "<mods #{ns_decl}><originInfo>
+          <dateCreated>early 1890s</dateCreated>
+        </originInfo></mods>"
+      smods_rec.from_str(m)
+      expect(smods_rec.send(:pub_date)).to eq('1890')
+    end
+    it 'takes first occurring 4 digit date in string' do
+      m = "<mods #{ns_decl}><originInfo>
+          <dateCreated>Text dated June 4, 1594; miniatures added by 1596</dateCreated>
+        </originInfo></mods>"
+      smods_rec.from_str(m)
+      expect(smods_rec.send(:pub_date)).to eq('1594')
+    end
+    it '1980 for 198u' do
+      m = "<mods #{ns_decl}><originInfo>
+          <dateIssued >198u</dateIssued>
+        </originInfo></mods>"
+      smods_rec.from_str(m)
+      expect(smods_rec.send(:pub_date)).to eq('1980')
+    end
+    it '19-- for 19uu' do
+      m = "<mods #{ns_decl}>
+      <originInfo>
+        <dateIssued>19uu</dateIssued>
+      </originInfo></mods>"
+      smods_rec.from_str(m)
+      expect(smods_rec.send(:pub_date)).to eq('19--')
+    end
+    it '-700 for 300 B.C.' do
+      m = "<mods #{ns_decl}><originInfo>
+          <dateCreated>300 B.C.</dateCreated>
+        </originInfo></mods>"
+      smods_rec.from_str(m)
+      expect(smods_rec.send(:pub_date)).to eq('-700')
+    end
+    it '966 for 966' do
+      m = "<mods #{ns_decl}><originInfo>
+          <dateIssued>966</dateIssued>
+        </originInfo></mods>"
+      smods_rec.from_str(m)
+      expect(smods_rec.send(:pub_date)).to eq('966')
+    end
+    it '8-- for 9th century' do
+      m = "<mods #{ns_decl}><originInfo>
+          <dateIssued>9th century</dateIssued>
+        </originInfo></mods>"
+      smods_rec.from_str(m)
+      expect(smods_rec.send(:pub_date)).to eq('8--')
+    end
+  end # pub_date
   context "pub_dates (protected)" do
     it "puts dateIssued values before dateCreated values" do
       m = "<mods #{ns_decl}><originInfo>

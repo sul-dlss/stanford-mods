@@ -200,34 +200,6 @@ module Stanford
         vals
       end
 
-      # For the date display only, the first place to look is in the dates without encoding=marc array.
-      # If no such dates, select the first date in the dates_marc_encoding array.  Otherwise return nil
-      # @return [String] value for the pub_date_display Solr field for this document or nil if none
-      # @deprecated:  this is no longer used in SW, Revs or Spotlight Jan 2016
-      def pub_date_display
-        return dates_no_marc_encoding.first unless dates_no_marc_encoding.empty?
-        return dates_marc_encoding.first unless dates_marc_encoding.empty?
-        nil
-      end
-
-      # creates a date suitable for sorting. Guarnteed to be 4 digits or nil
-      # @deprecated:  use pub_year_int, or pub_date_sortable_string if you must have a string (why?)
-      def pub_date_sort
-        if pub_date
-          pd = pub_date
-          pd = '0' + pd if pd.length == 3
-          pd = pd.gsub('--', '00')
-        end
-        fail "pub_date_sort was about to return a non 4 digit value #{pd}!" if pd && pd.length != 4
-        pd
-      end
-
-      # The year the object was published, filtered based on max_pub_date and min_pub_date from the config file
-      # @return [String] 4 character year or nil
-      def pub_date
-        pub_year || nil
-      end
-
       # Values for the pub date facet. This is less strict than the 4 year date requirements for pub_date
       # @return <Array[String]> with values for the pub date facet
       def pub_date_facet
@@ -247,11 +219,33 @@ module Stanford
         nil
       end
 
-# ----   old date parsing methods will be deprecated/replaced with new date parsing methods (see also DateParsing)
+      # creates a date suitable for sorting. Guarnteed to be 4 digits or nil
+      # @deprecated:  use pub_year_int, or pub_date_sortable_string if you must have a string (why?)
+      def pub_date_sort
+        if pub_date
+          pd = pub_date
+          pd = '0' + pd if pd.length == 3
+          pd = pd.gsub('--', '00')
+        end
+        fail "pub_date_sort was about to return a non 4 digit value #{pd}!" if pd && pd.length != 4
+        pd
+      end
+
+      # For the date display only, the first place to look is in the dates without encoding=marc array.
+      # If no such dates, select the first date in the dates_marc_encoding array.  Otherwise return nil
+      # @return [String] value for the pub_date_display Solr field for this document or nil if none
+      # @deprecated:  DO NOT USE: this is no longer used in SW, Revs or Spotlight Jan 2016
+      def pub_date_display
+        return dates_no_marc_encoding.first unless dates_no_marc_encoding.empty?
+        return dates_marc_encoding.first unless dates_marc_encoding.empty?
+        nil
+      end
+
+# ----   old date parsing protected methods will be deprecated/replaced with new date parsing methods (see also DateParsing)
 
     protected
 
-      # Get the publish year from mods
+      # The year the object was published
       # @return [String] 4 character year or nil if no valid date was found
       def pub_year
         # use the cached year if there is one
@@ -289,6 +283,7 @@ module Stanford
         @pub_year = ''
         nil
       end
+      alias_method :pub_date, :pub_year
 
       # For the date indexing, sorting and faceting, the first place to look is in the dates with encoding=marc array.
       # If that doesn't exist, look in the dates without encoding=marc array.  Otherwise return nil
@@ -336,7 +331,6 @@ module Stanford
         }
       end
 
-
       def is_number?(object)
         true if Integer(object) rescue false
       end
@@ -344,8 +338,6 @@ module Stanford
       def is_date?(object)
         true if Date.parse(object) rescue false
       end
-
-      # TODO:  need tests for these methods
 
       # get a 4 digit year like 1865 from array of dates
       # @param [Array<String>] dates an array of potential year strings
