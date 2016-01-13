@@ -83,8 +83,8 @@ describe "computations from /originInfo field" do
     it_behaves_like "single pub date value", :pub_date_facet_single_value, 1
   end
 
-  context '#pub_date_sortable_string' do
-    it_behaves_like "single pub date value", :pub_date_sortable_string, 0
+  context '#pub_year_sort_str' do
+    it_behaves_like "single pub date value", :pub_year_sort_str, 0
   end
 
   context '#pub_year_int' do
@@ -226,36 +226,36 @@ describe "computations from /originInfo field" do
     end
   end
 
-  context '#pub_date_best_single_facet_value' do
-    it_behaves_like "pub date best single value", :pub_date_best_single_facet_value
+  context '#date_best_str_facet_value' do
+    it_behaves_like "pub date best single value", :date_best_str_facet_value
     it 'uses facet value, not sorting value' do
       mods_str = mods_origin_info_start_str +
         '<dateCreated keyDate="yes">180 B.C.</dateCreated>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_date_best_single_facet_value(smods_rec.date_created_elements)).to eq '180 B.C.'
+      expect(smods_rec.date_best_str_facet_value(smods_rec.date_created_elements)).to eq '180 B.C.'
     end
   end
 
-  context '#pub_date_best_sort_str_value' do
-    it_behaves_like "pub date best single value", :pub_date_best_sort_str_value
+  context '#date_best_sort_str' do
+    it_behaves_like "pub date best single value", :date_best_sort_str
     it 'uses string sorting value, not facet value' do
       mods_str = mods_origin_info_start_str +
         '<dateCreated keyDate="yes">180 B.C.</dateCreated>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_date_best_sort_str_value(smods_rec.date_created_elements)).to eq '-820'
+      expect(smods_rec.date_best_sort_str(smods_rec.date_created_elements)).to eq '-820'
     end
   end
 
-  context '#pub_date_best_sort_int_value' do
-    it_behaves_like "pub date best single value", :pub_date_best_sort_int_value
+  context '#date_best_sort_int' do
+    it_behaves_like "pub date best single value", :date_best_sort_int
     it 'uses integer sorting value, not string or facet value' do
       mods_str = mods_origin_info_start_str +
         '<dateCreated keyDate="yes">180 B.C.</dateCreated>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_date_best_sort_int_value(smods_rec.date_created_elements)).to eq(-180)
+      expect(smods_rec.date_best_sort_int(smods_rec.date_created_elements)).to eq(-180)
     end
   end
 
