@@ -53,7 +53,7 @@ describe "Cartographic coordinates" do
     end
   end
 
-  context "point_bbox" do
+  describe "#coordinates_as_bbox" do
     it "returns empty array if no coordinates in the mods" do
       smods_rec.from_str(no_coord)
       expect(smods_rec.point_bbox).to eq([])
@@ -66,44 +66,20 @@ describe "Cartographic coordinates" do
       smods_rec.from_str(with_coords)
       expect(smods_rec.point_bbox).to eq(["-16.0 -15.0 28.0 13.0"])
     end
+  end
 
-    {
-      %((W 123°23ʹ16ʺ--W 122°31ʹ22ʺ/N 39°23ʹ57ʺ--N 38°17ʹ53ʺ)) =>
-        ['-123.38777777777779 38.29805555555556 -122.52277777777778 39.399166666666666'],
-      %(E 10°03'00"--E 12°58'00"/N 45°00'00"--N 41°46'00") =>
-        ['10.05 41.766666666666666 12.966666666666667 45.0'],
-      %(E 8°41'-E 12°21'/N 46°04'-N 44°23') =>
-        ['8.683333333333334 44.38333333333333 12.35 46.06666666666667'],
-      %((E17°--E11°/N14°--N18°).) =>
-        ['11.0 14.0 17.0 18.0'], # coordinates need to be reordered
-      %((W 170⁰--E 55⁰/N 40⁰--S 36⁰).) =>
-        ['-170.0 -36.0 55.0 40.0'], # superscript 0 is almost a degree character..
-      %(W80°--E100°/N487°--S42°) =>
-        [], # N487 is out of bounds for the bounding box
-      %((W 0°-W 0°/S 90°---S 90°)) =>
-        ['-0.0 -90.0 -0.0 -90.0'], # one dash, two dashes, three dashes.. what's the difference?
-      %(W 650--W 100/N 700--N 550) =>
-        [] # missing degree character, and all coordinates are out of bounds.
-    }.each do |value, expected|
-      describe 'data mappings' do
-        let(:mods) do
-          <<-EOF
-            <mods xmlns="#{Mods::MODS_NS}">
-              <subject>
-                <cartographics>
-                  <coordinates>#{value}</coordinates>
-                </cartographics>
-              </subject>
-            </mods>
-          EOF
-        end
-
-        let(:smods_rec) { Stanford::Mods::Record.new.from_str(mods) }
-
-        it 'maps to the right bounding box' do
-          expect(smods_rec.point_bbox).to eq expected
-        end
-      end
+  describe "#coordinates_as_envelope" do
+    it "returns empty array if no coordinates in the mods" do
+      smods_rec.from_str(no_coord)
+      expect(smods_rec.coordinates_as_envelope).to eq([])
+    end
+    it "returns empty array if bad data is in the mods" do
+      smods_rec.from_str(with_bad_data)
+      expect(smods_rec.coordinates_as_envelope).to eq([])
+    end
+    it "returns decimal representation of latitude and longitude" do
+      smods_rec.from_str(with_coords)
+      expect(smods_rec.coordinates_as_envelope).to eq(["ENVELOPE(-16.0, 28.0, -15.0, 13.0)"])
     end
   end
 end # describe Cartographic coordinates
