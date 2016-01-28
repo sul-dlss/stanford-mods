@@ -14,7 +14,7 @@ module Stanford
       def as_envelope
         return unless valid?
 
-        "ENVELOPE(#{bounds[:min_x]}, #{bounds[:max_x]}, #{bounds[:min_y]}, #{bounds[:max_y]})"
+        "ENVELOPE(#{bounds[:min_x]}, #{bounds[:max_x]}, #{bounds[:max_y]}, #{bounds[:min_y]})"
       end
 
       # Convert the coordinate to a Solr 4.x bbox-format representation

@@ -79,7 +79,7 @@ describe "Cartographic coordinates" do
     end
     it "returns decimal representation of latitude and longitude" do
       smods_rec.from_str(with_coords)
-      expect(smods_rec.coordinates_as_envelope).to eq(["ENVELOPE(-16.0, 28.0, -15.0, 13.0)"])
+      expect(smods_rec.coordinates_as_envelope).to eq(["ENVELOPE(-16.0, 28.0, 13.0, -15.0)"])
     end
   end
 end # describe Cartographic coordinates
