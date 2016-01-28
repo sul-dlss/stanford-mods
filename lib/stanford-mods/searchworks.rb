@@ -351,6 +351,14 @@ module Stanford
               val.delete 'Conference publication'
             end
           end
+          gov_pub = ['government publication', 'Government publication', 'Government Publication']
+          if !(genres & gov_pub).empty?
+            types = self.term_values(:typeOfResource)
+            if types && types.include?('text')
+              val << 'Government document'
+              val.delete 'Government publication'
+            end
+          end
         end
         val.uniq
       end
