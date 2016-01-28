@@ -60,15 +60,15 @@ describe Stanford::Mods::Coordinate do
   context '#as_envelope' do
     {
       %((W 123°23ʹ16ʺ--W 122°31ʹ22ʺ/N 39°23ʹ57ʺ--N 38°17ʹ53ʺ)) =>
-        'ENVELOPE(-123.38777777777779, -122.52277777777778, 38.29805555555556, 39.399166666666666)',
+        'ENVELOPE(-123.38777777777779, -122.52277777777778, 39.399166666666666, 38.29805555555556)',
       %(E 10°03'00"--E 12°58'00"/N 45°00'00"--N 41°46'00") =>
-        'ENVELOPE(10.05, 12.966666666666667, 41.766666666666666, 45.0)',
+        'ENVELOPE(10.05, 12.966666666666667, 45.0, 41.766666666666666)',
       %(E 8°41'-E 12°21'/N 46°04'-N 44°23') =>
-        'ENVELOPE(8.683333333333334, 12.35, 44.38333333333333, 46.06666666666667)',
+        'ENVELOPE(8.683333333333334, 12.35, 46.06666666666667, 44.38333333333333)',
       %((E17°--E11°/N14°--N18°).) =>
-        'ENVELOPE(11.0, 17.0, 14.0, 18.0)', # coordinates need to be reordered
+        'ENVELOPE(11.0, 17.0, 18.0, 14.0)', # coordinates need to be reordered
       %((W 170⁰--E 55⁰/N 40⁰--S 36⁰).) =>
-        'ENVELOPE(-170.0, 55.0, -36.0, 40.0)', # superscript 0 is almost a degree character..
+        'ENVELOPE(-170.0, 55.0, 40.0, -36.0)', # superscript 0 is almost a degree character..
       %((W 0°-W 0°/S 90°---S 90°)) =>
         'ENVELOPE(-0.0, -0.0, -90.0, -90.0)' # one dash, two dashes, three dashes.. what's the difference?
     }.each do |value, expected|
