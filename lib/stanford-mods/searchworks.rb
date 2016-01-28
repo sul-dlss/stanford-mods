@@ -359,6 +359,13 @@ module Stanford
               val.delete 'Government publication'
             end
           end
+          tech_rpt = ['technical report', 'Technical report', 'Technical Report']
+          if !(genres & tech_rpt).empty?
+            types = self.term_values(:typeOfResource)
+            if types && types.include?('text')
+              val << 'Technical report'
+            end
+          end
         end
         val.uniq
       end

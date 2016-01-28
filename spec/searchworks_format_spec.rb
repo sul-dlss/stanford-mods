@@ -602,6 +602,20 @@ describe "Format fields (searchworks.rb)" do
       @smods_rec.from_str(m)
       expect(@smods_rec.sw_genre).to eq ['Government document']
     end
+    it "Technical Report: typeOfResource 'text', genre 'technical report'" do
+      m = "<mods #{@ns_decl}><genre authority=\"marcgt\">technical report</genre><typeOfResource>text</typeOfResource></mods>"
+      @smods_rec.from_str(m)
+      expect(@smods_rec.sw_genre).to eq ['Technical report']
+      m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Technical report</genre><typeOfResource>text</typeOfResource></mods>"
+      @smods_rec.from_str(m)
+      expect(@smods_rec.sw_genre).to eq ['Technical report']
+      m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Technical Report</genre><typeOfResource>text</typeOfResource></mods>"
+      @smods_rec.from_str(m)
+      expect(@smods_rec.sw_genre).to eq ['Technical report']
+      m = "<mods #{@ns_decl}><genre>technical report</genre><typeOfResource>text</typeOfResource></mods>"
+      @smods_rec.from_str(m)
+      expect(@smods_rec.sw_genre).to eq ['Technical report']
+    end
     it "capitalizes the first letter of a genre value" do
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">student project report</genre></mods>"
       @smods_rec.from_str(m)
