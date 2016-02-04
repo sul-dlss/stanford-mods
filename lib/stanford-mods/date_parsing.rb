@@ -57,7 +57,7 @@ module Stanford
       def date_str_for_display
         return if orig_date_str == '0000-00-00' # shpc collection has these useless dates
         # B.C. first in case there are 4 digits, e.g. 1600 B.C.
-        return facet_string_for_bc if orig_date_str.match(BC_REGEX)
+        return display_str_for_bc if orig_date_str.match(BC_REGEX)
         result = sortable_year_for_yyyy_yy_or_decade
         unless result
           # try removing brackets between digits in case we have 169[5] or [18]91
@@ -66,8 +66,8 @@ module Stanford
         end
         # parsing below this line gives string inapprop for year_str_valid?
         unless self.class.year_str_valid?(result)
-          result = facet_string_for_century
-          result ||= facet_string_for_early_numeric
+          result = display_str_for_century
+          result ||= display_str_for_early_numeric
         end
         # remove leading 0s from early dates
         result = result.to_i.to_s if result && result.match(/^\d+$/)
@@ -188,10 +188,10 @@ module Stanford
         end
       end
 
-      # get single facet value for century (17th century) if we have:  yyuu, yy--, yy--? or xxth century pattern
+      # get display value for century (17th century) if we have:  yyuu, yy--, yy--? or xxth century pattern
       #   note that these are the only century patterns found in our actual date strings in MODS records
       # @return [String, nil] yy(th) Century if orig_date_str matches pattern, nil otherwise; also nil if B.C. in pattern
-      def facet_string_for_century
+      def display_str_for_century
         return unless orig_date_str
         return if orig_date_str.match(/B\.C\./)
         century_str_matches = orig_date_str.match(CENTURY_WORD_REGEXP)
@@ -224,9 +224,9 @@ module Stanford
         "-#{$1}".to_i if bc_matches
       end
 
-      # get single facet value for B.C. if we have  B.C. pattern
+      # get display value for B.C. if we have  B.C. pattern
       # @return [String, nil] ddd B.C.  if ddd B.C. in pattern; nil otherwise
-      def facet_string_for_bc
+      def display_str_for_bc
         bc_matches = orig_date_str.match(BC_REGEX) if orig_date_str
         bc_matches.to_s if bc_matches
       end
@@ -257,9 +257,9 @@ module Stanford
         orig_date_str.to_i if orig_date_str.match(/^-\d{4}$/)
       end
 
-      # get single facet value for date String containing yyy, yy, y, -y, -yy, -yyy
+      # get display value for date String containing yyy, yy, y, -y, -yy, -yyy
       #   negative number strings will be changed to B.C. strings
-      def facet_string_for_early_numeric
+      def display_str_for_early_numeric
         return unless orig_date_str.match(EARLY_NUMERIC)
         # negative number becomes B.C.
         return orig_date_str[1..-1] + " B.C." if orig_date_str.match(/^\-/)
