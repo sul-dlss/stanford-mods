@@ -323,6 +323,7 @@ module Stanford
                 val << 'Book' if issuance && issuance.include?('monographic')
                 val << 'Book' if genres && !(genres & book_genres).empty?
                 val << 'Journal/Periodical' if issuance && issuance.include?('continuing')
+                val << 'Archived website' if genres && genres.include?('archived website')
               when 'three dimensional object'
                 val << 'Object'
             end
@@ -336,6 +337,7 @@ module Stanford
       def sw_genre
         val = []
         genres = self.term_values(:genre)
+        types = self.term_values(:typeOfResource)
         if genres
           val << genres.map(&:capitalize)
           val.flatten! if !val.empty?
@@ -345,7 +347,6 @@ module Stanford
           end
           conf_pub = ['conference publication', 'Conference publication', 'Conference Publication']
           if !(genres & conf_pub).empty?
-            types = self.term_values(:typeOfResource)
             if types && types.include?('text')
               val << 'Conference proceedings'
               val.delete 'Conference publication'
@@ -353,7 +354,6 @@ module Stanford
           end
           gov_pub = ['government publication', 'Government publication', 'Government Publication']
           if !(genres & gov_pub).empty?
-            types = self.term_values(:typeOfResource)
             if types && types.include?('text')
               val << 'Government document'
               val.delete 'Government publication'
@@ -361,7 +361,6 @@ module Stanford
           end
           tech_rpt = ['technical report', 'Technical report', 'Technical Report']
           if !(genres & tech_rpt).empty?
-            types = self.term_values(:typeOfResource)
             if types && types.include?('text')
               val << 'Technical report'
             end

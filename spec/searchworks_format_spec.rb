@@ -284,6 +284,12 @@ describe "Format fields (searchworks.rb)" do
       expect(@smods_rec.format_main).to eq ['Archive/Manuscript']
     end
 
+    it "Archived website: typeOfResource text, genre 'archived website'" do
+      m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre authority=\"local\">archived website</genre></mods>"
+      @smods_rec.from_str(m)
+      expect(@smods_rec.format_main).to eq ['Archived website']
+    end
+
     context "Book, formerly Article: typeOfResource text, genre" do
       it "'article'" do
         m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre authority=\"marcgt\">article</genre></mods>"
