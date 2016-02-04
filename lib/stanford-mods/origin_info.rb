@@ -50,10 +50,10 @@ module Stanford
       # @param [Array<Nokogiri::XML::Element>] date_el_array the elements from which to select a pub date
       # @return [String] single String containing publication year for facet use
       def year_facet_str(date_el_array)
-        result = date_parsing_result(date_el_array, :facet_string_from_date_str)
+        result = date_parsing_result(date_el_array, :date_str_for_display)
         return result if result
         _ignore, orig_str_to_parse = self.class.earliest_year_str(date_el_array)
-        DateParsing.facet_string_from_date_str(orig_str_to_parse) if orig_str_to_parse
+        DateParsing.date_str_for_display(orig_str_to_parse) if orig_str_to_parse
       end
 
       # given the passed date elements, look for a single keyDate and use it if there is one;

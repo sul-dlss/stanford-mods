@@ -7,16 +7,13 @@ module Stanford
     #     - we could add methods like my_date.bc?
     class DateParsing
 
-      # get single facet value for date, generally an explicit year or "17th century" or "5 B.C."
-      #   returns '845', not 0845
-      # @param [String] date_str String containing a date (we hope)
-      # @return [String, nil] String facet value for year if we could parse one, nil otherwise
-      def self.facet_string_from_date_str(date_str)
-        DateParsing.new(date_str).facet_string_from_date_str
+      # get display value for year, generally an explicit year or "17th century" or "5 B.C." or "1950s" or '845 A.D.'
+      # @return [String, nil] display value for year if we could parse one, nil otherwise
+      def self.date_str_for_display(date_str)
+        DateParsing.new(date_str).date_str_for_display
       end
 
       # get year as Integer if we can parse date_str to get a year.
-      # @param [String] date_str String containing a date (we hope)
       # @return [Integer, nil] Integer year if we could parse one, nil otherwise
       def self.year_int_from_date_str(date_str)
         DateParsing.new(date_str).year_int_from_date_str
@@ -25,7 +22,6 @@ module Stanford
       # get String sortable value year if we can parse date_str to get a year.
       #   SearchWorks currently uses a string field for pub date sorting; thus so does Spotlight.
       #   The values returned must *lexically* sort in chronological order, so the B.C. dates are tricky
-      # @param [String] date_str String containing a date (we hope)
       # @return [String, nil] String sortable year if we could parse one, nil otherwise
       #  note that these values must *lexically* sort to create a chronological sort.
       def self.sortable_year_string_from_date_str(date_str)
@@ -56,9 +52,9 @@ module Stanford
 
       BRACKETS_BETWEEN_DIGITS_REXEXP = Regexp.new('\d[' + Regexp.escape('[]') + ']\d')
 
-      # get single facet value for date, generally an explicit year or "17th century" or "5 B.C."
-      # @return [String, nil] String facet value for year if we could parse one, nil otherwise
-      def facet_string_from_date_str
+      # get display value for year, generally an explicit year or "17th century" or "5 B.C." or "1950s" or '845 A.D.'
+      # @return [String, nil] String value for year if we could parse one, nil otherwise
+      def date_str_for_display
         return if orig_date_str == '0000-00-00' # shpc collection has these useless dates
         # B.C. first in case there are 4 digits, e.g. 1600 B.C.
         return facet_string_for_bc if orig_date_str.match(BC_REGEX)
@@ -66,7 +62,7 @@ module Stanford
         unless result
           # try removing brackets between digits in case we have 169[5] or [18]91
           no_brackets = remove_brackets
-          return DateParsing.new(no_brackets).facet_string_from_date_str if no_brackets
+          return DateParsing.new(no_brackets).date_str_for_display if no_brackets
         end
         # parsing below this line gives string inapprop for year_str_valid?
         unless self.class.year_str_valid?(result)
