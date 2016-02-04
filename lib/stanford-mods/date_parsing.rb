@@ -262,9 +262,9 @@ module Stanford
       def display_str_for_early_numeric
         return unless orig_date_str.match(EARLY_NUMERIC)
         # negative number becomes B.C.
-        return orig_date_str[1..-1] + " B.C." if orig_date_str.match(/^\-/)
+        return  "#{orig_date_str[1..-1]} B.C." if orig_date_str.match(/^\-/)
         # remove leading 0s from early dates
-        orig_date_str.to_i.to_s
+        "#{orig_date_str.to_i} A.D."
       end
 
       # NOTE:  while Date.parse() works for many dates, the *sortable_year_for_yyyy
