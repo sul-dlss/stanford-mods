@@ -70,7 +70,7 @@ module Stanford
           result ||= display_str_for_early_numeric
         end
         # remove leading 0s from early dates
-        result = result.to_i.to_s if result && result.match(/^\d+$/)
+        result = "#{result.to_i} A.D." if result && result.match(/^0\d+$/)
         result
       end
 

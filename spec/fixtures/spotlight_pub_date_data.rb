@@ -156,7 +156,7 @@ SPOTLIGHT_PUB_DATE_DATA = {
       mods_origin_info_start_str +
         '<dateIssued encoding="marc" point="start" keyDate="yes">0850</dateIssued>' +
         '<dateIssued encoding="marc" point="end">1499</dateIssued>' +
-        mods_origin_info_end_str => ['0850', '850'],
+        mods_origin_info_end_str => ['0850', '850 A.D.'],
       # nc881qb8504
       mods_origin_info_start_str +
         '<dateCreated point="start" qualifier="approximate" keyDate="yes">1000</dateCreated>' +

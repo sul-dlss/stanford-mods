@@ -417,6 +417,7 @@ describe "date parsing methods" do
       .merge(brackets_in_middle_of_year)
       .merge(invalid_but_can_get_year).each do |example, expected|
       expected = expected.to_i.to_s if expected.match(/^\d+$/)
+      expected = "#{expected} A.D." if expected.match(/^\d{1,3}$/)
       it "#{expected} for single value #{example}" do
         expect(Stanford::Mods::DateParsing.new(example).date_str_for_display).to eq expected
       end
@@ -438,7 +439,7 @@ describe "date parsing methods" do
           expect(Stanford::Mods::DateParsing.new(example).date_str_for_display).to eq exp
         end
       else
-        expected = "#{expected.to_i.to_s} A.D." if expected.match(/^\d+$/)
+        expected = "#{expected.to_i} A.D." if expected.match(/^\d+$/)
         it "#{expected} for #{example}" do
           expect(Stanford::Mods::DateParsing.new(example).date_str_for_display).to eq expected
         end
