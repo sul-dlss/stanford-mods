@@ -157,13 +157,32 @@ module Stanford
         nil # explicitly want nil if date won't parse
       end
 
+      DECADE_4CHAR_REGEXP = Regexp.new('(^|\D)\d{3}[u\-?x]')
+
       # get first year of decade (as String) if we have:  yyyu, yyy-, yyy? or yyyx pattern
       #   note that these are the only decade patterns found in our actual date strings in MODS records
       # @return [String, nil] 4 digit year (e.g. 1860, 1950) if orig_date_str matches pattern, nil otherwise
       def sortable_year_for_decade
-        decade_matches = orig_date_str.match(/\d{3}[u\-?x]/) if orig_date_str
+        decade_matches = orig_date_str.match(DECADE_4CHAR_REGEXP) if orig_date_str
         changed_to_zero = decade_matches.to_s.tr('u\-?x', '0') if decade_matches
         DateParsing.new(changed_to_zero).sortable_year_for_yyyy if changed_to_zero
+      end
+
+      DECADE_S_REGEXP = Regexp.new('\d{3}0\'?s')
+
+      # get, e.g. 1950s, if we have:  yyyu, yyy-, yyy? or yyyx pattern or  yyy0s or yyy0's
+      #   note that these are the only decade patterns found in our actual date strings in MODS records
+      # @return [String, nil] 4 digit year with s (e.g. 1860s, 1950s) if orig_date_str matches pattern, nil otherwise
+      def display_str_for_decade
+        decade_matches = orig_date_str.match(DECADE_4CHAR_REGEXP) if orig_date_str
+        if decade_matches
+          changed_to_zero = decade_matches.to_s.tr('u\-?x', '0') if decade_matches
+          zeroth_year = DateParsing.new(changed_to_zero).sortable_year_for_yyyy if changed_to_zero
+          return "#{zeroth_year}s" if zeroth_year
+        else
+          decade_matches = orig_date_str.match(DECADE_S_REGEXP) if orig_date_str
+          return decade_matches.to_s.tr("'", '') if decade_matches
+        end
       end
 
       CENTURY_WORD_REGEXP = Regexp.new('(\d{1,2}).*century')

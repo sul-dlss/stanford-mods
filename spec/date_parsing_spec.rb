@@ -702,6 +702,34 @@ describe "date parsing methods" do
     end
   end
 
+  context '#display_str_for_decade' do
+    decade_only.each do |example, expected|
+      it "#{expected.first} for #{example}" do
+        expect(Stanford::Mods::DateParsing.new(example).display_str_for_decade).to eq "#{expected.first}s"
+      end
+    end
+    { # example string as key, expected result as value
+      '199u' => '1990s',
+      '200-' => '2000s',
+      '201?' => '2010s',
+      '202x' => '2020s',
+      'early 1890s' => '1890s',
+      '1950s' => '1950s',
+      "1950's" => '1950s'
+    }.each do |example, expected|
+      it "#{expected} for #{example}" do
+        expect(Stanford::Mods::DateParsing.new(example).display_str_for_decade).to eq expected
+      end
+    end
+
+    # some of the strings this method cannot handle (so must be parsed with other instance methods)
+    specific_day_2_digit_year.keys.each do |example|
+      it "nil for #{example}" do
+        expect(Stanford::Mods::DateParsing.new(example).display_str_for_decade).to eq nil
+      end
+    end
+  end
+
   context '#sortable_year_for_century' do
     century_only.keys.each do |example|
       it "1700 from #{example}" do
