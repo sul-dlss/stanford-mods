@@ -423,10 +423,16 @@ describe "date parsing methods" do
       end
     end
 
-    multiple_years
-      .merge(multiple_years_4_digits_once)
-      .merge(decade_only)
+    decade_only
       .merge(decade_only_4_digits).each do |example, expected|
+      expected = "#{expected.first.to_i}s" if expected.first.match(/^\d+$/)
+      it "#{expected} for decade #{example}" do
+        expect(Stanford::Mods::DateParsing.new(example).date_str_for_display).to eq expected
+      end
+    end
+
+    multiple_years
+      .merge(multiple_years_4_digits_once).each do |example, expected|
       it "#{expected.first} for multi-value #{example}" do
         expect(Stanford::Mods::DateParsing.new(example).date_str_for_display).to eq expected.first
       end

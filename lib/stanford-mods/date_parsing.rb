@@ -58,7 +58,9 @@ module Stanford
         return if orig_date_str == '0000-00-00' # shpc collection has these useless dates
         # B.C. first in case there are 4 digits, e.g. 1600 B.C.
         return display_str_for_bc if orig_date_str.match(BC_REGEX)
-        result = sortable_year_for_yyyy_yy_or_decade
+        # decade next in case there are 4 digits, e.g. 1950s
+        return display_str_for_decade if orig_date_str.match(DECADE_4CHAR_REGEXP) || orig_date_str.match(DECADE_S_REGEXP)
+        result = sortable_year_for_yyyy_or_yy
         unless result
           # try removing brackets between digits in case we have 169[5] or [18]91
           no_brackets = remove_brackets
@@ -80,7 +82,8 @@ module Stanford
         return if orig_date_str == '0000-00-00' # shpc collection has these useless dates
         # B.C. first in case there are 4 digits, e.g. 1600 B.C.
         return sortable_year_int_for_bc if orig_date_str.match(BC_REGEX)
-        result = sortable_year_for_yyyy_yy_or_decade
+        result = sortable_year_for_yyyy_or_yy
+        result ||= sortable_year_for_decade # 19xx or 20xx
         result ||= sortable_year_for_century
         result ||= sortable_year_int_for_early_numeric
         unless result
@@ -100,7 +103,8 @@ module Stanford
         return if orig_date_str == '0000-00-00' # shpc collection has these useless dates
         # B.C. first in case there are 4 digits, e.g. 1600 B.C.
         return sortable_year_str_for_bc if orig_date_str.match(BC_REGEX)
-        result = sortable_year_for_yyyy_yy_or_decade
+        result = sortable_year_for_yyyy_or_yy
+        result ||= sortable_year_for_decade # 19xx or 20xx
         result ||= sortable_year_for_century
         result ||= sortable_year_str_for_early_numeric
         unless result
@@ -114,11 +118,10 @@ module Stanford
       # get String sortable value year if we can parse date_str to get a year.
       # @return [String, nil] String sortable year if we could parse one, nil otherwise
       #  note that these values must *lexically* sort to create a chronological sort.
-      def sortable_year_for_yyyy_yy_or_decade
+      def sortable_year_for_yyyy_or_yy
         # most date strings have a four digit year
         result = sortable_year_for_yyyy
         result ||= sortable_year_for_yy # 19xx or 20xx
-        result ||= sortable_year_for_decade # 19xx or 20xx
         result
       end
 
