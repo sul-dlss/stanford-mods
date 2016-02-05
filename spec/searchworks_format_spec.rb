@@ -622,6 +622,11 @@ describe "Format fields (searchworks.rb)" do
       @smods_rec.from_str(m)
       expect(@smods_rec.sw_genre).to eq ['Technical report']
     end
+    it "it does not include Archived website: typeOfResource 'text', genre 'archived website'" do
+      m = "<mods #{@ns_decl}><genre authority=\"marcgt\">archived website</genre><typeOfResource>text</typeOfResource></mods>"
+      @smods_rec.from_str(m)
+      expect(@smods_rec.sw_genre).to_not eq ['Archived website']
+    end
     it "capitalizes the first letter of a genre value" do
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">student project report</genre></mods>"
       @smods_rec.from_str(m)

@@ -366,6 +366,10 @@ module Stanford
             end
           end
         end
+        # Archived website is in the MODS genre tag but it is considered a
+        # Resource type for Searchworks, so it needs to be removed from the
+        # applicable genre values
+        val.delete 'Archived website'
         val.uniq
       end
 
