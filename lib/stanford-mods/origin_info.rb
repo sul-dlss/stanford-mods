@@ -4,23 +4,13 @@ require 'mods'
 # Parsing MODS /originInfo for Publication/Imprint data:
 #  * pub year for date slider facet
 #  * pub year for sorting
-#  * pub year for single facet value
+#  * pub year for single display value
 #  * imprint info for display
 #  *
 # These methods may be used by searchworks.rb file or by downstream apps
 module Stanford
   module Mods
     class Record < ::Mods::Record
-
-      # return a single string intended for facet use for pub date
-      # prefer dateIssued (any) before dateCreated (any) before dateCaptured (any)
-      #  look for a keyDate and use it if there is one;  otherwise pick earliest date
-      # @param [Boolean] ignore_approximate true if approximate dates (per qualifier attribute)
-      #   should be ignored; false if approximate dates should be included
-      # @return [String] single String containing publication year for facet use
-      def pub_date_facet_single_value(ignore_approximate = false)
-        single_pub_year(ignore_approximate, :year_facet_str)
-      end
 
       # return pub year as an Integer
       # prefer dateIssued (any) before dateCreated (any) before dateCaptured (any)
@@ -45,15 +35,53 @@ module Stanford
         single_pub_year(ignore_approximate, :year_sort_str)
       end
 
+      # return a single string intended for display of pub year
+      # 0 < year < 1000:  add A.D. suffix
+      # year < 0:  add B.C. suffix.  ('-5'  =>  '5 B.C.', '700 B.C.'  => '700 B.C.')
+      # 195u =>  195x
+      # 19uu => 19xx
+      #   '-5'  =>  '5 B.C.'
+      #   '700 B.C.'  => '700 B.C.'
+      #   '7th century' => '7th century'
+      # date ranges?
+      # prefer dateIssued (any) before dateCreated (any) before dateCaptured (any)
+      #  look for a keyDate and use it if there is one;  otherwise pick earliest date
+      # @param [Boolean] ignore_approximate true if approximate dates (per qualifier attribute)
+      #   should be ignored; false if approximate dates should be included
+      def pub_year_display_str(ignore_approximate = false)
+        single_pub_year(ignore_approximate, :year_display_str)
+
+        # TODO: want range displayed when start and end points
+        # TODO: also want best year in year_isi fields
+        # get_main_title_date
+        # https://github.com/sul-dlss/SearchWorks/blob/7d4d870a9d450fed8b081c38dc3dbd590f0b706e/app/helpers/results_document_helper.rb#L8-L46
+
+        #"publication_year_isi"   => "Publication date",  <--  do it already
+        #"beginning_year_isi"     => "Beginning date",
+        #"earliest_year_isi"      => "Earliest date",
+        #"earliest_poss_year_isi" => "Earliest possible date",
+        #"ending_year_isi"        => "Ending date",
+        #"latest_year_isi"        => "Latest date",
+        #"latest_poss_year_isi"   => "Latest possible date",
+        #"production_year_isi"    => "Production date",
+        #"original_year_isi"      => "Original date",
+        #"copyright_year_isi"     => "Copyright date"} %>
+
+        #"creation_year_isi"      => "Creation date",  <--  do it already
+        #{}"release_year_isi"       => "Release date",
+        #{}"reprint_year_isi"       => "Reprint/reissue date",
+        #{}"other_year_isi"         => "Date",
+      end
+
       # given the passed date elements, look for a single keyDate and use it if there is one;
       #    otherwise pick earliest parseable date
       # @param [Array<Nokogiri::XML::Element>] date_el_array the elements from which to select a pub date
-      # @return [String] single String containing publication year for facet use
-      def year_facet_str(date_el_array)
-        result = date_parsing_result(date_el_array, :facet_string_from_date_str)
+      # @return [String] single String containing publication year for display
+      def year_display_str(date_el_array)
+        result = date_parsing_result(date_el_array, :date_str_for_display)
         return result if result
         _ignore, orig_str_to_parse = self.class.earliest_year_str(date_el_array)
-        DateParsing.facet_string_from_date_str(orig_str_to_parse) if orig_str_to_parse
+        DateParsing.date_str_for_display(orig_str_to_parse) if orig_str_to_parse
       end
 
       # given the passed date elements, look for a single keyDate and use it if there is one;
@@ -205,8 +233,8 @@ module Stanford
       #   Spotlight:  pub_date field should be replaced by pub_year_w_approx_isi and pub_year_no_approx_isi
       #   SearchWorks:  pub_date field used for display in search results and show view; for sorting nearby-on-shelf
       #      these could be done with more approp fields/methods (pub_year_int for sorting;  new pub year methods to populate field)
-      # TODO:  prob should deprecated this in favor of pub_date_facet_single_value;
-      #    need head-to-head testing with pub_date_facet_single_value
+      # TODO:  prob should deprecate this in favor of pub_year_display_str;
+      #    need head-to-head testing with pub_year_display_str
       # @return <Array[String]> with values for the pub date facet
       def pub_date_facet
         if pub_date

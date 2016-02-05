@@ -79,8 +79,8 @@ describe "computations from /originInfo field" do
     end
   end
 
-  context '#pub_date_facet_single_value' do
-    it_behaves_like "single pub date value", :pub_date_facet_single_value, 1
+  context '#pub_year_display_str' do
+    it_behaves_like "single pub date value", :pub_year_display_str, 1
   end
 
   context '#pub_year_sort_str' do
@@ -226,14 +226,14 @@ describe "computations from /originInfo field" do
     end
   end
 
-  context '#year_facet_str' do
-    it_behaves_like "pub date best single value", :year_facet_str
+  context '#year_display_str' do
+    it_behaves_like "pub date best single value", :year_display_str
     it 'uses facet value, not sorting value' do
       mods_str = mods_origin_info_start_str +
         '<dateCreated keyDate="yes">180 B.C.</dateCreated>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.year_facet_str(smods_rec.date_created_elements)).to eq '180 B.C.'
+      expect(smods_rec.year_display_str(smods_rec.date_created_elements)).to eq '180 B.C.'
     end
   end
 

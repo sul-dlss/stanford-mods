@@ -7,16 +7,13 @@ module Stanford
     #     - we could add methods like my_date.bc?
     class DateParsing
 
-      # get single facet value for date, generally an explicit year or "17th century" or "5 B.C."
-      #   returns '845', not 0845
-      # @param [String] date_str String containing a date (we hope)
-      # @return [String, nil] String facet value for year if we could parse one, nil otherwise
-      def self.facet_string_from_date_str(date_str)
-        DateParsing.new(date_str).facet_string_from_date_str
+      # get display value for year, generally an explicit year or "17th century" or "5 B.C." or "1950s" or '845 A.D.'
+      # @return [String, nil] display value for year if we could parse one, nil otherwise
+      def self.date_str_for_display(date_str)
+        DateParsing.new(date_str).date_str_for_display
       end
 
       # get year as Integer if we can parse date_str to get a year.
-      # @param [String] date_str String containing a date (we hope)
       # @return [Integer, nil] Integer year if we could parse one, nil otherwise
       def self.year_int_from_date_str(date_str)
         DateParsing.new(date_str).year_int_from_date_str
@@ -25,7 +22,6 @@ module Stanford
       # get String sortable value year if we can parse date_str to get a year.
       #   SearchWorks currently uses a string field for pub date sorting; thus so does Spotlight.
       #   The values returned must *lexically* sort in chronological order, so the B.C. dates are tricky
-      # @param [String] date_str String containing a date (we hope)
       # @return [String, nil] String sortable year if we could parse one, nil otherwise
       #  note that these values must *lexically* sort to create a chronological sort.
       def self.sortable_year_string_from_date_str(date_str)
@@ -56,25 +52,27 @@ module Stanford
 
       BRACKETS_BETWEEN_DIGITS_REXEXP = Regexp.new('\d[' + Regexp.escape('[]') + ']\d')
 
-      # get single facet value for date, generally an explicit year or "17th century" or "5 B.C."
-      # @return [String, nil] String facet value for year if we could parse one, nil otherwise
-      def facet_string_from_date_str
+      # get display value for year, generally an explicit year or "17th century" or "5 B.C." or "1950s" or '845 A.D.'
+      # @return [String, nil] String value for year if we could parse one, nil otherwise
+      def date_str_for_display
         return if orig_date_str == '0000-00-00' # shpc collection has these useless dates
         # B.C. first in case there are 4 digits, e.g. 1600 B.C.
-        return facet_string_for_bc if orig_date_str.match(BC_REGEX)
-        result = sortable_year_for_yyyy_yy_or_decade
+        return display_str_for_bc if orig_date_str.match(BC_REGEX)
+        # decade next in case there are 4 digits, e.g. 1950s
+        return display_str_for_decade if orig_date_str.match(DECADE_4CHAR_REGEXP) || orig_date_str.match(DECADE_S_REGEXP)
+        result = sortable_year_for_yyyy_or_yy
         unless result
           # try removing brackets between digits in case we have 169[5] or [18]91
           no_brackets = remove_brackets
-          return DateParsing.new(no_brackets).facet_string_from_date_str if no_brackets
+          return DateParsing.new(no_brackets).date_str_for_display if no_brackets
         end
         # parsing below this line gives string inapprop for year_str_valid?
         unless self.class.year_str_valid?(result)
-          result = facet_string_for_century
-          result ||= facet_string_for_early_numeric
+          result = display_str_for_century
+          result ||= display_str_for_early_numeric
         end
         # remove leading 0s from early dates
-        result = result.to_i.to_s if result && result.match(/^\d+$/)
+        result = "#{result.to_i} A.D." if result && result.match(/^0\d+$/)
         result
       end
 
@@ -84,7 +82,8 @@ module Stanford
         return if orig_date_str == '0000-00-00' # shpc collection has these useless dates
         # B.C. first in case there are 4 digits, e.g. 1600 B.C.
         return sortable_year_int_for_bc if orig_date_str.match(BC_REGEX)
-        result = sortable_year_for_yyyy_yy_or_decade
+        result = sortable_year_for_yyyy_or_yy
+        result ||= sortable_year_for_decade # 19xx or 20xx
         result ||= sortable_year_for_century
         result ||= sortable_year_int_for_early_numeric
         unless result
@@ -104,7 +103,8 @@ module Stanford
         return if orig_date_str == '0000-00-00' # shpc collection has these useless dates
         # B.C. first in case there are 4 digits, e.g. 1600 B.C.
         return sortable_year_str_for_bc if orig_date_str.match(BC_REGEX)
-        result = sortable_year_for_yyyy_yy_or_decade
+        result = sortable_year_for_yyyy_or_yy
+        result ||= sortable_year_for_decade # 19xx or 20xx
         result ||= sortable_year_for_century
         result ||= sortable_year_str_for_early_numeric
         unless result
@@ -118,11 +118,10 @@ module Stanford
       # get String sortable value year if we can parse date_str to get a year.
       # @return [String, nil] String sortable year if we could parse one, nil otherwise
       #  note that these values must *lexically* sort to create a chronological sort.
-      def sortable_year_for_yyyy_yy_or_decade
+      def sortable_year_for_yyyy_or_yy
         # most date strings have a four digit year
         result = sortable_year_for_yyyy
         result ||= sortable_year_for_yy # 19xx or 20xx
-        result ||= sortable_year_for_decade # 19xx or 20xx
         result
       end
 
@@ -161,13 +160,32 @@ module Stanford
         nil # explicitly want nil if date won't parse
       end
 
+      DECADE_4CHAR_REGEXP = Regexp.new('(^|\D)\d{3}[u\-?x]')
+
       # get first year of decade (as String) if we have:  yyyu, yyy-, yyy? or yyyx pattern
       #   note that these are the only decade patterns found in our actual date strings in MODS records
       # @return [String, nil] 4 digit year (e.g. 1860, 1950) if orig_date_str matches pattern, nil otherwise
       def sortable_year_for_decade
-        decade_matches = orig_date_str.match(/\d{3}[u\-?x]/) if orig_date_str
+        decade_matches = orig_date_str.match(DECADE_4CHAR_REGEXP) if orig_date_str
         changed_to_zero = decade_matches.to_s.tr('u\-?x', '0') if decade_matches
         DateParsing.new(changed_to_zero).sortable_year_for_yyyy if changed_to_zero
+      end
+
+      DECADE_S_REGEXP = Regexp.new('\d{3}0\'?s')
+
+      # get, e.g. 1950s, if we have:  yyyu, yyy-, yyy? or yyyx pattern or  yyy0s or yyy0's
+      #   note that these are the only decade patterns found in our actual date strings in MODS records
+      # @return [String, nil] 4 digit year with s (e.g. 1860s, 1950s) if orig_date_str matches pattern, nil otherwise
+      def display_str_for_decade
+        decade_matches = orig_date_str.match(DECADE_4CHAR_REGEXP) if orig_date_str
+        if decade_matches
+          changed_to_zero = decade_matches.to_s.tr('u\-?x', '0') if decade_matches
+          zeroth_year = DateParsing.new(changed_to_zero).sortable_year_for_yyyy if changed_to_zero
+          return "#{zeroth_year}s" if zeroth_year
+        else
+          decade_matches = orig_date_str.match(DECADE_S_REGEXP) if orig_date_str
+          return decade_matches.to_s.tr("'", '') if decade_matches
+        end
       end
 
       CENTURY_WORD_REGEXP = Regexp.new('(\d{1,2}).*century')
@@ -192,10 +210,10 @@ module Stanford
         end
       end
 
-      # get single facet value for century (17th century) if we have:  yyuu, yy--, yy--? or xxth century pattern
+      # get display value for century (17th century) if we have:  yyuu, yy--, yy--? or xxth century pattern
       #   note that these are the only century patterns found in our actual date strings in MODS records
       # @return [String, nil] yy(th) Century if orig_date_str matches pattern, nil otherwise; also nil if B.C. in pattern
-      def facet_string_for_century
+      def display_str_for_century
         return unless orig_date_str
         return if orig_date_str.match(/B\.C\./)
         century_str_matches = orig_date_str.match(CENTURY_WORD_REGEXP)
@@ -228,9 +246,9 @@ module Stanford
         "-#{$1}".to_i if bc_matches
       end
 
-      # get single facet value for B.C. if we have  B.C. pattern
+      # get display value for B.C. if we have  B.C. pattern
       # @return [String, nil] ddd B.C.  if ddd B.C. in pattern; nil otherwise
-      def facet_string_for_bc
+      def display_str_for_bc
         bc_matches = orig_date_str.match(BC_REGEX) if orig_date_str
         bc_matches.to_s if bc_matches
       end
@@ -261,14 +279,14 @@ module Stanford
         orig_date_str.to_i if orig_date_str.match(/^-\d{4}$/)
       end
 
-      # get single facet value for date String containing yyy, yy, y, -y, -yy, -yyy
+      # get display value for date String containing yyy, yy, y, -y, -yy, -yyy
       #   negative number strings will be changed to B.C. strings
-      def facet_string_for_early_numeric
+      def display_str_for_early_numeric
         return unless orig_date_str.match(EARLY_NUMERIC)
         # negative number becomes B.C.
-        return orig_date_str[1..-1] + " B.C." if orig_date_str.match(/^\-/)
+        return  "#{orig_date_str[1..-1]} B.C." if orig_date_str.match(/^\-/)
         # remove leading 0s from early dates
-        orig_date_str.to_i.to_s
+        "#{orig_date_str.to_i} A.D."
       end
 
       # NOTE:  while Date.parse() works for many dates, the *sortable_year_for_yyyy
