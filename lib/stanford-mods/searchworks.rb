@@ -276,6 +276,8 @@ module Stanford
 
       # select one or more format values from the controlled vocabulary per JVine Summer 2014
       #   http://searchworks-solr-lb.stanford.edu:8983/solr/select?facet.field=format_main_ssim&rows=0&facet.sort=index
+      # https://github.com/sul-dlss/stanford-mods/issues/66 - For geodata, the
+      # resource type should be only Map and not include Software, multimedia.
       # @return <Array[String]> value in the SearchWorks controlled vocabulary
       def format_main
         val = []
@@ -300,6 +302,7 @@ module Stanford
             case type
               when 'cartographic'
                 val << 'Map'
+                val.delete 'Software/Multimedia'
               when 'mixed material'
                 val << 'Archive/Manuscript'
               when 'moving image'
@@ -309,7 +312,7 @@ module Stanford
               when 'software, multimedia'
                 if genres && (genres.include?('dataset') || genres.include?('Dataset'))
                   val << 'Dataset'
-                else
+                elsif (!val.include?('Map'))
                   val << 'Software/Multimedia'
                 end
               when 'sound recording-musical'
@@ -333,30 +336,28 @@ module Stanford
       end
 
       # return values for the genre facet in SearchWorks
+      # https://github.com/sul-dlss/stanford-mods/issues/66
+      # Limit genre values to Government document, Conference proceedings,
+      # Technical report and Thesis/Dissertation
       # @return <Array[String]>
       def sw_genre
         val = []
         genres = self.term_values(:genre)
         types = self.term_values(:typeOfResource)
         if genres
-          val << genres.map(&:capitalize)
-          val.flatten! if !val.empty?
           if genres.include?('thesis') || genres.include?('Thesis')
             val << 'Thesis/Dissertation'
-            val.delete 'Thesis'
           end
           conf_pub = ['conference publication', 'Conference publication', 'Conference Publication']
           if !(genres & conf_pub).empty?
             if types && types.include?('text')
               val << 'Conference proceedings'
-              val.delete 'Conference publication'
             end
           end
           gov_pub = ['government publication', 'Government publication', 'Government Publication']
           if !(genres & gov_pub).empty?
             if types && types.include?('text')
               val << 'Government document'
-              val.delete 'Government publication'
             end
           end
           tech_rpt = ['technical report', 'Technical report', 'Technical Report']
@@ -366,10 +367,6 @@ module Stanford
             end
           end
         end
-        # Archived website is in the MODS genre tag but it is considered a
-        # Resource type for Searchworks, so it needs to be removed from the
-        # applicable genre values
-        val.delete 'Archived website'
         val.uniq
       end
 

@@ -493,6 +493,13 @@ describe "Format fields (searchworks.rb)" do
         @smods_rec.from_str(m)
         expect(@smods_rec.format_main).to eq ['Software/Multimedia']
       end
+      # https://github.com/sul-dlss/stanford-mods/issues/66 - For geodata, the
+      # resource type should be only Map and not include Software, multimedia.
+      it "typeOfResource 'cartographic' and 'software, multimedia'" do
+        m = "<mods #{@ns_decl}><typeOfResource>cartographic</typeOfResource><typeOfResource>software, multimedia</typeOfResource></mods>"
+        @smods_rec.from_str(m)
+        expect(@smods_rec.format_main).to eq ['Map']
+      end
     end
 
     context "Sound Recording:" do
@@ -575,6 +582,11 @@ describe "Format fields (searchworks.rb)" do
   end #format_main
 
   context "sw_genre" do
+    it "ignores values that are not in the prescribed list" do
+      m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Not on the list</genre><typeOfResource>text</typeOfResource></mods>"
+      @smods_rec.from_str(m)
+      expect(@smods_rec.sw_genre).to eq []
+    end
     it "Conference proceedings: typeOfResource 'text', genre 'conference publication'" do
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">conference publication</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
@@ -628,37 +640,36 @@ describe "Format fields (searchworks.rb)" do
       expect(@smods_rec.sw_genre).to_not eq ['Archived website']
     end
     it "capitalizes the first letter of a genre value" do
-      m = "<mods #{@ns_decl}><genre authority=\"marcgt\">student project report</genre></mods>"
+      m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre authority=\"marcgt\">technical report</genre></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Student project report']
-      m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Student project report</genre></mods>"
+      expect(@smods_rec.sw_genre).to eq ['Technical report']
+      m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre authority=\"marcgt\">Technical report</genre></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Student project report']
-      m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Student Project report</genre></mods>"
+      expect(@smods_rec.sw_genre).to eq ['Technical report']
+      m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre authority=\"marcgt\">Technical Report</genre></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Student project report']
-      m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Student Project Report</genre></mods>"
-      @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Student project report']
+      expect(@smods_rec.sw_genre).to eq ['Technical report']
     end
     # NOTE: may need to remove plurals and/or trailing punctuation in future
     it "returns all genre values" do
       m = "<mods #{@ns_decl}>
-            <genre>game</genre>
-            <genre>foo</genre>
-            <genre>technical report</genre>
+            <typeOfResource>text</typeOfResource>
+            <genre>government publication</genre>
+            <genre>conference publication</genre>
+            <genre>thesis</genre>
           </mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Game', 'Foo', 'Technical report']
+      expect(@smods_rec.sw_genre).to eq ['Thesis/Dissertation', 'Conference proceedings', 'Government document']
     end
     it "doesn't have duplicates" do
       m = "<mods #{@ns_decl}>
-            <genre>game</genre>
+            <typeOfResource>text</typeOfResource>
+            <genre>conference publication</genre>
             <genre>technical report</genre>
-            <genre>Game</genre>
+            <genre>Conference publication</genre>
           </mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Game', 'Technical report']
+      expect(@smods_rec.sw_genre).to eq ['Conference proceedings', 'Technical report']
     end
     it "empty Array if no genre values" do
       m = "<mods #{@ns_decl}>
