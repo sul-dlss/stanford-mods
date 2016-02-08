@@ -739,8 +739,7 @@ SEARCHWORKS_PUB_DATE_DATA = {
   # project_south
   # reaction_kinetics?
   # reliability
-  # renaissance
-  'xxx' =>
+  'renaissance' =>
     { # key is mods_xml;  values = [pub date sortable facet value, pub date single string facet value]
       # coll rec sr605np6062 no originInfo
       # mj187xt5183
@@ -808,18 +807,18 @@ SEARCHWORKS_PUB_DATE_DATA = {
   # rigler
   # rumsey
   'rumsey' =>
-  { # key is mods_xml;  values = [pub date sortable facet value, pub date single string facet value]
-    # coll rec xh235dd9059 no originInfo
-    # fy259fg4220
-    mods_origin_info_start_str +
-      '<dateIssued>1855.</dateIssued>' +
-      mods_origin_info_end_str => [1855, '1855'],
-    # hp058zk7170
-    mods_origin_info_start_str +
-      '<dateCreated encoding="marc">1861</dateCreated>' +
-      '<dateIssued>1861.</dateIssued>' +
-      mods_origin_info_end_str => [1861, '1861'],
-  },
+    { # key is mods_xml;  values = [pub date sortable facet value, pub date single string facet value]
+      # coll rec xh235dd9059 no originInfo
+      # fy259fg4220
+      mods_origin_info_start_str +
+        '<dateIssued>1855.</dateIssued>' +
+        mods_origin_info_end_str => [1855, '1855'],
+      # hp058zk7170
+      mods_origin_info_start_str +
+        '<dateCreated encoding="marc">1861</dateCreated>' +
+        '<dateIssued>1861.</dateIssued>' +
+        mods_origin_info_end_str => [1861, '1861']
+    },
   # rock?
   # scrf
   # shale
