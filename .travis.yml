@@ -5,7 +5,7 @@ rvm:
   - 2.2.0
   - 2.1.5
   - 2.0.0
-  - 1.9.3  # argo, FRDA
+  - 1.9.3  # FRDA
   # we used to use jruby for merged DOR + MARC records, but no more ...
   - jruby-head
   # we also test against ruby-head, which may be unstable.
