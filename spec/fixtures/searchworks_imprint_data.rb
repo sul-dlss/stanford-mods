@@ -64,7 +64,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <dateIssued encoding="marc" point="start" qualifier="questionable">1670</dateIssued>
         <dateIssued encoding="marc" point="end" qualifier="questionable">1680</dateIssued>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => 'Amstelodami : [s.n. 1670s] [1670 - 1680?]',
+        mods_origin_info_end_str => 'Amstelodami : [s.n. 1670s?] [1670 - 1680?]',
       # ct011mf9794
       mods_origin_info_start_str +
         '<place>
@@ -77,7 +77,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <dateIssued>17--]</dateIssued>
         <dateIssued encoding="marc">17uu</dateIssued>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => '[Paris : s.n. 18th century 18th century',
+        mods_origin_info_end_str => '[Paris : s.n. 18th century]',
       # mm076bz8960
       mods_origin_info_start_str +
         '<place>
@@ -384,7 +384,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <publisher>s.n.</publisher>
         <dateIssued>18--]</dateIssued>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => '[Bonn : s.n. 19th century',
+        mods_origin_info_end_str => '[Bonn : s.n. 19th century]',
       # zp382js2355
       mods_origin_info_start_str +
         '<place>
@@ -397,7 +397,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <dateIssued>[184-]</dateIssued>
         <dateIssued encoding="marc" keyDate="yes">184u</dateIssued>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => 'London : [s.n.], [1840s] 1840s',
+        mods_origin_info_end_str => 'London : [s.n.], [1840s]',
       # qg377px6180
       mods_origin_info_start_str +
         '<place>
@@ -631,7 +631,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <dateIssued>168-?]</dateIssued>
         <dateIssued encoding="marc">168u</dateIssued>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => '[Italy? : s.n. 1680s] 1680s',
+        mods_origin_info_end_str => '[Italy? : s.n. 1680s?]',
       # cm303hd3051
       mods_origin_info_start_str +
         '<place>
@@ -644,7 +644,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <dateIssued>17--?]</dateIssued>
         <dateIssued encoding="marc">17uu</dateIssued>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => '[Germany : s.n. 18th century] 18th century',
+        mods_origin_info_end_str => '[Germany : s.n. 18th century?]',
       # dv052xw4248
       mods_origin_info_start_str +
         '<place>
