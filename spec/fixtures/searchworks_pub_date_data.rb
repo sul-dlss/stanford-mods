@@ -782,17 +782,17 @@ SEARCHWORKS_PUB_DATE_DATA = {
       mods_origin_info_start_str +
         '<dateCreated encoding="edtf" point="start" keyDate="yes">-18</dateCreated>' +
         '<dateCreated encoding="edtf" point="end">-17</dateCreated>' +
-        mods_origin_info_end_str => [-18, '18 B.C. - 17 B.C.'],
+        mods_origin_info_end_str => [-18, '19 B.C. - 17 B.C.'],
       # bb408km1389
       mods_origin_info_start_str +
         '<dateCreated encoding="edtf" point="start" keyDate="yes">-1</dateCreated>' +
         '<dateCreated encoding="edtf" point="end">11</dateCreated>' +
-        mods_origin_info_end_str => [-1, '1 B.C. - 11 A.D.'],
+        mods_origin_info_end_str => [-1, '2 B.C. - 11 A.D.'],
       # cs470ng8064
       mods_origin_info_start_str +
         '<dateCreated encoding="edtf" point="start" keyDate="yes">-1</dateCreated>' +
         '<dateCreated encoding="edtf" point="end">0</dateCreated>' +
-        mods_origin_info_end_str => [-1, '1 B.C. - 0 A.D.'],
+        mods_origin_info_end_str => [-1, '2 B.C. - 0 A.D.'],
       # vh834jh5059
       mods_origin_info_start_str +
         '<dateCreated encoding="edtf" point="start" keyDate="yes">13</dateCreated>' +
