@@ -439,8 +439,8 @@ describe "date parsing methods" do
     end
 
     early_numeric_dates.each do |example, expected|
-      if example.start_with?('-')
-        exp = "#{example[1..-1]} B.C."
+      if example.start_with?('-') || example == '0'
+        exp = "#{example[1..-1].to_i + 1} B.C."
         it "#{exp} for #{example}" do
           expect(Stanford::Mods::DateParsing.new(example).date_str_for_display).to eq exp
         end
@@ -450,6 +450,10 @@ describe "date parsing methods" do
           expect(Stanford::Mods::DateParsing.new(example).date_str_for_display).to eq expected
         end
       end
+    end
+
+    it 'handled year "0" correctly' do
+      expect(Stanford::Mods::DateParsing.new('0').date_str_for_display).to eq '1 B.C.'
     end
 
     bc_dates.keys.each do |example|
@@ -793,8 +797,8 @@ describe "date parsing methods" do
   context '#display_str_for_early_numeric' do
     early_numeric_dates.each do |example, expected|
       expected = expected.to_i.to_s if expected.match(/^\d+$/)
-      if example.start_with?('-')
-        exp = "#{example[1..-1]} B.C."
+      if example.start_with?('-') || example == '0'
+        exp = "#{example[1..-1].to_i + 1} B.C."
         it "#{exp} for #{example}" do
           expect(Stanford::Mods::DateParsing.new(example).display_str_for_early_numeric).to eq exp
         end

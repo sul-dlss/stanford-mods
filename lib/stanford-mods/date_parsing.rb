@@ -283,8 +283,10 @@ module Stanford
       #   negative number strings will be changed to B.C. strings
       def display_str_for_early_numeric
         return unless orig_date_str.match(EARLY_NUMERIC)
+        # return 1 B.C. when the date is 0 since there is no 0 year
+        return '1 B.C.' if orig_date_str == '0'
         # negative number becomes B.C.
-        return  "#{orig_date_str[1..-1]} B.C." if orig_date_str.match(/^\-/)
+        return  "#{orig_date_str[1..-1].to_i + 1} B.C." if orig_date_str.match(/^\-/)
         # remove leading 0s from early dates
         "#{orig_date_str.to_i} A.D."
       end
