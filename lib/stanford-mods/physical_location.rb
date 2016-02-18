@@ -47,12 +47,13 @@ module Stanford
         folder_num.first
       end
 
-      # return entire contents of physicalLocation (note: single valued)
+      # return entire contents of physicalLocation as a string (note: single valued)
       #   but only if it has series, accession, box or folder data
       #   data in location/physicalLocation or in relatedItem/location/physicalLocation
       #   so use _location to get the data from either one of them
       # TODO:  should it be hierarchical series/box/folder?
-      def location
+      # NOTE: there is a "physicalLocation" and a "location" method defined in the mods gem, so we cannot use these names to avoid conflicts
+      def physical_location_str
         #   _location.physicalLocation should find top level and relatedItem
         loc = @mods_ng_xml._location.physicalLocation.map do |node|
           node.text if node.text.match(/.*(Series)|(Accession)|(Folder)|(Box).*/i)

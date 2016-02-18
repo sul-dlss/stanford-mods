@@ -30,7 +30,7 @@ name_to_xpath = {
   'physical_description_form'       => '//physicalDescription/form/text()', # .to_s
   'physical_description_media_type' => '//physicalDescription/internetMediaType/text()', # .to_s
 
-# location
+# physical_location
   'physical_location' => '//location/physicalLocation/text()', # .to_s
   'location_url'      => '//location/url/text()', # .to_s
 
