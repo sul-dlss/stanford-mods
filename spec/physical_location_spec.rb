@@ -179,19 +179,19 @@ describe "Physical Location for series, box, folder" do
         context 'in /location/physicalLocation' do
           it "has the expected location '#{expected}'" do
             @smods_rec.from_str(mods_loc_phys_loc)
-            expect(@smods_rec.location).to eq expected
+            expect(@smods_rec.physical_location_str).to eq expected
           end
         end
         context 'in /relatedItem/location/physicalLocation' do
           it "has the expected location '#{expected}'" do
             @smods_rec.from_str(mods_rel_item_loc_phys_loc)
-            expect(@smods_rec.location).to eq expected
+            expect(@smods_rec.physical_location_str).to eq expected
           end
         end
         context 'with multiple physicalLocation elements' do
           it "has the expected location '#{expected}'" do
             @smods_rec.from_str(mods_loc_multiple_phys_loc)
-            expect(@smods_rec.location).to eq expected
+            expect(@smods_rec.physical_location_str).to eq expected
           end
         end
       end # for example
