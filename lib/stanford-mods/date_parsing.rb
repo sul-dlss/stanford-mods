@@ -281,6 +281,10 @@ module Stanford
 
       # get display value for date String containing yyy, yy, y, -y, -yy, -yyy
       #   negative number strings will be changed to B.C. strings
+      # note that there is no year 0:  from https://en.wikipedia.org/wiki/Anno_Domini
+      # "AD counting years from the start of this epoch, and BC denoting years before the start of the era.
+      # There is no year zero in this scheme, so the year AD 1 immediately follows the year 1 BC."
+      # See also https://consul.stanford.edu/display/chimera/MODS+display+rules for etdf
       def display_str_for_early_numeric
         return unless orig_date_str.match(EARLY_NUMERIC)
         # return 1 B.C. when the date is 0 since there is no 0 year
