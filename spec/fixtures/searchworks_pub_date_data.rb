@@ -215,7 +215,7 @@ SEARCHWORKS_PUB_DATE_DATA = {
   # estonian_kgb
   'feigenbaum' =>
     { # key is mods_xml;  values = [pub date sortable facet value, pub date single string facet value]
-      # coll rec
+      # coll rec ms016pb9280
       mods_origin_info_start_str +
         '<dateIssued encoding="marc" point="start">1950</dateIssued>' +
         '<dateIssued encoding="marc" point="end">2007</dateIssued>' +
@@ -418,6 +418,20 @@ SEARCHWORKS_PUB_DATE_DATA = {
   # hopkins
   # hopkins_thesis
   # human_bio_lectures
+  'human-impact-marine' =>
+    { # key is mods_xml;  values = [pub date sortable facet value, pub date single string facet value]
+      # coll rec wy139zd0043: no originInfo dates
+      # tg926kp6619
+      mods_origin_info_start_str +
+        '<publisher>Science</publisher>
+        <place>
+          <placeTerm type="text">Washington, D.C., US</placeTerm>
+        </place>
+        <dateIssued encoding="w3cdtf" keyDate="yes">2008</dateIssued>
+        <dateValid encoding="w3cdtf">2007</dateValid>
+        <dateValid encoding="w3cdtf">2008</dateValid>' +
+        mods_origin_info_end_str => [2008, '2008']
+    },
   # hummel
   # image_proc
   # image_video_multimedia
@@ -872,6 +886,40 @@ SEARCHWORKS_PUB_DATE_DATA = {
   # stop_aids
   # sul_staff
   # tide_prediction?
+  'uganda' =>
+    { # key is mods_xml;  values = [pub date sortable facet value, pub date single string facet value]
+      # coll rec rb371kw9607
+      mods_origin_info_start_str +
+        '<place>
+          <placeTerm type="code" authority="marccountry">ug</placeTerm>
+        </place>
+        <place>
+          <placeTerm type="text">Kampala , Uganda</placeTerm>
+        </place>
+        <publisher>Uganda Bureau of Statistics</publisher>
+        <dateIssued>2012</dateIssued>
+        <issuance>monographic</issuance>' +
+        mods_origin_info_end_str => [2012, '2012'],
+      # cz128vq0535
+      mods_origin_info_start_str +
+        '<publisher>Uganda Bureau of Statistics</publisher>
+        <place>
+          <placeTerm type="text">Kampala , UG</placeTerm>
+        </place>
+        <dateIssued encoding="w3cdtf" keyDate="yes">2005</dateIssued>
+        <dateValid encoding="w3cdtf">2005</dateValid>' +
+        mods_origin_info_end_str => [2005, '2005'],
+      # cz128vq0535
+      mods_origin_info_start_str +
+        '<publisher>Uganda Bureau of Statistics</publisher>
+        <place>
+          <placeTerm type="text">Kampala , UG</placeTerm>
+        </place>
+        <dateIssued encoding="w3cdtf" keyDate="yes">2012</dateIssued>
+        <dateValid encoding="w3cdtf" point="start">2008</dateValid>
+        <dateValid encoding="w3cdtf" point="end">2010</dateValid>' +
+        mods_origin_info_end_str => [2012, '2012']
+    },
   # understanding_911?
   # urban
   # virtual_worlds
