@@ -1235,7 +1235,8 @@ SEARCHWORKS_IMPRINT_DATA = {
         '<dateIssued encoding="marc" point="start">800</dateIssued>
         <dateIssued encoding="marc" point="start">1899</dateIssued>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => '800 A.D. - 1899',
+        # space missing between first date and hyphen because the data has two start dates
+        mods_origin_info_end_str => '800 A.D.- 1899',
       # dc882bs3541
       mods_origin_info_start_str +
         '<place>
