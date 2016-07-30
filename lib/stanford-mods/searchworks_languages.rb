@@ -484,7 +484,7 @@ SEARCHWORKS_LANGUAGES = {
   'uig' => 'Uighur',
   'ukr' => 'Ukrainian',
   'umb' => 'Umbundu',
-  #'und' => 'Undetermined',
+  # 'und' => 'Undetermined',
   'urd' => 'Urdu',
   'uzb' => 'Uzbek',
   'vai' => 'Vai',
@@ -514,6 +514,6 @@ SEARCHWORKS_LANGUAGES = {
   'znd' => 'Zande',
   'zul' => 'Zulu',
   'zun' => 'Zuni',
-  #'zxx' => 'null',
+  # 'zxx' => 'null',
   'zza' => 'Zaza'
-}
+}.freeze

@@ -1297,4 +1297,4 @@ SEARCHWORKS_IMPRINT_DATA = {
   # water
   # wilpf?
   # yotsuba
-}
+}.freeze

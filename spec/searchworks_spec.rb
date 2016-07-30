@@ -2,7 +2,6 @@
 require 'spec_helper'
 
 describe "Searchworks mixin for Stanford::Mods::Record" do
-
   before(:all) do
     @smods_rec = Stanford::Mods::Record.new
     @ns_decl = "xmlns='#{Mods::MODS_NS}'"
@@ -109,5 +108,4 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
       end
     end
   end # context sw author methods
-
 end

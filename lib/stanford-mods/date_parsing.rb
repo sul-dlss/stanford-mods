@@ -6,7 +6,6 @@ module Stanford
     #     - we may want an integer or date sort field as well as lexical
     #     - we could add methods like my_date.bc?
     class DateParsing
-
       # get display value for year, generally an explicit year or "17th century" or "5 B.C." or "1950s" or '845 A.D.'
       # @return [String, nil] display value for year if we could parse one, nil otherwise
       def self.date_str_for_display(date_str)
@@ -196,7 +195,7 @@ module Stanford
       # @return [String, nil] yy00 if orig_date_str matches pattern, nil otherwise; also nil if B.C. in pattern
       def sortable_year_for_century
         return unless orig_date_str
-        return if orig_date_str.match(/B\.C\./)
+        return if orig_date_str =~ /B\.C\./
         century_matches = orig_date_str.match(CENTURY_4CHAR_REGEXP)
         if century_matches
           return $1 + '00' if $1.length == 2
@@ -215,7 +214,7 @@ module Stanford
       # @return [String, nil] yy(th) Century if orig_date_str matches pattern, nil otherwise; also nil if B.C. in pattern
       def display_str_for_century
         return unless orig_date_str
-        return if orig_date_str.match(/B\.C\./)
+        return if orig_date_str =~ /B\.C\./
         century_str_matches = orig_date_str.match(CENTURY_WORD_REGEXP)
         return century_str_matches.to_s if century_str_matches
 
@@ -263,7 +262,7 @@ module Stanford
       # @return [String, nil] String sortable -ddd if orig_date_str matches pattern; nil otherwise
       def sortable_year_str_for_early_numeric
         return unless orig_date_str.match(EARLY_NUMERIC)
-        if orig_date_str.match(/^\-/)
+        if orig_date_str =~ /^\-/
           # negative number becomes x - 1000 for sorting; -005 for -995
           num = orig_date_str[1..-1].to_i - 1000
           return '-' + num.to_s[1..-1].rjust(3, '0')
@@ -276,7 +275,7 @@ module Stanford
       # @return [Integer, nil] Integer sortable -ddd if orig_date_str matches pattern; nil otherwise
       def sortable_year_int_for_early_numeric
         return orig_date_str.to_i if orig_date_str.match(EARLY_NUMERIC)
-        orig_date_str.to_i if orig_date_str.match(/^-\d{4}$/)
+        orig_date_str.to_i if orig_date_str =~ /^-\d{4}$/
       end
 
       # get display value for date String containing yyy, yy, y, -y, -yy, -yyy
@@ -290,7 +289,7 @@ module Stanford
         # return 1 B.C. when the date is 0 since there is no 0 year
         return '1 B.C.' if orig_date_str == '0'
         # negative number becomes B.C.
-        return  "#{orig_date_str[1..-1].to_i + 1} B.C." if orig_date_str.match(/^\-/)
+        return "#{orig_date_str[1..-1].to_i + 1} B.C." if orig_date_str =~ /^\-/
         # remove leading 0s from early dates
         "#{orig_date_str.to_i} A.D."
       end
@@ -301,10 +300,10 @@ module Stanford
       #   has made this method bogus.
       # @return [String, nil] sortable 4 digit year (e.g. 1865, 0950) if orig_date_str is parseable via ruby Date, nil otherwise
       def year_via_ruby_parsing
-        return unless orig_date_str.match(/\d\d/) # need at least 2 digits
+        return unless orig_date_str =~ /\d\d/ # need at least 2 digits
         # need more in string than only 2 digits
         return if orig_date_str.match(/^\d\d$/) || orig_date_str.match(/^\D*\d\d\D*$/)
-        return if orig_date_str.match(/\d\s*B.C./) # skip B.C. dates
+        return if orig_date_str =~ /\d\s*B.C./ # skip B.C. dates
         date_obj = Date.parse(orig_date_str)
         date_obj.year.to_s
       rescue ArgumentError

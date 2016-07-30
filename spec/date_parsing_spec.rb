@@ -1,6 +1,5 @@
 # encoding: utf-8
 describe "date parsing methods" do
-
   unparseable = [ # here to remind us of what they might look like in our data
     nil,
     '',
@@ -106,11 +105,11 @@ describe "date parsing methods" do
     'No. 15 1792' => '1792',
     's.a. [1712]' => '1712',
     'publié le 24 floréal [1796]' => '1796',
-    "Fructidor l'an 3.e [i.e. 1795]" => '1795',
+    "Fructidor l'an 3.e [i.e. 1795]" => '1795'
   }
   # example string as key, expected parsed value as value
   specific_month = {
-    '1975-05' => '1975',     # vs 1918-27
+    '1975-05' => '1975', # vs 1918-27
     '1996 Jun' => '1996',
     'February 1798' => '1798',
     'March, 1794' => '1794',
@@ -262,7 +261,7 @@ describe "date parsing methods" do
     'March 22 d. 1794' => '1794',
     'N. 7 1796' => '1796',
     'N[ovember] 21st 1786' => '1786',
-    'Oct. the 2.d 1793' => '1793',
+    'Oct. the 2.d 1793' => '1793'
   }
   # example string as key, expected parsed value as value
   specific_day_2_digit_year = {
@@ -285,12 +284,12 @@ describe "date parsing methods" do
     '1901, c1900' => ['1901', '1900'], # pub date is one without the c,
     '1627 [i.e. 1646]' => ['1627', '1646'],
     '1698/1715' => ['1698', '1715'],
-    '1965,1968' => ['1965', '1968'],  # revs
+    '1965,1968' => ['1965', '1968'], # revs
     '1965|1968' => ['1965', '1968'], # revs
     '1789 ou 1790]' => ['1789', '1790'],
     '1689 [i.e. 1688-89]' => ['1689', '1688'],
     '1598 or 1599' => ['1598', '1599'],
-    '1890 [c1884]' => ['1890', '1884'],  # pub date is one without the c
+    '1890 [c1884]' => ['1890', '1884'], # pub date is one without the c
     '1873,c1868' => ['1873', '1868'], # # pub date is one without the c
     '1872-1877 [t.5, 1874]' => ['1872', '1873', '1874', '1875', '1876', '1877'],
     '1809 [ca. 1810]' => ['1809', '1810'],
@@ -324,7 +323,7 @@ describe "date parsing methods" do
   }
   # example string as key, expected parsed value as value
   multiple_years_4_digits_once = {
-    '1918-20' => ['1918', '1919', '1920'],   # vs. 1961-04
+    '1918-20' => ['1918', '1919', '1920'], # vs. 1961-04
     '1965-8' => ['1965', '1966', '1967', '1968'], # revs
     '[1846-51]' => ['1846', '1847', '1848', '1849', '1850', '1851']
   }
@@ -416,8 +415,8 @@ describe "date parsing methods" do
       .merge(century_only)
       .merge(brackets_in_middle_of_year)
       .merge(invalid_but_can_get_year).each do |example, expected|
-      expected = expected.to_i.to_s if expected.match(/^\d+$/)
-      expected = "#{expected} A.D." if expected.match(/^\d{1,3}$/)
+      expected = expected.to_i.to_s if expected =~ /^\d+$/
+      expected = "#{expected} A.D." if expected =~ /^\d{1,3}$/
       it "#{expected} for single value #{example}" do
         expect(Stanford::Mods::DateParsing.new(example).date_str_for_display).to eq expected
       end
@@ -425,7 +424,7 @@ describe "date parsing methods" do
 
     decade_only
       .merge(decade_only_4_digits).each do |example, expected|
-      expected = "#{expected.first.to_i}s" if expected.first.match(/^\d+$/)
+      expected = "#{expected.first.to_i}s" if expected.first =~ /^\d+$/
       it "#{expected} for decade #{example}" do
         expect(Stanford::Mods::DateParsing.new(example).date_str_for_display).to eq expected
       end
@@ -445,7 +444,7 @@ describe "date parsing methods" do
           expect(Stanford::Mods::DateParsing.new(example).date_str_for_display).to eq exp
         end
       else
-        expected = "#{expected.to_i} A.D." if expected.match(/^\d+$/)
+        expected = "#{expected.to_i} A.D." if expected =~ /^\d+$/
         it "#{expected} for #{example}" do
           expect(Stanford::Mods::DateParsing.new(example).date_str_for_display).to eq expected
         end
@@ -601,9 +600,9 @@ describe "date parsing methods" do
       'random text' => false,
       nil => false
     }.each do |example, expected|
-        it "#{expected} for #{example}" do
-          expect(Stanford::Mods::DateParsing.year_str_valid?(example)).to eq expected
-        end
+      it "#{expected} for #{example}" do
+        expect(Stanford::Mods::DateParsing.year_str_valid?(example)).to eq expected
+      end
     end
   end
 
@@ -625,9 +624,9 @@ describe "date parsing methods" do
       'random text' => false,
       nil => false
     }.each do |example, expected|
-        it "#{expected} for #{example}" do
-          expect(Stanford::Mods::DateParsing.year_int_valid?(example)).to eq expected
-        end
+      it "#{expected} for #{example}" do
+        expect(Stanford::Mods::DateParsing.year_int_valid?(example)).to eq expected
+      end
     end
     it 'true for 0000' do
       expect(Stanford::Mods::DateParsing.year_int_valid?(0000)).to eq true
@@ -796,7 +795,7 @@ describe "date parsing methods" do
 
   context '#display_str_for_early_numeric' do
     early_numeric_dates.each do |example, expected|
-      expected = expected.to_i.to_s if expected.match(/^\d+$/)
+      expected = expected.to_i.to_s if expected =~ /^\d+$/
       if example.start_with?('-') || example == '0'
         exp = "#{example[1..-1].to_i + 1} B.C."
         it "#{exp} for #{example}" do
@@ -897,5 +896,4 @@ describe "date parsing methods" do
       end
     end
   end
-
 end

@@ -976,4 +976,4 @@ SEARCHWORKS_PUB_DATE_DATA = {
   # water
   # wilpf?
   # yotsuba
-}
+}.freeze

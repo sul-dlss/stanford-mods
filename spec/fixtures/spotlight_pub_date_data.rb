@@ -313,4 +313,4 @@ SPOTLIGHT_PUB_DATE_DATA = {
         '<dateIssued encoding="marc">1786</dateIssued>' +
         mods_origin_info_end_str => ['1786', '1786']
     }
-}
+}.freeze

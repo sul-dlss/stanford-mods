@@ -2,7 +2,6 @@
 require 'spec_helper'
 
 describe "Searchworks mixin for Stanford::Mods::Record" do
-
   before(:all) do
     @smods_rec = Stanford::Mods::Record.new
     @ns_decl = "xmlns='#{Mods::MODS_NS}'"
@@ -219,7 +218,6 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
       end
     end # sw_subject_titles
 
-
     context "sw_geographic_search" do
       it "should contain subject <geographic> subelement data" do
         expect(@sw_geographic_search).to include(@geo)
@@ -380,5 +378,4 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
       end
     end # sw_geographic_search
   end # context sw subject methods
-
 end

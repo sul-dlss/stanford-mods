@@ -7,18 +7,16 @@ require 'mods'
 # SearchWorks specific wranglings of MODS metadata as a mixin to the Stanford::Mods::Record object
 module Stanford
   module Mods
-
     class Record < ::Mods::Record
-
       # include langagues known to SearchWorks; try to error correct when possible (e.g. when ISO-639 disagrees with MARC standard)
       def sw_language_facet
         result = []
         @mods_ng_xml.language.each { |n|
           # get languageTerm codes and add their translations to the result
           n.code_term.each { |ct|
-            if ct.authority.match(/^iso639/)
+            if ct.authority =~ /^iso639/
               begin
-                vals = ct.text.split(/[,|\ ]/).reject {|x| x.strip.length == 0 }
+                vals = ct.text.split(/[,|\ ]/).reject { |x| x.strip.empty? }
                 vals.each do |v|
                   iso639_val = ISO_639.find(v.strip).english_name
                   if SEARCHWORKS_LANGUAGES.has_value?(iso639_val)
@@ -32,7 +30,7 @@ module Stanford
                 p "Couldn't find english name for #{ct.text}"
               end
             else
-              vals = ct.text.split(/[,|\ ]/).reject {|x| x.strip.length == 0 }
+              vals = ct.text.split(/[,|\ ]/).reject { |x| x.strip.empty? }
               vals.each do |v|
                 result << SEARCHWORKS_LANGUAGES[v.strip]
               end
@@ -41,17 +39,16 @@ module Stanford
           # add languageTerm text values
           n.text_term.each { |tt|
             val = tt.text.strip
-            result << val if val.length > 0 && SEARCHWORKS_LANGUAGES.has_value?(val)
+            result << val if !val.empty? && SEARCHWORKS_LANGUAGES.has_value?(val)
           }
 
           # add language values that aren't in languageTerm subelement
-          if n.languageTerm.size == 0
+          if n.languageTerm.empty?
             result << n.text if SEARCHWORKS_LANGUAGES.has_value?(n.text)
           end
         }
         result.uniq
       end # language_facet
-
 
       # ---- AUTHOR ----
 
@@ -73,18 +70,18 @@ module Stanford
       # return the display_value_w_date for all <mods><name> elements that do not have type='personal'
       # @return [Array<String>] values for author_other_facet
       def sw_impersonal_authors
-        @mods_ng_xml.plain_name.select {|n| n.type_at != 'personal'}.map { |n| n.display_value_w_date }
+        @mods_ng_xml.plain_name.select { |n| n.type_at != 'personal' }.map { |n| n.display_value_w_date }
       end
 
       # @return [Array<String>] values for author_corp_display
       def sw_corporate_authors
-        val = @mods_ng_xml.plain_name.select {|n| n.type_at == 'corporate'}.map { |n| n.display_value_w_date }
+        val = @mods_ng_xml.plain_name.select { |n| n.type_at == 'corporate' }.map { |n| n.display_value_w_date }
         val
       end
 
       # @return [Array<String>] values for author_meeting_display
       def sw_meeting_authors
-        @mods_ng_xml.plain_name.select {|n| n.type_at == 'conference'}.map { |n| n.display_value_w_date }
+        @mods_ng_xml.plain_name.select { |n| n.type_at == 'conference' }.map { |n| n.display_value_w_date }
       end
 
       # Returns a sortable version of the main_author:
@@ -93,17 +90,15 @@ module Stanford
       # @return [String] value for author_sort field
       def sw_sort_author
         #  substitute java Character.MAX_CODE_POINT for nil main_author so missing main authors sort last
-        val = '' + (main_author_w_date ? main_author_w_date : "\u{10FFFF} ") + ( sort_title ? sort_title : '')
+        val = '' + (main_author_w_date ? main_author_w_date : "\u{10FFFF} ") + (sort_title ? sort_title : '')
         val.gsub(/[[:punct:]]*/, '').strip
       end
 
       def main_author_w_date_test
         result = nil
         first_wo_role = nil
-        self.plain_name.each { |n|
-          if n.role.size == 0
-            first_wo_role ||= n
-          end
+        plain_name.each { |n|
+          first_wo_role ||= n if n.role.empty?
           n.role.each { |r|
             if r.authority.include?('marcrelator') &&
               (r.value.include?('Creator') || r.value.include?('Author'))
@@ -111,9 +106,7 @@ module Stanford
             end
           }
         }
-        if !result && first_wo_role
-          result = first_wo_role.display_value_w_date
-        end
+        result = first_wo_role.display_value_w_date if !result && first_wo_role
         result
       end
 
@@ -153,7 +146,7 @@ module Stanford
           parts.sub!(/\.$/, '') if parts
 
           result = parts ? preParts + ". " + parts : preParts
-          result += "." if !result.match(/[[:punct:]]$/)
+          result += "." unless result =~ /[[:punct:]]$/
           result.strip!
           result = nil if result.empty?
           result
@@ -191,16 +184,16 @@ module Stanford
           nonSort = outer_node.nonSort.text.strip.empty? ? nil : outer_node.nonSort.text.strip
         end
 
-        val = '' + ( sw_full_title ? sw_full_title : '')
+        val = '' + (sw_full_title ? sw_full_title : '')
         val.sub!(Regexp.new("^" + Regexp.escape(nonSort)), '') if nonSort
         val.gsub!(/[[:punct:]]*/, '').strip
         val.squeeze(" ").strip
       end
 
-      #remove trailing commas
+      # remove trailing commas
       # @deprecated in favor of sw_title_display
       def sw_full_title_without_commas
-        result = self.sw_full_title
+        result = sw_full_title
         result.sub!(/,$/, '') if result
         result
       end
@@ -226,10 +219,10 @@ module Stanford
       # @deprecated:  this is no longer used in SW, Revs or Spotlight Jan 2016
       def format
         val = []
-        types = self.term_values(:typeOfResource)
+        types = term_values(:typeOfResource)
         if types
-          genres = self.term_values(:genre)
-          issuance = self.term_values([:origin_info,:issuance])
+          genres = term_values(:genre)
+          issuance = term_values([:origin_info, :issuance])
           types.each do |type|
             case type
               when 'cartographic'
@@ -281,7 +274,7 @@ module Stanford
       # @return <Array[String]> value in the SearchWorks controlled vocabulary
       def format_main
         val = []
-        types = self.term_values(:typeOfResource)
+        types = term_values(:typeOfResource)
         article_genres = ['article', 'Article',
           'book chapter', 'Book chapter', 'Book Chapter',
           'issue brief', 'Issue brief', 'Issue Brief',
@@ -296,8 +289,8 @@ module Stanford
           'thesis', 'Thesis'
         ]
         if types
-          genres = self.term_values(:genre)
-          issuance = self.term_values([:origin_info, :issuance])
+          genres = term_values(:genre)
+          issuance = term_values([:origin_info, :issuance])
           types.each do |type|
             case type
               when 'cartographic'
@@ -312,7 +305,7 @@ module Stanford
               when 'software, multimedia'
                 if genres && (genres.include?('dataset') || genres.include?('Dataset'))
                   val << 'Dataset'
-                elsif (!val.include?('Map'))
+                elsif !val.include?('Map')
                   val << 'Software/Multimedia'
                 end
               when 'sound recording-musical'
@@ -342,29 +335,23 @@ module Stanford
       # @return <Array[String]>
       def sw_genre
         val = []
-        genres = self.term_values(:genre)
-        types = self.term_values(:typeOfResource)
+        genres = term_values(:genre)
+        types = term_values(:typeOfResource)
         if genres
           if genres.include?('thesis') || genres.include?('Thesis')
             val << 'Thesis/Dissertation'
           end
           conf_pub = ['conference publication', 'Conference publication', 'Conference Publication']
-          if !(genres & conf_pub).empty?
-            if types && types.include?('text')
-              val << 'Conference proceedings'
-            end
+          unless (genres & conf_pub).empty?
+            val << 'Conference proceedings' if types && types.include?('text')
           end
           gov_pub = ['government publication', 'Government publication', 'Government Publication']
-          if !(genres & gov_pub).empty?
-            if types && types.include?('text')
-              val << 'Government document'
-            end
+          unless (genres & gov_pub).empty?
+            val << 'Government document' if types && types.include?('text')
           end
           tech_rpt = ['technical report', 'Technical report', 'Technical Report']
-          if !(genres & tech_rpt).empty?
-            if types && types.include?('text')
-              val << 'Technical report'
-            end
+          unless (genres & tech_rpt).empty?
+            val << 'Technical report' if types && types.include?('text')
           end
         end
         val.uniq
@@ -372,8 +359,8 @@ module Stanford
 
       # @return [String] value with the numeric catkey in it, or nil if none exists
       def catkey
-        catkey = self.term_values([:record_info, :recordIdentifier])
-        if catkey && catkey.length > 0
+        catkey = term_values([:record_info, :recordIdentifier])
+        if catkey && !catkey.empty?
           return catkey.first.tr('a', '') # ensure catkey is numeric only
         end
         nil
@@ -386,7 +373,6 @@ module Stanford
       def druid
         @druid ? @druid : 'Unknown item'
       end
-
     end # class Record
   end # Module Mods
 end # Module Stanford
