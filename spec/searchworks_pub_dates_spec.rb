@@ -2,7 +2,6 @@
 require 'spec_helper'
 
 describe "Date methods (searchworks.rb)" do
-
   let(:ns_decl) { "xmlns='#{Mods::MODS_NS}'" }
   let(:smods_rec) { Stanford::Mods::Record.new }
 
@@ -13,7 +12,6 @@ describe "Date methods (searchworks.rb)" do
   # or
   # dateCreated:  4 digit year
   #   and they should go in spec/fixtures searchworks_pub_date_data.rb
-
 
   # @deprecated:  need to switch to pub_year_int, or pub_date_sortable_string if you must have a string (why?)
   context '#pub_date_sort (deprecated)' do
@@ -228,5 +226,4 @@ describe "Date methods (searchworks.rb)" do
       expect(smods_rec.send(:pub_dates)).to eq(['1906', '1904', '1904'])
     end
   end
-
 end

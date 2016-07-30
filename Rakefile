@@ -10,12 +10,12 @@ rescue Bundler::BundlerError => e
   exit e.status_code
 end
 
-task :default => :ci
+task default: :ci
 
 desc "run continuous integration suite (tests, coverage, rubocop lint)"
-task :ci => [:rspec, :rubocop]
+task ci: [:rspec, :rubocop]
 
-task :spec => :rspec
+task spec: :rspec
 
 require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:rspec) do |spec|

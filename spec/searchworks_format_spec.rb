@@ -2,7 +2,6 @@
 require 'spec_helper'
 
 describe "Format fields (searchworks.rb)" do
-
   before(:all) do
     @smods_rec = Stanford::Mods::Record.new
     @ns_decl = "xmlns='#{Mods::MODS_NS}'"
@@ -18,7 +17,7 @@ describe "Format fields (searchworks.rb)" do
           expect(@smods_rec.format).to eq ['Book']
         end
         context "genre" do
-          it "'book chapter'", :email => 'mods-squad 2014-05-22, Joanna Dyla' do
+          it "'book chapter'", email: 'mods-squad 2014-05-22, Joanna Dyla' do
             m = "<mods #{@ns_decl}><genre>book chapter</genre><typeOfResource>text</typeOfResource></mods>"
             @smods_rec.from_str(m)
             expect(@smods_rec.format).to eq ['Book']
@@ -29,7 +28,7 @@ describe "Format fields (searchworks.rb)" do
             @smods_rec.from_str(m)
             expect(@smods_rec.format).to eq ['Book']
           end
-          it "'issue brief'", :email => 'mods-squad 2014-05-22, Joanna Dyla' do
+          it "'issue brief'", email: 'mods-squad 2014-05-22, Joanna Dyla' do
             m = "<mods #{@ns_decl}><genre>issue brief</genre><typeOfResource>text</typeOfResource></mods>"
             @smods_rec.from_str(m)
             expect(@smods_rec.format).to eq ['Book']
@@ -40,7 +39,7 @@ describe "Format fields (searchworks.rb)" do
             @smods_rec.from_str(m)
             expect(@smods_rec.format).to eq ['Book']
           end
-          it "'librettos'", :jira => 'INDEX-98' do
+          it "'librettos'", jira: 'INDEX-98' do
             m = "<mods #{@ns_decl}><genre>librettos</genre><typeOfResource>text</typeOfResource></mods>"
             @smods_rec.from_str(m)
             expect(@smods_rec.format).to eq ['Book']
@@ -48,12 +47,12 @@ describe "Format fields (searchworks.rb)" do
             @smods_rec.from_str(m)
             expect(@smods_rec.format).to eq ['Book']
           end
-          it "'libretto' isn't valid", :jira => 'INDEX-98' do
+          it "'libretto' isn't valid", jira: 'INDEX-98' do
             m = "<mods #{@ns_decl}><genre>libretto</genre><typeOfResource>text</typeOfResource></mods>"
             @smods_rec.from_str(m)
             expect(@smods_rec.format).to eq []
           end
-          it "'project report'", :jira => 'GRYP-170', :github => 'gdor-indexer/#7' do
+          it "'project report'", jira: 'GRYP-170', github: 'gdor-indexer/#7' do
             m = "<mods #{@ns_decl}><genre>project report</genre><typeOfResource>text</typeOfResource></mods>"
             @smods_rec.from_str(m)
             expect(@smods_rec.format).to eq ['Book']
@@ -64,12 +63,12 @@ describe "Format fields (searchworks.rb)" do
             @smods_rec.from_str(m)
             expect(@smods_rec.format).to eq ['Book']
           end
-          it "'report' isn't valid", :jira => 'GRYP-170', :github => 'gdor-indexer/#7' do
+          it "'report' isn't valid", jira: 'GRYP-170', github: 'gdor-indexer/#7' do
             m = "<mods #{@ns_decl}><genre>report</genre><typeOfResource>text</typeOfResource></mods>"
             @smods_rec.from_str(m)
             expect(@smods_rec.format).to eq []
           end
-          it "'technical report'", :jira => 'GRYPHONDOR-207' do
+          it "'technical report'", jira: 'GRYPHONDOR-207' do
             m = "<mods #{@ns_decl}><genre>technical report</genre><typeOfResource>text</typeOfResource></mods>"
             @smods_rec.from_str(m)
             expect(@smods_rec.format).to eq ['Book']
@@ -80,7 +79,7 @@ describe "Format fields (searchworks.rb)" do
             @smods_rec.from_str(m)
             expect(@smods_rec.format).to eq ['Book']
           end
-          it "'working paper'", :email => 'mods-squad 2014-05-22, Joanna Dyla' do
+          it "'working paper'", email: 'mods-squad 2014-05-22, Joanna Dyla' do
             m = "<mods #{@ns_decl}><genre>working paper</genre><typeOfResource>text</typeOfResource></mods>"
             @smods_rec.from_str(m)
             expect(@smods_rec.format).to eq ['Book']
@@ -101,7 +100,7 @@ describe "Format fields (searchworks.rb)" do
         @smods_rec.from_str(m)
         expect(@smods_rec.format).to eq ['Computer File']
       end
-      it "genre 'game'", :jira => 'GRYPHONDOR-207' do
+      it "genre 'game'", jira: 'GRYPHONDOR-207' do
         m = "<mods #{@ns_decl}><genre>game</genre><typeOfResource>software, multimedia</typeOfResource></mods>"
         @smods_rec.from_str(m)
         expect(@smods_rec.format).to eq ['Computer File']
@@ -111,7 +110,7 @@ describe "Format fields (searchworks.rb)" do
       end
     end
 
-    it "Conference Proceedings: typeOfResource 'text', genre 'conference publication'", :jira => 'GRYPHONDOR-207' do
+    it "Conference Proceedings: typeOfResource 'text', genre 'conference publication'", jira: 'GRYPHONDOR-207' do
       m = "<mods #{@ns_decl}><genre>conference publication</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
       expect(@smods_rec.format).to eq ['Conference Proceedings']
@@ -157,7 +156,7 @@ describe "Format fields (searchworks.rb)" do
       expect(@smods_rec.format).to eq ['Map/Globe']
     end
 
-    it "Music - Recording: typeOfResource 'sound recording-musical'", :jira => 'GRYPHONDOR-207' do
+    it "Music - Recording: typeOfResource 'sound recording-musical'", jira: 'GRYPHONDOR-207' do
       m = "<mods #{@ns_decl}><typeOfResource>sound recording-musical</typeOfResource></mods>"
       @smods_rec.from_str(m)
       expect(@smods_rec.format).to eq ['Music - Recording']
@@ -169,7 +168,7 @@ describe "Format fields (searchworks.rb)" do
       expect(@smods_rec.format).to eq ['Music - Score']
     end
 
-    it "Other: typeOfResource 'text', genre 'student project report'", :email => 'from Vitus, August 16, 2013' do
+    it "Other: typeOfResource 'text', genre 'student project report'", email: 'from Vitus, August 16, 2013' do
       m = "<mods #{@ns_decl}><genre>student project report</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
       expect(@smods_rec.format).to eq ['Other']
@@ -185,7 +184,7 @@ describe "Format fields (searchworks.rb)" do
     end
 
     context "Sound Recording:" do
-      it "typeOfResource 'sound recording-nonmusical', genre 'sound", :jira => 'GRYPHONDOR-207' do
+      it "typeOfResource 'sound recording-nonmusical', genre 'sound", jira: 'GRYPHONDOR-207' do
         m = "<mods #{@ns_decl}><genre>sound</genre><typeOfResource>sound recording-nonmusical</typeOfResource></mods>"
         @smods_rec.from_str(m)
         expect(@smods_rec.format).to eq ['Sound Recording']
@@ -193,7 +192,7 @@ describe "Format fields (searchworks.rb)" do
         @smods_rec.from_str(m)
         expect(@smods_rec.format).to eq ['Sound Recording']
       end
-      it "typeOfResource 'sound recording', genre 'sound", :jira => 'INDEX-94' do
+      it "typeOfResource 'sound recording', genre 'sound", jira: 'INDEX-94' do
         m = "<mods #{@ns_decl}><genre>sound</genre><typeOfResource>sound recording</typeOfResource></mods>"
         @smods_rec.from_str(m)
         expect(@smods_rec.format).to eq ['Sound Recording']
@@ -218,7 +217,7 @@ describe "Format fields (searchworks.rb)" do
         @smods_rec.from_str(m)
         expect(@smods_rec.format).to eq ['Video']
       end
-      it "genre 'motion picture'", :jira => 'GRYPHONDOR-207' do
+      it "genre 'motion picture'", jira: 'GRYPHONDOR-207' do
         m = "<mods #{@ns_decl}><genre>motion picture</genre><typeOfResource>moving image</typeOfResource></mods>"
         @smods_rec.from_str(m)
         expect(@smods_rec.format).to eq ['Video']
@@ -231,7 +230,7 @@ describe "Format fields (searchworks.rb)" do
       end
     end
 
-    context "multiple format values", :jira => 'INDEX-32' do
+    context "multiple format values", jira: 'INDEX-32' do
       it "multiple typeOfResource elements" do
         m = "<mods #{@ns_decl}><typeOfResource>moving image</typeOfResource><typeOfResource>sound recording</typeOfResource></mods>"
         @smods_rec.from_str(m)
@@ -299,7 +298,7 @@ describe "Format fields (searchworks.rb)" do
         @smods_rec.from_str(m)
         expect(@smods_rec.format_main).to eq ['Book']
       end
-      it "'book chapter'", :email => 'mods-squad 2014-05-22, Joanna Dyla' do
+      it "'book chapter'", email: 'mods-squad 2014-05-22, Joanna Dyla' do
         m = "<mods #{@ns_decl}><genre authority=\"local\">book chapter</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
         expect(@smods_rec.format_main).to eq ['Book']
@@ -310,7 +309,7 @@ describe "Format fields (searchworks.rb)" do
         @smods_rec.from_str(m)
         expect(@smods_rec.format_main).to eq ['Book']
       end
-      it "'issue brief'", :email => 'mods-squad 2014-05-22, Joanna Dyla' do
+      it "'issue brief'", email: 'mods-squad 2014-05-22, Joanna Dyla' do
         m = "<mods #{@ns_decl}><genre authority=\"local\">issue brief</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
         expect(@smods_rec.format_main).to eq ['Book']
@@ -321,7 +320,7 @@ describe "Format fields (searchworks.rb)" do
         @smods_rec.from_str(m)
         expect(@smods_rec.format_main).to eq ['Book']
       end
-      it "'project report'", :jira => 'GRYP-170', :github => 'gdor-indexer/#7' do
+      it "'project report'", jira: 'GRYP-170', github: 'gdor-indexer/#7' do
         m = "<mods #{@ns_decl}><genre>project report</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
         expect(@smods_rec.format_main).to eq ['Book']
@@ -332,12 +331,12 @@ describe "Format fields (searchworks.rb)" do
         @smods_rec.from_str(m)
         expect(@smods_rec.format_main).to eq ['Book']
       end
-      it "'report' isn't valid", :jira => 'GRYP-170', :github => 'gdor-indexer/#7' do
+      it "'report' isn't valid", jira: 'GRYP-170', github: 'gdor-indexer/#7' do
         m = "<mods #{@ns_decl}><genre>report</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
         expect(@smods_rec.format_main).to eq []
       end
-      it "'student project report'", :consul => '/NGDE/Format 2014-05-28' do
+      it "'student project report'", consul: '/NGDE/Format 2014-05-28' do
         m = "<mods #{@ns_decl}><genre authority=\"local\">student project report</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
         expect(@smods_rec.format_main).to eq ['Book']
@@ -351,7 +350,7 @@ describe "Format fields (searchworks.rb)" do
         @smods_rec.from_str(m)
         expect(@smods_rec.format_main).to eq ['Book']
       end
-      it "'technical report'", :jira => 'GRYPHONDOR-207' do
+      it "'technical report'", jira: 'GRYPHONDOR-207' do
         m = "<mods #{@ns_decl}><genre authority=\"marcgt\">technical report</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
         expect(@smods_rec.format_main).to eq ['Book']
@@ -362,7 +361,7 @@ describe "Format fields (searchworks.rb)" do
         @smods_rec.from_str(m)
         expect(@smods_rec.format_main).to eq ['Book']
       end
-      it "'working paper'", :email => 'mods-squad 2014-05-22, Joanna Dyla' do
+      it "'working paper'", email: 'mods-squad 2014-05-22, Joanna Dyla' do
         m = "<mods #{@ns_decl}><genre authority=\"local\">working paper</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
         expect(@smods_rec.format_main).to eq ['Book']
@@ -383,7 +382,7 @@ describe "Format fields (searchworks.rb)" do
           expect(@smods_rec.format_main).to eq ['Book']
         end
         context "genre" do
-          it "'conference publication'", :jira => 'GRYPHONDOR-207' do
+          it "'conference publication'", jira: 'GRYPHONDOR-207' do
             m = "<mods #{@ns_decl}><genre authority=\"marcgt\">conference publication</genre><typeOfResource>text</typeOfResource></mods>"
             @smods_rec.from_str(m)
             expect(@smods_rec.format_main).to eq ['Book']
@@ -394,7 +393,7 @@ describe "Format fields (searchworks.rb)" do
             @smods_rec.from_str(m)
             expect(@smods_rec.format_main).to eq ['Book']
           end
-          it "'instruction'", :consul => '/NGDE/Format 2014-05-28' do
+          it "'instruction'", consul: '/NGDE/Format 2014-05-28' do
             # Hydrus 'textbook'
             m = "<mods #{@ns_decl}><genre authority=\"marcgt\">instruction</genre><typeOfResource>text</typeOfResource></mods>"
             @smods_rec.from_str(m)
@@ -403,12 +402,12 @@ describe "Format fields (searchworks.rb)" do
             @smods_rec.from_str(m)
             expect(@smods_rec.format_main).to eq ['Book']
           end
-          it "'libretto' isn't valid", :jira => 'INDEX-98' do
+          it "'libretto' isn't valid", jira: 'INDEX-98' do
             m = "<mods #{@ns_decl}><genre>libretto</genre><typeOfResource>text</typeOfResource></mods>"
             @smods_rec.from_str(m)
             expect(@smods_rec.format_main).to eq []
           end
-          it "'librettos'", :jira => 'INDEX-98' do
+          it "'librettos'", jira: 'INDEX-98' do
             m = "<mods #{@ns_decl}><genre>librettos</genre><typeOfResource>text</typeOfResource></mods>"
             @smods_rec.from_str(m)
             expect(@smods_rec.format_main).to eq ['Book']
@@ -457,7 +456,7 @@ describe "Format fields (searchworks.rb)" do
       expect(@smods_rec.format_main).to eq ['Map']
     end
 
-    context "Music - Recording: typeOfResource 'sound recording-musical'", :jira => 'GRYPHONDOR-207' do
+    context "Music - Recording: typeOfResource 'sound recording-musical'", jira: 'GRYPHONDOR-207' do
       it "no genre" do
         m = "<mods #{@ns_decl}><typeOfResource>sound recording-musical</typeOfResource></mods>"
         @smods_rec.from_str(m)
@@ -485,7 +484,7 @@ describe "Format fields (searchworks.rb)" do
         @smods_rec.from_str(m)
         expect(@smods_rec.format_main).to eq ['Software/Multimedia']
       end
-      it "genre 'game'", :jira => 'GRYPHONDOR-207' do
+      it "genre 'game'", jira: 'GRYPHONDOR-207' do
         m = "<mods #{@ns_decl}><genre authority=\"marcgt\">game</genre><typeOfResource>software, multimedia</typeOfResource></mods>"
         @smods_rec.from_str(m)
         expect(@smods_rec.format_main).to eq ['Software/Multimedia']
@@ -503,7 +502,7 @@ describe "Format fields (searchworks.rb)" do
     end
 
     context "Sound Recording:" do
-      it "typeOfResource 'sound recording-nonmusical', genre 'sound", :jira => 'GRYPHONDOR-207' do
+      it "typeOfResource 'sound recording-nonmusical', genre 'sound", jira: 'GRYPHONDOR-207' do
         m = "<mods #{@ns_decl}><genre>sound</genre><typeOfResource>sound recording-nonmusical</typeOfResource></mods>"
         @smods_rec.from_str(m)
         expect(@smods_rec.format_main).to eq ['Sound recording']
@@ -511,7 +510,7 @@ describe "Format fields (searchworks.rb)" do
         @smods_rec.from_str(m)
         expect(@smods_rec.format_main).to eq ['Sound recording']
       end
-      it "typeOfResource 'sound recording', genre 'sound", :jira => 'INDEX-94' do
+      it "typeOfResource 'sound recording', genre 'sound", jira: 'INDEX-94' do
         m = "<mods #{@ns_decl}><genre>sound</genre><typeOfResource>sound recording</typeOfResource></mods>"
         @smods_rec.from_str(m)
         expect(@smods_rec.format_main).to eq ['Sound recording']
@@ -521,14 +520,13 @@ describe "Format fields (searchworks.rb)" do
       end
     end
 
-
     context "Video: typeOfResource 'moving image'" do
       it "no genre" do
         m = "<mods #{@ns_decl}><typeOfResource>moving image</typeOfResource></mods>"
         @smods_rec.from_str(m)
         expect(@smods_rec.format_main).to eq ['Video']
       end
-      it "genre 'motion picture'", :jira => 'GRYPHONDOR-207' do
+      it "genre 'motion picture'", jira: 'GRYPHONDOR-207' do
         m = "<mods #{@ns_decl}><genre>motion picture</genre><typeOfResource>moving image</typeOfResource></mods>"
         @smods_rec.from_str(m)
         expect(@smods_rec.format_main).to eq ['Video']
@@ -541,7 +539,7 @@ describe "Format fields (searchworks.rb)" do
       end
     end
 
-    context "multiple values", :jira => 'INDEX-32' do
+    context "multiple values", jira: 'INDEX-32' do
       it "multiple typeOfResource elements" do
         m = "<mods #{@ns_decl}><typeOfResource>moving image</typeOfResource><typeOfResource>sound recording</typeOfResource></mods>"
         @smods_rec.from_str(m)
@@ -579,7 +577,7 @@ describe "Format fields (searchworks.rb)" do
       @smods_rec.from_str(m)
       expect(@smods_rec.format_main).to eq []
     end
-  end #format_main
+  end # format_main
 
   context "sw_genre" do
     it "ignores values that are not in the prescribed list" do
@@ -637,7 +635,7 @@ describe "Format fields (searchworks.rb)" do
     it "it does not include Archived website: typeOfResource 'text', genre 'archived website'" do
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">archived website</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to_not eq ['Archived website']
+      expect(@smods_rec.sw_genre).not_to eq ['Archived website']
     end
     it "capitalizes the first letter of a genre value" do
       m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre authority=\"marcgt\">technical report</genre></mods>"

@@ -2,7 +2,6 @@
 require 'spec_helper'
 
 describe "Subject fields (searchworks.rb)" do
-
   before(:all) do
     @ns_decl = "xmlns='#{Mods::MODS_NS}'"
     @genre = 'genre top level'
@@ -284,7 +283,7 @@ describe "Subject fields (searchworks.rb)" do
         expect(@smods_rec.subject_all_search).to be_nil
       end
       it "should contain top level <genre> element data" do
-         expect(@smods_rec.subject_all_search).to include(@genre)
+        expect(@smods_rec.subject_all_search).to include(@genre)
       end
       it "should not contain cartographic sub element" do
         expect(@smods_rec.subject_all_search).not_to include(@cart_coord)
@@ -307,11 +306,9 @@ describe "Subject fields (searchworks.rb)" do
         expect(@smods_rec.subject_all_search).to include(@topic)
       end
     end # subject_all_search
-
-  end  # search fields
+  end # search fields
 
   context "facet fields" do
-
     context "topic_facet" do
       it "should include topic subelement" do
         expect(@smods_rec.topic_facet).to include(@topic)
@@ -394,7 +391,5 @@ describe "Subject fields (searchworks.rb)" do
         expect(@smods_rec.era_facet).to be_nil
       end
     end
-
   end # facet fields
-
 end

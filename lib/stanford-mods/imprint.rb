@@ -354,7 +354,7 @@ module Stanford
           century_matches = orig_date_str.match(CENTURY_4CHAR_REGEXP) if orig_date_str
           if century_matches
             require 'active_support/core_ext/integer/inflections'
-            new_century_str =  "#{(century_matches[3].to_i + 1).ordinalize} century"
+            new_century_str = "#{(century_matches[3].to_i + 1).ordinalize} century"
             my_ng_date_element.content = "#{century_matches[1]}#{new_century_str}#{century_matches[4]}"
           else
             my_ng_date_element.content

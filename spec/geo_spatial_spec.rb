@@ -2,7 +2,6 @@
 require 'spec_helper'
 
 describe "Cartographic coordinates" do
-
   let(:smods_rec) { Stanford::Mods::Record.new }
   let(:no_coord)  do
     <<-EOF
@@ -16,7 +15,7 @@ describe "Cartographic coordinates" do
       </mods>
     EOF
   end
-  let(:with_coords)  do
+  let(:with_coords) do
     <<-EOF
       <mods xmlns="#{Mods::MODS_NS}">
         <subject>

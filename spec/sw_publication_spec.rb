@@ -1,5 +1,4 @@
 describe "SearchWorks Publication methods" do
-
   let(:smods_rec) { Stanford::Mods::Record.new }
   RSpec.shared_examples "pub year" do |method_sym, exp_val_position|
     context 'searchworks actual data' do

@@ -11,7 +11,6 @@ require 'mods'
 module Stanford
   module Mods
     class Record < ::Mods::Record
-
       # return pub year as an Integer
       # prefer dateIssued (any) before dateCreated (any) before dateCaptured (any)
       #  look for a keyDate and use it if there is one;  otherwise pick earliest date
@@ -56,26 +55,26 @@ module Stanford
         # get_main_title_date
         # https://github.com/sul-dlss/SearchWorks/blob/7d4d870a9d450fed8b081c38dc3dbd590f0b706e/app/helpers/results_document_helper.rb#L8-L46
 
-        #"publication_year_isi"   => "Publication date",  <--  do it already
-        #"beginning_year_isi"     => "Beginning date",
-        #"earliest_year_isi"      => "Earliest date",
-        #"earliest_poss_year_isi" => "Earliest possible date",
-        #"ending_year_isi"        => "Ending date",
-        #"latest_year_isi"        => "Latest date",
-        #"latest_poss_year_isi"   => "Latest possible date",
-        #"production_year_isi"    => "Production date",
-        #"original_year_isi"      => "Original date",
-        #"copyright_year_isi"     => "Copyright date"} %>
+        # "publication_year_isi"   => "Publication date",  <--  do it already
+        # "beginning_year_isi"     => "Beginning date",
+        # "earliest_year_isi"      => "Earliest date",
+        # "earliest_poss_year_isi" => "Earliest possible date",
+        # "ending_year_isi"        => "Ending date",
+        # "latest_year_isi"        => "Latest date",
+        # "latest_poss_year_isi"   => "Latest possible date",
+        # "production_year_isi"    => "Production date",
+        # "original_year_isi"      => "Original date",
+        # "copyright_year_isi"     => "Copyright date"} %>
 
-        #"creation_year_isi"      => "Creation date",  <--  do it already
-        #{}"release_year_isi"       => "Release date",
-        #{}"reprint_year_isi"       => "Reprint/reissue date",
-        #{}"other_year_isi"         => "Date",
+        # "creation_year_isi"      => "Creation date",  <--  do it already
+        # {}"release_year_isi"       => "Release date",
+        # {}"reprint_year_isi"       => "Reprint/reissue date",
+        # {}"other_year_isi"         => "Date",
       end
 
       # @return [String] single String containing imprint information for display
       def imprint_display_str
-        imp = Stanford::Mods::Imprint.new(self.origin_info)
+        imp = Stanford::Mods::Imprint.new(origin_info)
         imp.display_str
       end
 
@@ -116,7 +115,7 @@ module Stanford
       # @param [Boolean] ignore_approximate true if approximate dates (per qualifier attribute)
       #   should be excluded; false approximate dates should be included
       # @return [Array<Nokogiri::XML::Element>]
-      def date_created_elements(ignore_approximate=false)
+      def date_created_elements(ignore_approximate = false)
         date_created_nodeset = @mods_ng_xml.origin_info.dateCreated
         return self.class.remove_approximate(date_created_nodeset) if ignore_approximate
         date_created_nodeset.to_a
@@ -126,7 +125,7 @@ module Stanford
       # @param [Boolean] ignore_approximate true if approximate dates (per qualifier attribute)
       #   should be excluded; false approximate dates should be included
       # @return [Array<Nokogiri::XML::Element>]
-      def date_issued_elements(ignore_approximate=false)
+      def date_issued_elements(ignore_approximate = false)
         date_issued_nodeset = @mods_ng_xml.origin_info.dateIssued
         return self.class.remove_approximate(date_issued_nodeset) if ignore_approximate
         date_issued_nodeset.to_a
@@ -208,6 +207,7 @@ module Stanford
 
       class << self
         private
+
         # get earliest parseable year from the passed date elements
         # @param [Array<Nokogiri::XML::Element>] date_el_array the elements from which to select a pub date
         # @param [Symbol] method_sym method name in DateParsing, as a symbol
@@ -226,11 +226,10 @@ module Stanford
         end
       end
 
-
 # ----   old date parsing methods used downstream of gem;  will be deprecated/replaced with new date parsing methods
 
       def place
-        vals = self.term_values([:origin_info, :place, :placeTerm])
+        vals = term_values([:origin_info, :place, :placeTerm])
         vals
       end
 
@@ -355,14 +354,14 @@ module Stanford
       def parse_dates_from_originInfo
         @dates_marc_encoding = []
         @dates_no_marc_encoding = []
-        self.origin_info.dateIssued.each { |di|
+        origin_info.dateIssued.each { |di|
           if di.encoding == "marc"
             @dates_marc_encoding << di.text
           else
             @dates_no_marc_encoding << di.text
           end
         }
-        self.origin_info.dateCreated.each { |dc|
+        origin_info.dateCreated.each { |dc|
           if dc.encoding == "marc"
             @dates_marc_encoding << dc.text
           else
@@ -393,7 +392,7 @@ module Stanford
               # look for things like '1865-6 CE'
               pos = f_date.index(Regexp.new(match + '...CE'))
               pos = pos ? pos.to_i : 0
-              if f_date.include?(match+' CE') or pos > 0
+              if f_date.include?(match + ' CE') || pos > 0
                 @pub_year = match
                 return match
               end
@@ -409,7 +408,7 @@ module Stanford
       def get_three_digit_year(dates)
         dates.each do |f_date|
           matches = f_date.scan(/\d{3}/)
-          return matches.first if matches.length > 0
+          return matches.first unless matches.empty?
         end
         nil
       end
@@ -420,7 +419,7 @@ module Stanford
       def get_bc_year(dates)
         dates.each do |f_date|
           matches = f_date.scan(/\d{3} B.C./)
-          if matches.length > 0
+          unless matches.empty?
             bc_year = matches.first[0..2]
             return (bc_year.to_i - 1000).to_s
           end
@@ -434,9 +433,9 @@ module Stanford
       def get_single_digit_century(dates)
         dates.each do |f_date|
           matches = f_date.scan(/\d{1}th/)
-          next if matches.length == 0
+          next if matches.empty?
           if matches.length == 1
-            @pub_year = ((matches.first[0, 2].to_i) - 1).to_s + '--'
+            @pub_year = (matches.first[0, 2].to_i - 1).to_s + '--'
             return @pub_year
           else
             # when there are multiple matches, check for ones with CE after them
@@ -445,7 +444,7 @@ module Stanford
               pos = pos ? pos.to_i : f_date.index(Regexp.new(match + ' century CE'))
               pos = pos ? pos.to_i : 0
               if f_date.include?(match + ' CE') || pos > 0
-                @pub_year = ((match[0, 1].to_i) - 1).to_s + '--'
+                @pub_year = (match[0, 1].to_i - 1).to_s + '--'
                 return @pub_year
               end
             end
@@ -460,9 +459,9 @@ module Stanford
       def get_double_digit_century(dates)
         dates.each do |f_date|
           matches = f_date.scan(/\d{2}th/)
-          next if matches.length == 0
+          next if matches.empty?
           if matches.length == 1
-            @pub_year=((matches.first[0, 2].to_i) - 1).to_s + '--'
+            @pub_year = (matches.first[0, 2].to_i - 1).to_s + '--'
             return @pub_year
           else
             # when there are multiple matches, check for ones with CE after them
@@ -470,8 +469,8 @@ module Stanford
               pos = f_date.index(Regexp.new(match + '...CE'))
               pos = pos ? pos.to_i : f_date.index(Regexp.new(match + ' century CE'))
               pos = pos ? pos.to_i : 0
-              if f_date.include?(match+' CE') or pos > 0
-                @pub_year = ((match[0, 2].to_i) - 1).to_s + '--'
+              if f_date.include?(match + ' CE') || pos > 0
+                @pub_year = (match[0, 2].to_i - 1).to_s + '--'
                 return @pub_year
               end
             end

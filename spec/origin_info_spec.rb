@@ -1,5 +1,4 @@
 describe "computations from /originInfo field" do
-
   let(:smods_rec) { Stanford::Mods::Record.new }
 
   # used for single examples
@@ -24,7 +23,7 @@ describe "computations from /originInfo field" do
           <dateCreated>1999</dateCreated>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.send(method_sym)).to eq method_sym.to_s.match(/int/) ? 2005 : '2005'
+      expect(smods_rec.send(method_sym)).to eq method_sym.to_s =~ /int/ ? 2005 : '2005'
     end
     it 'respects ignore_approximate param' do
       mods_str = mods_origin_info_start_str +
@@ -32,8 +31,8 @@ describe "computations from /originInfo field" do
         '<dateCreated point="end">1599</dateCreated>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.send(method_sym, true)).to eq method_sym.to_s.match(/int/) ? 1599 : '1599'
-      expect(smods_rec.send(method_sym, false)).to eq method_sym.to_s.match(/int/) ? 1000 : '1000'
+      expect(smods_rec.send(method_sym, true)).to eq method_sym.to_s =~ /int/ ? 1599 : '1599'
+      expect(smods_rec.send(method_sym, false)).to eq method_sym.to_s =~ /int/ ? 1000 : '1000'
     end
     it 'nil if ignore_approximate and all dates are approximate' do
       mods_str = mods_origin_info_start_str +
@@ -42,7 +41,7 @@ describe "computations from /originInfo field" do
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
       expect(smods_rec.send(method_sym, true)).to eq nil
-      expect(smods_rec.send(method_sym, false)).to eq method_sym.to_s.match(/int/) ? 1000 : '1000'
+      expect(smods_rec.send(method_sym, false)).to eq method_sym.to_s =~ /int/ ? 1000 : '1000'
     end
     it 'respects ignore_approximate even for keyDate' do
       mods_str = mods_origin_info_start_str +
@@ -50,8 +49,8 @@ describe "computations from /originInfo field" do
         '<dateCreated point="end">1599</dateCreated>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.send(method_sym, true)).to eq method_sym.to_s.match(/int/) ? 1599 : '1599'
-      expect(smods_rec.send(method_sym, false)).to eq method_sym.to_s.match(/int/) ? 1000 : '1000'
+      expect(smods_rec.send(method_sym, true)).to eq method_sym.to_s =~ /int/ ? 1599 : '1599'
+      expect(smods_rec.send(method_sym, false)).to eq method_sym.to_s =~ /int/ ? 1000 : '1000'
     end
     it 'uses dateCaptured if no dateIssued or dateCreated' do
       # for web archive seed files
@@ -60,19 +59,18 @@ describe "computations from /originInfo field" do
         '<dateCaptured encoding="w3cdtf" point="end">20151218111111</dateCaptured>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.send(method_sym)).to eq method_sym.to_s.match(/int/) ? 2015 : '2015'
+      expect(smods_rec.send(method_sym)).to eq method_sym.to_s =~ /int/ ? 2015 : '2015'
     end
     context 'spotlight actual data' do
       require 'fixtures/spotlight_pub_date_data'
       SPOTLIGHT_PUB_DATE_DATA.each_pair.each do |coll_name, coll_data|
         # papyri - the only Spotlight data with BC dates
-        unless coll_name == 'papyri' && method_sym == :pub_year_int
-          coll_data.each_pair do |mods_str, exp_vals|
-            expected = exp_vals[exp_val_position]
-            it "#{expected} for rec in #{coll_name}" do
-              smods_rec.from_str(mods_str)
-              expect(smods_rec.send(method_sym)).to eq((method_sym.to_s.match(/int/) ? expected.to_i : expected)) if expected
-            end
+        next if coll_name == 'papyri' && method_sym == :pub_year_int
+        coll_data.each_pair do |mods_str, exp_vals|
+          expected = exp_vals[exp_val_position]
+          it "#{expected} for rec in #{coll_name}" do
+            smods_rec.from_str(mods_str)
+            expect(smods_rec.send(method_sym)).to eq((method_sym.to_s =~ /int/ ? expected.to_i : expected)) if expected
           end
         end
       end
@@ -163,7 +161,7 @@ describe "computations from /originInfo field" do
         '<dateIssued keyDate="yes">2014</dateIssued>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq method_sym.to_s.match(/int/) ? 2014 : '2014'
+      expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq method_sym.to_s =~ /int/ ? 2014 : '2014'
     end
     it 'ignores invalid keyDate value' do
       mods_str = mods_origin_info_start_str +
@@ -171,7 +169,7 @@ describe "computations from /originInfo field" do
         '<dateIssued>1499</dateIssued>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq method_sym.to_s.match(/int/) ? 1499 : '1499'
+      expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq method_sym.to_s =~ /int/ ? 1499 : '1499'
     end
     it 'calls earliest_year_str if multiple keyDates present' do
       mods_str = mods_origin_info_start_str +
@@ -179,7 +177,7 @@ describe "computations from /originInfo field" do
         '<dateCreated keyDate="yes">2001</dateCreated>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      if method_sym.to_s.match(/int/)
+      if method_sym.to_s =~ /int/
         expect(Stanford::Mods::Record).to receive(:earliest_year_int).with(smods_rec.date_created_elements)
       else
         expect(Stanford::Mods::Record).to receive(:earliest_year_str).with(smods_rec.date_created_elements)
@@ -193,7 +191,7 @@ describe "computations from /originInfo field" do
         '<dateIssued point="end" qualifier="questionable">uuuu</dateIssued>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      if method_sym.to_s.match(/int/)
+      if method_sym.to_s =~ /int/
         expect(Stanford::Mods::Record).to receive(:earliest_year_int).with(smods_rec.date_issued_elements)
       else
         expect(Stanford::Mods::Record).to receive(:earliest_year_str).with(smods_rec.date_issued_elements)
@@ -208,21 +206,21 @@ describe "computations from /originInfo field" do
         '<dateIssued encoding="w3cdtf">1300</dateIssued>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq method_sym.to_s.match(/int/) ? 1100 : '1100'
+      expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq method_sym.to_s =~ /int/ ? 1100 : '1100'
       mods_str = mods_origin_info_start_str +
         '<dateIssued>1200</dateIssued>' +
         '<dateIssued encoding="marc">1300</dateIssued>' +
         '<dateIssued encoding="w3cdtf" keyDate="yes">1100</dateIssued>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq method_sym.to_s.match(/int/) ? 1100 : '1100'
+      expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq method_sym.to_s =~ /int/ ? 1100 : '1100'
       mods_str = mods_origin_info_start_str +
         '<dateIssued>1300</dateIssued>' +
         '<dateIssued encoding="marc" keyDate="yes">1100</dateIssued>' +
         '<dateIssued encoding="w3cdtf">1200</dateIssued>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq method_sym.to_s.match(/int/) ? 1100 : '1100'
+      expect(smods_rec.send(method_sym, smods_rec.date_issued_elements)).to eq method_sym.to_s =~ /int/ ? 1100 : '1100'
     end
   end
 
@@ -307,7 +305,7 @@ describe "computations from /originInfo field" do
       end
       context "retains element when attribute qualifer=" do
         ['inferred', 'invalid_attr_val'].each do |attr_val|
-        let(:qual_attr_val) { attr_val }
+          let(:qual_attr_val) { attr_val }
           it attr_val do
             smods_rec.from_str mods_rec
             result = smods_rec.date_issued_elements(true)
@@ -319,7 +317,7 @@ describe "computations from /originInfo field" do
         end
       end
 
-      let(:start_str) {"#{mods_origin_info_start_str}<dateIssued>2015</dateIssued>"}
+      let(:start_str) { "#{mods_origin_info_start_str}<dateIssued>2015</dateIssued>" }
       it 'retains element without qualifier attribute"' do
         m = start_str + '<dateIssued>1666</dateIssued>' + mods_origin_info_end_str
         smods_rec.from_str m
@@ -376,7 +374,7 @@ describe "computations from /originInfo field" do
       end
       context "retains element when attribute qualifer=" do
         ['inferred', 'invalid_attr_val'].each do |attr_val|
-        let(:qual_attr_val) { attr_val }
+          let(:qual_attr_val) { attr_val }
           it attr_val do
             smods_rec.from_str mods_rec
             result = smods_rec.date_created_elements(true)
@@ -388,7 +386,7 @@ describe "computations from /originInfo field" do
         end
       end
 
-      let(:start_str) {"#{mods_origin_info_start_str}<dateCreated>2015</dateCreated>"}
+      let(:start_str) { "#{mods_origin_info_start_str}<dateCreated>2015</dateCreated>" }
       it 'retains element without qualifier attribute"' do
         m = start_str + '<dateCreated>1666</dateCreated>' + mods_origin_info_end_str
         smods_rec.from_str m
@@ -468,7 +466,7 @@ describe "computations from /originInfo field" do
              <dateIssued qualifier='#{attr_value}'>1968</dateIssued>
           #{mods_origin_info_end_str}"
         end
-        it "#{expected}" do
+        it expected.to_s do
           smods_rec.from_str(mods_str)
           date_el = smods_rec.date_issued_elements.first
           expect(Stanford::Mods::Record.date_is_approximate?(date_el)).to eq expected

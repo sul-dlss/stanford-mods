@@ -56,7 +56,7 @@ module Stanford
       def physical_location_str
         #   _location.physicalLocation should find top level and relatedItem
         loc = @mods_ng_xml._location.physicalLocation.map do |node|
-          node.text if node.text.match(/.*(Series)|(Accession)|(Folder)|(Box).*/i)
+          node.text if node.text =~ /.*(Series)|(Accession)|(Folder)|(Box).*/i
         end.compact
 
         # There should only be one location

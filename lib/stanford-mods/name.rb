@@ -5,9 +5,7 @@ require 'mods'
 # NON-SearchWorks specific wranglings of MODS <name> metadata as a mixin to the Stanford::Mods::Record object
 module Stanford
   module Mods
-
     class Record < ::Mods::Record
-
       # the first encountered <mods><name> element with marcrelator flavor role of 'Creator' or 'Author'.
       # if no marcrelator 'Creator' or 'Author', the first name without a role.
       # if no name without a role, then nil
@@ -17,9 +15,7 @@ module Stanford
         result = nil
         first_wo_role = nil
         @mods_ng_xml.plain_name.each { |n|
-          if n.role.size == 0
-            first_wo_role ||= n
-          end
+          first_wo_role ||= n if n.role.empty?
           n.role.each { |r|
             if r.authority.include?('marcrelator') &&
                   (r.value.include?('Creator') || r.value.include?('Author'))
@@ -27,9 +23,7 @@ module Stanford
             end
           }
         }
-        if !result && first_wo_role
-          result = first_wo_role.display_value_w_date
-        end
+        result = first_wo_role.display_value_w_date if !result && first_wo_role
         result
       end # main_author
 
@@ -72,7 +66,7 @@ module Stanford
         result unless result.empty?
       end
 
-      COLLECTOR_ROLE_URI = 'http://id.loc.gov/vocabulary/relators/col'
+      COLLECTOR_ROLE_URI = 'http://id.loc.gov/vocabulary/relators/col'.freeze
 
       # @param Nokogiri::XML::Node role_node the role node from a parent name node
       # @return true if there is a MARC relator collector role assigned
@@ -80,7 +74,6 @@ module Stanford
         (role_node.authority.include?('marcrelator') && role_node.value.include?('Collector')) ||
         role_node.roleTerm.valueURI.first == COLLECTOR_ROLE_URI
       end
-
     end # class Record
   end # Module Mods
 end # Module Stanford

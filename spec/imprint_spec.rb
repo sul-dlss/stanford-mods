@@ -59,7 +59,7 @@ describe Stanford::Mods::Imprint do
     end
 
     context 'date_is_decade?' do
-      [ '156u',
+      ['156u',
         '167-?]',
         '[171-?]',
         '[189-]',
@@ -78,7 +78,7 @@ describe Stanford::Mods::Imprint do
           expect(imp.send(:date_is_decade?, element)).to be_truthy
         end
       end
-      [ '1950s',
+      ['1950s',
         "1950's",
         'before 1950s after'
       ].each do |example|
@@ -136,7 +136,7 @@ describe Stanford::Mods::Imprint do
     end
 
     context 'date_is_century?' do
-      [ '17uu',
+      ['17uu',
         '17--?',
         'before [16--] after'
       ].each do |example|
@@ -149,7 +149,7 @@ describe Stanford::Mods::Imprint do
           expect(imp.send(:date_is_century?, element)).to be_truthy
         end
       end
-      [ '18th century CE',
+      ['18th century CE',
         "before 5th century after"
       ].each do |example|
         it 'false when no century string to change' do

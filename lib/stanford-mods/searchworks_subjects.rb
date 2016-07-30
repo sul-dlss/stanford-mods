@@ -6,7 +6,6 @@ require 'mods'
 module Stanford
   module Mods
     class Record < ::Mods::Record
-
       # Values are the contents of:
       #   subject/geographic
       #   subject/hierarchicalGeographic
@@ -28,7 +27,7 @@ module Stanford
         trans_code_vals = @mods_ng_xml.subject.geographicCode.translated_value
         if trans_code_vals
           trans_code_vals.each { |val|
-            result << val if !result.include?(val)
+            result << val unless result.include?(val)
           }
         end
 
@@ -68,7 +67,7 @@ module Stanford
       # @return [Array<String>] values for the topic_search Solr field for this document or nil if none
       def topic_search
         @topic_search ||= begin
-          vals = self.term_values(:genre) || []
+          vals = term_values(:genre) || []
           vals.concat(subject_topics) if subject_topics
           vals.empty? ? nil : vals
         end
@@ -96,13 +95,13 @@ module Stanford
       # geographic_search values with trailing comma, semicolon, and backslash (and any preceding spaces) removed
       # @return [Array<String>] values for the geographic_facet Solr field for this document or nil if none
       def geographic_facet
-        geographic_search.map { |val| val.sub(/[\\,;]$/, '').strip } unless !geographic_search
+        geographic_search.map { |val| val.sub(/[\\,;]$/, '').strip } if geographic_search
       end
 
       # subject/temporal values with trailing comma, semicolon, and backslash (and any preceding spaces) removed
       # @return [Array<String>] values for the era_facet Solr field for this document or nil if none
       def era_facet
-        subject_temporal.map { |val| val.sub(/[\\,;]$/, '').strip } unless !subject_temporal
+        subject_temporal.map { |val| val.sub(/[\\,;]$/, '').strip } if subject_temporal
       end
 
       # Values are the contents of:
@@ -112,14 +111,14 @@ module Stanford
       # @return [Array<String>] values for the geographic_search Solr field for this document or nil if none
       def geographic_search
         @geographic_search ||= begin
-          result = self.sw_geographic_search
+          result = sw_geographic_search
 
           # TODO:  this should go into stanford-mods ... but then we have to set that gem up with a Logger
           # print a message for any unrecognized encodings
-          xvals = self.subject.geographicCode.translated_value
-          codes = self.term_values([:subject, :geographicCode])
+          xvals = subject.geographicCode.translated_value
+          codes = term_values([:subject, :geographicCode])
           if codes && codes.size > xvals.size
-            self.subject.geographicCode.each { |n|
+            subject.geographicCode.each { |n|
               if n.authority != 'marcgac' && n.authority != 'marccountry'
                 sw_logger.info("#{druid} has subject geographicCode element with untranslated encoding (#{n.authority}): #{n.to_xml}")
               end
@@ -153,12 +152,12 @@ module Stanford
       def subject_other_subvy_search
         @subject_other_subvy_search ||= begin
           vals = subject_temporal ? Array.new(subject_temporal) : []
-          gvals = self.term_values([:subject, :genre])
+          gvals = term_values([:subject, :genre])
           vals.concat(gvals) if gvals
 
           # print a message for any temporal encodings
-          self.subject.temporal.each { |n|
-            sw_logger.info("#{druid} has subject temporal element with untranslated encoding: #{n.to_xml}") if !n.encoding.empty?
+          subject.temporal.each { |n|
+            sw_logger.info("#{druid} has subject temporal element with untranslated encoding: #{n.to_xml}") unless n.encoding.empty?
           }
 
           vals.empty? ? nil : vals
@@ -180,29 +179,28 @@ module Stanford
 
       # convenience method for subject/name/namePart values (to avoid parsing the mods for the same thing multiple times)
       def subject_names
-        @subject_names ||= self.sw_subject_names
+        @subject_names ||= sw_subject_names
       end
 
       # convenience method for subject/occupation values (to avoid parsing the mods for the same thing multiple times)
       def subject_occupations
-        @subject_occupations ||= self.term_values([:subject, :occupation])
+        @subject_occupations ||= term_values([:subject, :occupation])
       end
 
       # convenience method for subject/temporal values (to avoid parsing the mods for the same thing multiple times)
       def subject_temporal
-        @subject_temporal ||= self.term_values([:subject, :temporal])
+        @subject_temporal ||= term_values([:subject, :temporal])
       end
 
       # convenience method for subject/titleInfo values (to avoid parsing the mods for the same thing multiple times)
       def subject_titles
-        @subject_titles ||= self.sw_subject_titles
+        @subject_titles ||= sw_subject_titles
       end
 
       # convenience method for subject/topic values (to avoid parsing the mods for the same thing multiple times)
       def subject_topics
-        @subject_topics ||= self.term_values([:subject, :topic])
+        @subject_topics ||= term_values([:subject, :topic])
       end
-
     end
   end
 end
