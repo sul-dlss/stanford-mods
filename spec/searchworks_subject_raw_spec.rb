@@ -1,6 +1,4 @@
 # encoding: UTF-8
-require 'spec_helper'
-
 describe "Searchworks mixin for Stanford::Mods::Record" do
   before(:all) do
     @smods_rec = Stanford::Mods::Record.new

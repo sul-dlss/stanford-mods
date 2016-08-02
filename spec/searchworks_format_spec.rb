@@ -1,6 +1,4 @@
 # encoding: UTF-8
-require 'spec_helper'
-
 describe "Format fields (searchworks.rb)" do
   before(:all) do
     @smods_rec = Stanford::Mods::Record.new

@@ -1,6 +1,4 @@
 # encoding: UTF-8
-require 'spec_helper'
-
 describe "Date methods (searchworks.rb)" do
   let(:ns_decl) { "xmlns='#{Mods::MODS_NS}'" }
   let(:smods_rec) { Stanford::Mods::Record.new }

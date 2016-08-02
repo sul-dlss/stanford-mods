@@ -1,6 +1,4 @@
 # encoding: UTF-8
-require 'spec_helper'
-
 describe "Searchworks mixin for Stanford::Mods::Record" do
   before(:all) do
     @smods_rec = Stanford::Mods::Record.new
@@ -13,9 +11,7 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
       @smods_rec.from_str m
       langs = @smods_rec.sw_language_facet
       expect(langs.size).to eq(3)
-      expect(langs).to include("Persian")
-      expect(langs).to include("Arabic")
-      expect(langs).to include("Dutch")
+      expect(langs).to include("Persian", "Arabic", "Dutch")
       expect(langs).not_to include("Dutch; Flemish")
     end
     it "should not have duplicates" do

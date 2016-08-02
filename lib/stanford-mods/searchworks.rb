@@ -75,8 +75,7 @@ module Stanford
 
       # @return [Array<String>] values for author_corp_display
       def sw_corporate_authors
-        val = @mods_ng_xml.plain_name.select { |n| n.type_at == 'corporate' }.map { |n| n.display_value_w_date }
-        val
+        @mods_ng_xml.plain_name.select { |n| n.type_at == 'corporate' }.map { |n| n.display_value_w_date }
       end
 
       # @return [Array<String>] values for author_meeting_display
@@ -123,36 +122,33 @@ module Stanford
       def sw_full_title
         outer_nodes = @mods_ng_xml.title_info
         outer_node = outer_nodes ? outer_nodes.first : nil
-        if outer_node
-          nonSort = outer_node.nonSort.text.strip.empty? ? nil : outer_node.nonSort.text.strip
-          title   = outer_node.title.text.strip.empty?   ? nil : outer_node.title.text.strip
-          preSubTitle = nonSort ? [nonSort, title].compact.join(" ") : title
-          preSubTitle.sub!(/:$/, '') if preSubTitle # remove trailing colon
+        return nil unless outer_node
+        nonSort = outer_node.nonSort.text.strip.empty? ? nil : outer_node.nonSort.text.strip
+        title   = outer_node.title.text.strip.empty?   ? nil : outer_node.title.text.strip
+        preSubTitle = nonSort ? [nonSort, title].compact.join(" ") : title
+        preSubTitle.sub!(/:$/, '') if preSubTitle # remove trailing colon
 
-          subTitle = outer_node.subTitle.text.strip
-          preParts = subTitle.empty? ? preSubTitle : preSubTitle + " : " + subTitle
-          preParts.sub!(/\.$/, '') if preParts # remove trailing period
+        subTitle = outer_node.subTitle.text.strip
+        preParts = subTitle.empty? ? preSubTitle : preSubTitle + " : " + subTitle
+        preParts.sub!(/\.$/, '') if preParts # remove trailing period
 
-          partName   = outer_node.partName.text.strip   unless outer_node.partName.text.strip.empty?
-          partNumber = outer_node.partNumber.text.strip unless outer_node.partNumber.text.strip.empty?
-          partNumber.sub!(/,$/, '') if partNumber # remove trailing comma
-          if partNumber && partName
-            parts = partNumber + ", " + partName
-          elsif partNumber
-            parts = partNumber
-          elsif partName
-            parts = partName
-          end
-          parts.sub!(/\.$/, '') if parts
-
-          result = parts ? preParts + ". " + parts : preParts
-          result += "." unless result =~ /[[:punct:]]$/
-          result.strip!
-          result = nil if result.empty?
-          result
-        else
-          nil
+        partName   = outer_node.partName.text.strip   unless outer_node.partName.text.strip.empty?
+        partNumber = outer_node.partNumber.text.strip unless outer_node.partNumber.text.strip.empty?
+        partNumber.sub!(/,$/, '') if partNumber # remove trailing comma
+        if partNumber && partName
+          parts = partNumber + ", " + partName
+        elsif partNumber
+          parts = partNumber
+        elsif partName
+          parts = partName
         end
+        parts.sub!(/\.$/, '') if parts
+
+        result = parts ? preParts + ". " + parts : preParts
+        result += "." unless result =~ /[[:punct:]]$/
+        result.strip!
+        result = nil if result.empty?
+        result
       end
 
       # like sw_full_title without trailing \,/;:.
@@ -160,12 +156,9 @@ module Stanford
       #    title_display = custom, removeTrailingPunct(245abdefghijklmnopqrstuvwxyz, [\\\\,/;:], ([A-Za-z]{4}|[0-9]{3}|\\)|\\,))
       # @return [String] value for title_display (like title_full_display without trailing punctuation)
       def sw_title_display
-        result = sw_full_title ? sw_full_title : nil
-        if result
-          result.sub!(/[\.,;:\/\\]+$/, '')
-          result.strip!
-        end
-        result
+        result = sw_full_title
+        return nil unless result
+        result.sub(/[\.,;:\/\\]+$/, '').strip
       end
 
       # this includes all titles except
@@ -218,50 +211,49 @@ module Stanford
       # @deprecated - kept for backwards compatibility but not part of SW UI redesign work Summer 2014
       # @deprecated:  this is no longer used in SW, Revs or Spotlight Jan 2016
       def format
-        val = []
         types = term_values(:typeOfResource)
-        if types
-          genres = term_values(:genre)
-          issuance = term_values([:origin_info, :issuance])
-          types.each do |type|
-            case type
-              when 'cartographic'
-                val << 'Map/Globe'
-              when 'mixed material'
-                val << 'Manuscript/Archive'
-              when 'moving image'
-                val << 'Video'
-              when 'notated music'
-                val << 'Music - Score'
-              when 'software, multimedia'
-                val << 'Computer File'
-              when 'sound recording-musical'
-                val << 'Music - Recording'
-              when 'sound recording-nonmusical', 'sound recording'
-                val << 'Sound Recording'
-              when 'still image'
-                val << 'Image'
-              when 'text'
-                val << 'Book' if issuance && issuance.include?('monographic')
-                book_genres = ['book chapter', 'Book chapter', 'Book Chapter',
-                  'issue brief', 'Issue brief', 'Issue Brief',
-                  'librettos', 'Librettos',
-                  'project report', 'Project report', 'Project Report',
-                  'technical report', 'Technical report', 'Technical Report',
-                  'working paper', 'Working paper', 'Working Paper']
-                val << 'Book' if genres && !(genres & book_genres).empty?
-                conf_pub = ['conference publication', 'Conference publication', 'Conference Publication']
-                val << 'Conference Proceedings' if genres && !(genres & conf_pub).empty?
-                val << 'Journal/Periodical' if issuance && issuance.include?('continuing')
-                article = ['article', 'Article']
-                val << 'Journal/Periodical' if genres && !(genres & article).empty?
-                stu_proj_rpt = ['student project report', 'Student project report', 'Student Project report', 'Student Project Report']
-                val << 'Other' if genres && !(genres & stu_proj_rpt).empty?
-                thesis = ['thesis', 'Thesis']
-                val << 'Thesis' if genres && !(genres & thesis).empty?
-              when 'three dimensional object'
-                val << 'Other'
-            end
+        return [] unless types
+        genres = term_values(:genre)
+        issuance = term_values([:origin_info, :issuance])
+        val = []
+        types.each do |type|
+          case type
+            when 'cartographic'
+              val << 'Map/Globe'
+            when 'mixed material'
+              val << 'Manuscript/Archive'
+            when 'moving image'
+              val << 'Video'
+            when 'notated music'
+              val << 'Music - Score'
+            when 'software, multimedia'
+              val << 'Computer File'
+            when 'sound recording-musical'
+              val << 'Music - Recording'
+            when 'sound recording-nonmusical', 'sound recording'
+              val << 'Sound Recording'
+            when 'still image'
+              val << 'Image'
+            when 'text'
+              val << 'Book' if issuance && issuance.include?('monographic')
+              book_genres = ['book chapter', 'Book chapter', 'Book Chapter',
+                'issue brief', 'Issue brief', 'Issue Brief',
+                'librettos', 'Librettos',
+                'project report', 'Project report', 'Project Report',
+                'technical report', 'Technical report', 'Technical Report',
+                'working paper', 'Working paper', 'Working Paper']
+              val << 'Book' if genres && !(genres & book_genres).empty?
+              conf_pub = ['conference publication', 'Conference publication', 'Conference Publication']
+              val << 'Conference Proceedings' if genres && !(genres & conf_pub).empty?
+              val << 'Journal/Periodical' if issuance && issuance.include?('continuing')
+              article = ['article', 'Article']
+              val << 'Journal/Periodical' if genres && !(genres & article).empty?
+              stu_proj_rpt = ['student project report', 'Student project report', 'Student Project report', 'Student Project Report']
+              val << 'Other' if genres && !(genres & stu_proj_rpt).empty?
+              thesis = ['thesis', 'Thesis']
+              val << 'Thesis' if genres && !(genres & thesis).empty?
+            when 'three dimensional object'
+              val << 'Other'
           end
         end
         val.uniq
@@ -273,8 +265,8 @@ module Stanford
       # resource type should be only Map and not include Software, multimedia.
       # @return <Array[String]> value in the SearchWorks controlled vocabulary
       def format_main
-        val = []
         types = term_values(:typeOfResource)
+        return [] unless types
         article_genres = ['article', 'Article',
           'book chapter', 'Book chapter', 'Book Chapter',
           'issue brief', 'Issue brief', 'Issue Brief',
@@ -288,71 +280,62 @@ module Stanford
           'librettos', 'Librettos',
           'thesis', 'Thesis'
         ]
-        if types
-          genres = term_values(:genre)
-          issuance = term_values([:origin_info, :issuance])
-          types.each do |type|
-            case type
-              when 'cartographic'
-                val << 'Map'
-                val.delete 'Software/Multimedia'
-              when 'mixed material'
-                val << 'Archive/Manuscript'
-              when 'moving image'
-                val << 'Video'
-              when 'notated music'
-                val << 'Music score'
-              when 'software, multimedia'
-                if genres && (genres.include?('dataset') || genres.include?('Dataset'))
-                  val << 'Dataset'
-                elsif !val.include?('Map')
-                  val << 'Software/Multimedia'
-                end
-              when 'sound recording-musical'
-                val << 'Music recording'
-              when 'sound recording-nonmusical', 'sound recording'
-                val << 'Sound recording'
-              when 'still image'
-                val << 'Image'
-              when 'text'
-                val << 'Book' if genres && !(genres & article_genres).empty?
-                val << 'Book' if issuance && issuance.include?('monographic')
-                val << 'Book' if genres && !(genres & book_genres).empty?
-                val << 'Journal/Periodical' if issuance && issuance.include?('continuing')
-                val << 'Archived website' if genres && genres.include?('archived website')
-              when 'three dimensional object'
-                val << 'Object'
-            end
+        val = []
+        genres = term_values(:genre)
+        issuance = term_values([:origin_info, :issuance])
+        types.each do |type|
+          case type
+            when 'cartographic'
+              val << 'Map'
+              val.delete 'Software/Multimedia'
+            when 'mixed material'
+              val << 'Archive/Manuscript'
+            when 'moving image'
+              val << 'Video'
+            when 'notated music'
+              val << 'Music score'
+            when 'software, multimedia'
+              if genres && (genres.include?('dataset') || genres.include?('Dataset'))
+                val << 'Dataset'
+              elsif !val.include?('Map')
+                val << 'Software/Multimedia'
+              end
+            when 'sound recording-musical'
+              val << 'Music recording'
+            when 'sound recording-nonmusical', 'sound recording'
+              val << 'Sound recording'
+            when 'still image'
+              val << 'Image'
+            when 'text'
+              val << 'Book' if genres && !(genres & article_genres).empty?
+              val << 'Book' if issuance && issuance.include?('monographic')
+              val << 'Book' if genres && !(genres & book_genres).empty?
+              val << 'Journal/Periodical' if issuance && issuance.include?('continuing')
+              val << 'Archived website' if genres && genres.include?('archived website')
+            when 'three dimensional object'
+              val << 'Object'
           end
         end
         val.uniq
       end
 
-      # return values for the genre facet in SearchWorks
       # https://github.com/sul-dlss/stanford-mods/issues/66
       # Limit genre values to Government document, Conference proceedings,
       # Technical report and Thesis/Dissertation
-      # @return <Array[String]>
+      # @return <Array[String]> values for the genre facet in SearchWorks
       def sw_genre
-        val = []
         genres = term_values(:genre)
+        return [] unless genres
         types = term_values(:typeOfResource)
-        if genres
-          if genres.include?('thesis') || genres.include?('Thesis')
-            val << 'Thesis/Dissertation'
-          end
+        val = []
+        val << 'Thesis/Dissertation' if genres.include?('thesis') || genres.include?('Thesis')
+        if genres && types && types.include?('text')
           conf_pub = ['conference publication', 'Conference publication', 'Conference Publication']
-          unless (genres & conf_pub).empty?
-            val << 'Conference proceedings' if types && types.include?('text')
-          end
-          gov_pub = ['government publication', 'Government publication', 'Government Publication']
-          unless (genres & gov_pub).empty?
-            val << 'Government document' if types && types.include?('text')
-          end
+          gov_pub  = ['government publication', 'Government publication', 'Government Publication']
           tech_rpt = ['technical report', 'Technical report', 'Technical Report']
-          unless (genres & tech_rpt).empty?
-            val << 'Technical report' if types && types.include?('text')
-          end
+          val << 'Conference proceedings' unless (genres & conf_pub).empty?
+          val << 'Government document' unless (genres & gov_pub).empty?
+          val << 'Technical report' unless (genres & tech_rpt).empty?
         end
         val.uniq
       end
@@ -360,18 +343,14 @@ module Stanford
       # @return [String] value with the numeric catkey in it, or nil if none exists
       def catkey
         catkey = term_values([:record_info, :recordIdentifier])
-        if catkey && !catkey.empty?
-          return catkey.first.tr('a', '') # ensure catkey is numeric only
-        end
-        nil
+        return nil unless catkey && !catkey.empty?
+        catkey.first.tr('a', '') # ensure catkey is numeric only
       end
 
-      def druid=(new_druid)
-        @druid = new_druid
-      end
+      attr_writer :druid
 
       def druid
-        @druid ? @druid : 'Unknown item'
+        @druid || 'Unknown item'
       end
     end # class Record
   end # Module Mods

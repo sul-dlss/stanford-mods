@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe "Physical Location for series, box, folder" do
   before(:all) do
     @smods_rec = Stanford::Mods::Record.new

@@ -1,6 +1,4 @@
 # encoding: utf-8
-require 'spec_helper'
-
 describe Stanford::Mods::Coordinate do
   describe '#valid' do
     it 'is valid for well-formed coordinates' do

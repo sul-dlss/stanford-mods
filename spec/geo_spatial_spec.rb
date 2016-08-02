@@ -1,6 +1,4 @@
 # encoding: utf-8
-require 'spec_helper'
-
 describe "Cartographic coordinates" do
   let(:smods_rec) { Stanford::Mods::Record.new }
   let(:no_coord)  do
