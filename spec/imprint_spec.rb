@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 def stanford_mods_imprint(smods_rec)
   Stanford::Mods::Imprint.new(smods_rec.origin_info)
 end

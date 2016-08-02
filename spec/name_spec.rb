@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe "name/author concepts" do
   let(:smods_rec) { Stanford::Mods::Record.new }
   let(:mods_start) { "<mods xmlns=\"#{Mods::MODS_NS}\">" }

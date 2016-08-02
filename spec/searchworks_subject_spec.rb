@@ -1,6 +1,4 @@
 # encoding: UTF-8
-require 'spec_helper'
-
 describe "Subject fields (searchworks.rb)" do
   before(:all) do
     @ns_decl = "xmlns='#{Mods::MODS_NS}'"

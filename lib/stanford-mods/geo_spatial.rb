@@ -13,7 +13,6 @@ module Stanford
       def coordinates_as_envelope
         coordinates.map do |n|
           c = Stanford::Mods::Coordinate.new(n)
-
           c.as_envelope if c.valid?
         end.compact
       end
@@ -21,7 +20,6 @@ module Stanford
       def coordinates_as_bbox
         coordinates.map do |n|
           c = Stanford::Mods::Coordinate.new(n)
-
           c.as_bbox if c.valid?
         end.compact
       end
