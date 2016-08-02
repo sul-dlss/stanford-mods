@@ -329,17 +329,13 @@ module Stanford
         types = term_values(:typeOfResource)
         val = []
         val << 'Thesis/Dissertation' if genres.include?('thesis') || genres.include?('Thesis')
-        conf_pub = ['conference publication', 'Conference publication', 'Conference Publication']
-        unless (genres & conf_pub).empty?
-          val << 'Conference proceedings' if types && types.include?('text')
-        end
-        gov_pub = ['government publication', 'Government publication', 'Government Publication']
-        unless (genres & gov_pub).empty?
-          val << 'Government document' if types && types.include?('text')
-        end
-        tech_rpt = ['technical report', 'Technical report', 'Technical Report']
-        unless (genres & tech_rpt).empty?
-          val << 'Technical report' if types && types.include?('text')
+        if genres && types && types.include?('text')
+          conf_pub = ['conference publication', 'Conference publication', 'Conference Publication']
+          gov_pub  = ['government publication', 'Government publication', 'Government Publication']
+          tech_rpt = ['technical report', 'Technical report', 'Technical Report']
+          val << 'Conference proceedings' unless (genres & conf_pub).empty?
+          val << 'Government document' unless (genres & gov_pub).empty?
+          val << 'Technical report' unless (genres & tech_rpt).empty?
         end
         val.uniq
       end
