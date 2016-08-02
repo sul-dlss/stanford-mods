@@ -1,5 +1,5 @@
 # encoding: UTF-8
-require 'logger'
+# require 'logger'
 require 'mods'
 
 module Stanford
