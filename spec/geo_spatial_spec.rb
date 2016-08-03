@@ -25,7 +25,6 @@ describe "Cartographic coordinates" do
       </mods>
     EOF
   end
-
   let(:with_bad_data) do
     <<-EOF
       <mods xmlns="#{Mods::MODS_NS}">
@@ -80,3 +79,42 @@ describe "Cartographic coordinates" do
     end
   end
 end # describe Cartographic coordinates
+
+describe '#geo_extension_as_envelope' do
+  let(:modsbody) { '' }
+  let(:mods) do
+    rec = Stanford::Mods::Record.new
+    rec.from_str %(<mods xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.loc.gov/mods/v3" version="3.5"
+      xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-5.xsd">#{modsbody}</mods>)
+    rec
+  end
+
+  it 'without data, returns emtpy array' do
+    expect(mods.geo_extensions_as_envelope).to eq []
+  end
+
+  describe 'with data' do
+    let(:modsbody) do
+      <<-EOF
+        <extension displayLabel="geo">
+          <rdf:RDF xmlns:gml="http://www.opengis.net/gml/3.2/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+            <rdf:Description rdf:about="http://purl.stanford.edu/cw222pt0426">
+            <dc:format>image/jpeg</dc:format>
+            <dc:type>Image</dc:type>
+            <gml:boundedBy>
+              <gml:Envelope>
+                <gml:lowerCorner>-122.191292 37.4063388</gml:lowerCorner>
+                <gml:upperCorner>-122.149475 37.4435369</gml:upperCorner>
+              </gml:Envelope>
+            </gml:boundedBy>
+            </rdf:Description>
+          </rdf:RDF>
+        </extension>
+      EOF
+    end
+    it 'extract envelope strings' do
+      expect(mods.geo_extensions_as_envelope).to eq ["ENVELOPE(-122.191292, -122.149475, 37.4435369, 37.4063388)"]
+    end
+  end
+end
