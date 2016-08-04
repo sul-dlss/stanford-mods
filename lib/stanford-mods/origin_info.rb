@@ -1,4 +1,3 @@
-require 'logger'
 require 'mods'
 
 # Parsing MODS /originInfo for Publication/Imprint data:
@@ -116,7 +115,7 @@ module Stanford
       #   should be excluded; false approximate dates should be included
       # @return [Array<Nokogiri::XML::Element>]
       def date_created_elements(ignore_approximate = false)
-        date_created_nodeset = @mods_ng_xml.origin_info.dateCreated
+        date_created_nodeset = mods_ng_xml.origin_info.dateCreated
         return self.class.remove_approximate(date_created_nodeset) if ignore_approximate
         date_created_nodeset.to_a
       end
@@ -126,7 +125,7 @@ module Stanford
       #   should be excluded; false approximate dates should be included
       # @return [Array<Nokogiri::XML::Element>]
       def date_issued_elements(ignore_approximate = false)
-        date_issued_nodeset = @mods_ng_xml.origin_info.dateIssued
+        date_issued_nodeset = mods_ng_xml.origin_info.dateIssued
         return self.class.remove_approximate(date_issued_nodeset) if ignore_approximate
         date_issued_nodeset.to_a
       end
@@ -187,7 +186,7 @@ module Stanford
         result = send(method_sym, date_issued_elements(ignore_approximate))
         result ||= send(method_sym, date_created_elements(ignore_approximate))
         # dateCaptured for web archive seed records
-        result ||= send(method_sym, @mods_ng_xml.origin_info.dateCaptured.to_a)
+        result ||= send(method_sym, mods_ng_xml.origin_info.dateCaptured.to_a)
         result
       end
 

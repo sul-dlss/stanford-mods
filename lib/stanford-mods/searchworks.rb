@@ -8,10 +8,22 @@ require 'mods'
 module Stanford
   module Mods
     class Record < ::Mods::Record
+      attr_writer :druid
+      attr_writer :logger
+
+      def druid
+        @druid || 'Unknown item'
+      end
+
+      def logger
+        @logger ||= Logger.new(STDOUT)
+      end
+      alias sw_logger logger
+
       # include langagues known to SearchWorks; try to error correct when possible (e.g. when ISO-639 disagrees with MARC standard)
       def sw_language_facet
         result = []
-        @mods_ng_xml.language.each { |n|
+        mods_ng_xml.language.each { |n|
           # get languageTerm codes and add their translations to the result
           n.code_term.each { |ct|
             if ct.authority =~ /^iso639/
@@ -70,17 +82,17 @@ module Stanford
       # return the display_value_w_date for all <mods><name> elements that do not have type='personal'
       # @return [Array<String>] values for author_other_facet
       def sw_impersonal_authors
-        @mods_ng_xml.plain_name.select { |n| n.type_at != 'personal' }.map { |n| n.display_value_w_date }
+        mods_ng_xml.plain_name.select { |n| n.type_at != 'personal' }.map { |n| n.display_value_w_date }
       end
 
       # @return [Array<String>] values for author_corp_display
       def sw_corporate_authors
-        @mods_ng_xml.plain_name.select { |n| n.type_at == 'corporate' }.map { |n| n.display_value_w_date }
+        mods_ng_xml.plain_name.select { |n| n.type_at == 'corporate' }.map { |n| n.display_value_w_date }
       end
 
       # @return [Array<String>] values for author_meeting_display
       def sw_meeting_authors
-        @mods_ng_xml.plain_name.select { |n| n.type_at == 'conference' }.map { |n| n.display_value_w_date }
+        mods_ng_xml.plain_name.select { |n| n.type_at == 'conference' }.map { |n| n.display_value_w_date }
       end
 
       # Returns a sortable version of the main_author:
@@ -120,7 +132,7 @@ module Stanford
 
       # @return [String] value for title_245_search, title_full_display
       def sw_full_title
-        outer_nodes = @mods_ng_xml.title_info
+        outer_nodes = mods_ng_xml.title_info
         outer_node = outer_nodes ? outer_nodes.first : nil
         return nil unless outer_node
         nonSort = outer_node.nonSort.text.strip.empty? ? nil : outer_node.nonSort.text.strip
@@ -171,7 +183,7 @@ module Stanford
       # @return [String] value for title_sort field
       def sw_sort_title
         # get nonSort piece
-        outer_nodes = @mods_ng_xml.title_info
+        outer_nodes = mods_ng_xml.title_info
         outer_node = outer_nodes ? outer_nodes.first : nil
         if outer_node
           nonSort = outer_node.nonSort.text.strip.empty? ? nil : outer_node.nonSort.text.strip
@@ -200,10 +212,6 @@ module Stanford
       # ---- PUBLICATION (place, year) ----
       # see origin_info.rb  (as all this information comes from top level originInfo element)
       # ---- end PUBLICATION (place, year) ----
-
-      def sw_logger
-        @logger ||= Logger.new(STDOUT)
-      end
 
       # select one or more format values from the controlled vocabulary here:
       #   http://searchworks-solr-lb.stanford.edu:8983/solr/select?facet.field=format&rows=0&facet.sort=index
@@ -345,12 +353,6 @@ module Stanford
         catkey = term_values([:record_info, :recordIdentifier])
         return nil unless catkey && !catkey.empty?
         catkey.first.tr('a', '') # ensure catkey is numeric only
-      end
-
-      attr_writer :druid
-
-      def druid
-        @druid || 'Unknown item'
       end
     end # class Record
   end # Module Mods

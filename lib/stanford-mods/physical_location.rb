@@ -1,10 +1,12 @@
-require 'logger'
 require 'mods'
 
-# Parsing MODS //location/physicalLocation for series, box, and folder for Special Collections
-# This is not used by Searchworks, otherwise it would have been in the searchworks.rb file
 module Stanford
   module Mods
+    # Parsing MODS //location/physicalLocation for series, box, and folder for Special Collections.
+    # This is not used by Searchworks, otherwise it would have been in the searchworks.rb file.
+    # Note: mods_ng_xml_location.physicalLocation should find top level and relatedItem.
+    # Each method here expects to find at most ONE matching element.  Subsequent potential matches
+    # are ignored.
     class Record < ::Mods::Record
       # return box number (note: single valued and might be something like 35A)
       #   data in location/physicalLocation or in relatedItem/location/physicalLocation
