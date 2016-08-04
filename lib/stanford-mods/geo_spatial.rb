@@ -9,7 +9,7 @@ module Stanford
 
       # @return [Array{String}] subject cartographic coordinates values
       def coordinates
-        Array(@mods_ng_xml.subject.cartographics.coordinates).map(&:text)
+        Array(mods_ng_xml.subject.cartographics.coordinates).map(&:text)
       end
 
       # @return [Array{String}] values suitable for solr SRPT fields, like "ENVELOPE(-16.0, 28.0, 13.0, -15.0)"
@@ -17,7 +17,7 @@ module Stanford
       #  <gml:lowerCorner>-122.191292 37.4063388</gml:lowerCorner>
       #  <gml:upperCorner>-122.149475 37.4435369</gml:upperCorner>
       def geo_extensions_as_envelope
-        @mods_ng_xml.extension
+        mods_ng_xml.extension
                     .xpath('//rdf:RDF/rdf:Description/gml:boundedBy/gml:Envelope',
                       'gml' => GMLNS,
                       'rdf' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
@@ -26,8 +26,8 @@ module Stanford
                       lowers = v.xpath('gml:lowerCorner', 'gml' => GMLNS).text.split
                       "ENVELOPE(#{lowers[0]}, #{uppers[0]}, #{uppers[1]}, #{lowers[1]})"
                     end
-      rescue RuntimeError
-        # TODO: logging
+      rescue RuntimeError => e
+        logger.warn "failure parsing <extension> element: #{e.message}"
         []
       end
 

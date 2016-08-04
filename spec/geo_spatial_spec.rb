@@ -38,6 +38,10 @@ describe "Cartographic coordinates" do
     EOF
   end
 
+  it 'has access to logger' do
+    expect(smods_rec.logger).to be_a Logger
+  end
+
   context "coordinates" do
     it "returns empty array if no coordinates in the mods" do
       smods_rec.from_str(no_coord)
@@ -113,6 +117,13 @@ describe '#geo_extension_as_envelope' do
         </extension>
       EOF
     end
+
+    it 'logs error and returns emtpy array' do
+      allow(mods.mods_ng_xml).to receive(:extension).and_raise(RuntimeError)
+      expect(mods.logger).to receive(:warn).with(/failure parsing.*RuntimeError/)
+      expect(mods.geo_extensions_as_envelope).to eq []
+    end
+
     it 'extract envelope strings' do
       expect(mods.geo_extensions_as_envelope).to eq ["ENVELOPE(-122.191292, -122.149475, 37.4435369, 37.4063388)"]
     end
