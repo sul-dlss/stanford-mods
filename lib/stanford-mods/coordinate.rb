@@ -43,18 +43,14 @@ module Stanford
       def bounds
         @bounds ||= begin
           matches = cleaner_coordinate(value).match %r{\A(?<lat>[EW].+-+.+)\s*/\s*(?<lng>[NS].+-+.+)\Z}
-
-          if matches
-            min_x, max_x = matches['lat'].split(/-+/).map { |x| coord_to_decimal(x) }.minmax
-            min_y, max_y = matches['lng'].split(/-+/).map { |y| coord_to_decimal(y) }.minmax
-
-            { min_x: min_x, min_y: min_y, max_x: max_x, max_y: max_y }
-          else
-            {}
-          end
+          return {} unless matches
+          min_x, max_x = matches['lat'].split(/-+/).map { |x| coord_to_decimal(x) }.minmax
+          min_y, max_y = matches['lng'].split(/-+/).map { |y| coord_to_decimal(y) }.minmax
+          { min_x: min_x, min_y: min_y, max_x: max_x, max_y: max_y }
         end
       end
 
+      # @deprecated see GeoUtils
       def coord
         cleaner_coordinate(value)
       end
