@@ -8,78 +8,56 @@ module Stanford
     # Each method here expects to find at most ONE matching element.  Subsequent potential matches
     # are ignored.
     class Record < ::Mods::Record
-      # return box number (note: single valued and might be something like 35A)
-      #   data in location/physicalLocation or in relatedItem/location/physicalLocation
-      #   so use _location to get the data from either one of them
-      # TODO:  should it be hierarchical series/box/folder?
+      # data in location/physicalLocation or in relatedItem/location/physicalLocation
+      # so use _location to get the data from either one of them
+      # @return [String] box number (note: single valued and might be something like 35A)
+      # @todo should it be hierarchical series/box/folder?
       def box
-        #   _location.physicalLocation should find top level and relatedItem
-        box_num = @mods_ng_xml._location.physicalLocation.map do |node|
-          val = node.text
-          # note that this will also find Flatbox or Flat-box
-          match_data = val.match(/Box ?:? ?([^,|(Folder)]+)/i)
-          match_data[1].strip if match_data.present?
-        end.compact
-
-        # There should only be one box
-        box_num.first
+        mods_ng_xml._location.physicalLocation.each do |node|
+          match_data = node.text.match(/Box ?:? ?([^,|(Folder)]+)/i) # note that this will also find Flatbox or Flat-box
+          return match_data[1].strip if match_data.present?
+        end
+        nil
       end
 
-      # returns folder number (note: single valued)
-      #   data in location/physicalLocation or in relatedItem/location/physicalLocation
-      #   so use _location to get the data from either one of them
-      # TODO:  should it be hierarchical series/box/folder?
+      # data in location/physicalLocation or in relatedItem/location/physicalLocation
+      # so use _location to get the data from either one of them
+      # @return [String] folder number (note: single valued)
+      # @todo should it be hierarchical series/box/folder?
       def folder
-        #   _location.physicalLocation should find top level and relatedItem
-        folder_num = @mods_ng_xml._location.physicalLocation.map do |node|
+        mods_ng_xml._location.physicalLocation.each do |node|
           val = node.text
-
-          match_data = if val =~ /\|/
-                         # we assume the data is pipe-delimited, and may contain commas within values
-                         val.match(/Folder ?:? ?([^|]+)/)
-                       else
-                         # the data should be comma-delimited, and may not contain commas within values
-                         val.match(/Folder ?:? ?([^,]+)/)
-                       end
-
-          match_data[1].strip if match_data.present?
-        end.compact
-
-        # There should be one folder
-        folder_num.first
+          match_data = val =~ /\|/ ?
+                       val.match(/Folder ?:? ?([^|]+)/) : # expect pipe-delimited, may contain commas within values
+                       val.match(/Folder ?:? ?([^,]+)/)   # expect comma-delimited, may NOT contain commas within values
+          return match_data[1].strip if match_data.present?
+        end
+        nil
       end
 
-      # return entire contents of physicalLocation as a string (note: single valued)
-      #   but only if it has series, accession, box or folder data
-      #   data in location/physicalLocation or in relatedItem/location/physicalLocation
-      #   so use _location to get the data from either one of them
-      # TODO:  should it be hierarchical series/box/folder?
-      # NOTE: there is a "physicalLocation" and a "location" method defined in the mods gem, so we cannot use these names to avoid conflicts
+      # but only if it has series, accession, box or folder data
+      # data in location/physicalLocation or in relatedItem/location/physicalLocation
+      # so use _location to get the data from either one of them
+      # @return [String] entire contents of physicalLocation as a string (note: single valued)
+      # @note there is a "physicalLocation" and a "location" method defined in the mods gem, so we cannot use these names to avoid conflicts
+      # @todo should it be hierarchical series/box/folder?
       def physical_location_str
-        #   _location.physicalLocation should find top level and relatedItem
-        loc = @mods_ng_xml._location.physicalLocation.map do |node|
-          node.text if node.text =~ /.*(Series)|(Accession)|(Folder)|(Box).*/i
-        end.compact
-
-        # There should only be one location
-        loc.first
+        mods_ng_xml._location.physicalLocation.map(&:text).find do |text|
+          text =~ /.*(Series)|(Accession)|(Folder)|(Box).*/i
+        end
       end
 
-      # return series/accession 'number' (note: single valued)
-      #   data in location/physicalLocation or in relatedItem/location/physicalLocation
-      #   so use _location to get the data from either one of them
-      # TODO: should it be hierarchical series/box/folder?
+      # data in location/physicalLocation or in relatedItem/location/physicalLocation
+      # so use _location to get the data from either one of them
+      # @return [String] series/accession 'number' (note: single valued)
+      # @todo should it be hierarchical series/box/folder?
       def series
-        #   _location.physicalLocation should find top level and relatedItem
-        series_num = @mods_ng_xml._location.physicalLocation.map do |node|
-          val = node.text
+        mods_ng_xml._location.physicalLocation.each do |node|
           # feigenbaum uses 'Accession'
-          match_data = val.match(/(?:(?:Series)|(?:Accession)):? ([^,|]+)/i)
-          match_data[1].strip if match_data.present?
-        end.compact
-
-        # There should be only one series
-        series_num.first
+          match_data = node.text.match(/(?:(?:Series)|(?:Accession)):? ([^,|]+)/i)
+          return match_data[1].strip if match_data.present?
+        end
+        nil
       end
     end # class Record
   end # Module Mods

@@ -18,14 +18,15 @@ module Stanford
       #  <gml:upperCorner>-122.149475 37.4435369</gml:upperCorner>
       def geo_extensions_as_envelope
         mods_ng_xml.extension
-                    .xpath('//rdf:RDF/rdf:Description/gml:boundedBy/gml:Envelope',
-                      'gml' => GMLNS,
-                      'rdf' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
-                    ).map do |v|
-                      uppers = v.xpath('gml:upperCorner', 'gml' => GMLNS).text.split
-                      lowers = v.xpath('gml:lowerCorner', 'gml' => GMLNS).text.split
-                      "ENVELOPE(#{lowers[0]}, #{uppers[0]}, #{uppers[1]}, #{lowers[1]})"
-                    end
+                   .xpath(
+                     '//rdf:RDF/rdf:Description/gml:boundedBy/gml:Envelope',
+                     'gml' => GMLNS,
+                     'rdf' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+                   ).map do |v|
+                     uppers = v.xpath('gml:upperCorner', 'gml' => GMLNS).text.split
+                     lowers = v.xpath('gml:lowerCorner', 'gml' => GMLNS).text.split
+                     "ENVELOPE(#{lowers[0]}, #{uppers[0]}, #{uppers[1]}, #{lowers[1]})"
+                   end
       rescue RuntimeError => e
         logger.warn "failure parsing <extension> element: #{e.message}"
         []
@@ -47,6 +48,6 @@ module Stanford
       end
 
       alias point_bbox coordinates_as_bbox
-    end # class Record
-  end # Module Mods
-end # Module Stanford
+    end
+  end
+end

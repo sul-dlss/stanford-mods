@@ -13,10 +13,9 @@ module Stanford
       # return pub year as an Integer
       # prefer dateIssued (any) before dateCreated (any) before dateCaptured (any)
       #  look for a keyDate and use it if there is one;  otherwise pick earliest date
-      # @param [Boolean] ignore_approximate true if approximate dates (per qualifier attribute)
-      #   should be ignored; false if approximate dates should be included
+      # @param [Boolean] ignore_approximate true if approximate dates (per qualifier attribute) should be ignored; false if approximate dates should be included
       # @return [Integer] publication year as an Integer
-      #   note that for sorting  5 B.C. => -5;  666 B.C. => -666
+      # @note for sorting:  5 B.C. => -5;  666 B.C. => -666
       def pub_year_int(ignore_approximate = false)
         single_pub_year(ignore_approximate, :year_int)
       end
@@ -24,11 +23,10 @@ module Stanford
       # return a single string intended for lexical sorting for pub date
       # prefer dateIssued (any) before dateCreated (any) before dateCaptured (any)
       #  look for a keyDate and use it if there is one;  otherwise pick earliest date
-      # @param [Boolean] ignore_approximate true if approximate dates (per qualifier attribute)
-      #   should be ignored; false if approximate dates should be included
+      # @param [Boolean] ignore_approximate true if approximate dates (per qualifier attribute) should be ignored; false if approximate dates should be included
       # @return [String] single String containing publication year for lexical sorting
-      #   note that for string sorting  5 B.C. = -5  => -995;  6 B.C. => -994  so 6 B.C. sorts before 5 B.C.
-      # @deprecated  use pub_year_int
+      # @note for string sorting  5 B.C. = -5  => -995;  6 B.C. => -994, so 6 B.C. sorts before 5 B.C.
+      # @deprecated use pub_year_int
       def pub_year_sort_str(ignore_approximate = false)
         single_pub_year(ignore_approximate, :year_sort_str)
       end
@@ -186,8 +184,7 @@ module Stanford
         result = send(method_sym, date_issued_elements(ignore_approximate))
         result ||= send(method_sym, date_created_elements(ignore_approximate))
         # dateCaptured for web archive seed records
-        result ||= send(method_sym, mods_ng_xml.origin_info.dateCaptured.to_a)
-        result
+        result || send(method_sym, mods_ng_xml.origin_info.dateCaptured.to_a)
       end
 
       # given the passed date elements, look for a single keyDate and use it if there is one;
@@ -210,10 +207,9 @@ module Stanford
         # get earliest parseable year from the passed date elements
         # @param [Array<Nokogiri::XML::Element>] date_el_array the elements from which to select a pub date
         # @param [Symbol] method_sym method name in DateParsing, as a symbol
-        # @return two values:
-        #   the first is either:  the lexically sortable String value of the earliest date or the Integer value of same,
-        #     depending on the method_sym passed in
-        #   the second is the original String value of the chosen element
+        # @return [Array<String,Integer>] two values: earliest date and the original element string
+        #   - first is earliest date either as lexically sortable String value or the Integer, depending on method_sym
+        #   - second is the original String value of the chosen element
         def earliest_year(date_el_array, method_sym)
           poss_results = {}
           date_el_array.each { |el|
@@ -228,8 +224,7 @@ module Stanford
 # ----   old date parsing methods used downstream of gem;  will be deprecated/replaced with new date parsing methods
 
       def place
-        vals = term_values([:origin_info, :place, :placeTerm])
-        vals
+        term_values([:origin_info, :place, :placeTerm])
       end
 
       # Values for the pub date facet. This is less strict than the 4 year date requirements for pub_date
@@ -237,28 +232,18 @@ module Stanford
       #   Spotlight:  pub_date field should be replaced by pub_year_w_approx_isi and pub_year_no_approx_isi
       #   SearchWorks:  pub_date field used for display in search results and show view; for sorting nearby-on-shelf
       #      these could be done with more approp fields/methods (pub_year_int for sorting;  new pub year methods to populate field)
-      # TODO:  prob should deprecate this in favor of pub_year_display_str;
+      # TODO: prob should deprecate this in favor of pub_year_display_str;
       #    need head-to-head testing with pub_year_display_str
-      # @return <Array[String]> with values for the pub date facet
+      # @return [String] value for the pub date facet
       def pub_date_facet
-        if pub_date
-          if pub_date.start_with?('-')
-            return (pub_date.to_i + 1000).to_s + ' B.C.'
-          end
-          if pub_date.include? '--'
-            cent = pub_date[0, 2].to_i
-            cent += 1
-            cent = cent.to_s + 'th century'
-            return cent
-          else
-            return pub_date
-          end
-        end
-        nil
+        return nil unless pub_date
+        return "#{pub_date.to_i + 1000} B.C." if pub_date.start_with?('-')
+        return pub_date unless pub_date.include? '--'
+        "#{pub_date[0, 2].to_i + 1}th century"
       end
 
       # creates a date suitable for sorting. Guarnteed to be 4 digits or nil
-      # @deprecated:  use pub_year_int, or pub_year_sort_str if you must have a string (why?)
+      # @deprecated use pub_year_int, or pub_year_sort_str if you must have a string (why?)
       def pub_date_sort
         if pub_date
           pd = pub_date
@@ -272,14 +257,14 @@ module Stanford
       # For the date display only, the first place to look is in the dates without encoding=marc array.
       # If no such dates, select the first date in the dates_marc_encoding array.  Otherwise return nil
       # @return [String] value for the pub_date_display Solr field for this document or nil if none
-      # @deprecated:  DO NOT USE: this is no longer used in SW, Revs or Spotlight Jan 2016
+      # @deprecated DO NOT USE: this is no longer used in SW, Revs or Spotlight Jan 2016
       def pub_date_display
         return dates_no_marc_encoding.first unless dates_no_marc_encoding.empty?
         return dates_marc_encoding.first unless dates_marc_encoding.empty?
         nil
       end
 
-# ----   old date parsing protected methods will be deprecated/replaced with new date parsing methods (see also DateParsing)
+# old date parsing protected methods to be deprecated/replaced with new methods (see also DateParsing)
 
     protected
 
@@ -292,30 +277,23 @@ module Stanford
           return @pub_year
         end
 
-        dates = pub_dates
-        if dates
-          pruned_dates = []
-          dates.each do |f_date|
-            # remove ? and []
-            if f_date.length == 4 && f_date.end_with?('?')
-              pruned_dates << f_date.tr('?', '0')
-            else
-              pruned_dates << f_date.delete('?[]')
-            end
+        dates = pub_dates.map do |f_date|
+          # remove ? and []
+          if f_date.length == 4 && f_date.end_with?('?')
+            f_date.tr('?', '0')
+          else
+            f_date.delete('?[]')
           end
+        end
+
+        if dates
           # try to find a date starting with the most normal date formats and progressing to more wonky ones
-          @pub_year = get_plain_four_digit_year pruned_dates
-          return @pub_year if @pub_year
-          # Check for years in u notation, e.g., 198u
-          @pub_year = get_u_year pruned_dates
-          return @pub_year if @pub_year
-          @pub_year = get_double_digit_century pruned_dates
-          return @pub_year if @pub_year
-          @pub_year = get_bc_year pruned_dates
-          return @pub_year if @pub_year
-          @pub_year = get_three_digit_year pruned_dates
-          return @pub_year if @pub_year
-          @pub_year = get_single_digit_century pruned_dates
+          @pub_year = get_plain_four_digit_year(dates) ||
+                      get_u_year(dates)                || # Check for years in u notation, e.g., 198u
+                      get_double_digit_century(dates)  ||
+                      get_bc_year(dates)               ||
+                      get_three_digit_year(dates)      ||
+                      get_single_digit_century(dates)
           return @pub_year if @pub_year
         end
         @pub_year = ''
@@ -384,7 +362,6 @@ module Stanford
           matches = f_date.scan(/\d{4}/)
           if matches.length == 1
             @pub_year = matches.first
-            return matches.first
           else
             # when there are multiple matches, check for ones with CE after them
             matches.each do |match|
@@ -396,8 +373,8 @@ module Stanford
                 return match
               end
             end
-            return matches.first
           end
+          return matches.first
         end
         nil
       end
