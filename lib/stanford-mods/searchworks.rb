@@ -127,12 +127,16 @@ module Stanford
 
       # @return [String] value for title_245a_search field
       def sw_short_title
-        short_titles ? short_titles.first : nil
+        short_titles ? short_titles.compact.reject(&:empty?).first : nil
       end
 
+      # @return [Nokogiri::XML::NodeSet] title_info nodes, rejecting ones that just have blank text values
+      def outer_nodes
+        mods_ng_xml.title_info.reject {|node| node.text.strip.empty?}
+      end
+      
       # @return [String] value for title_245_search, title_full_display
       def sw_full_title
-        outer_nodes = mods_ng_xml.title_info
         outer_node = outer_nodes ? outer_nodes.first : nil
         return nil unless outer_node
         nonSort = outer_node.nonSort.text.strip.empty? ? nil : outer_node.nonSort.text.strip
@@ -157,6 +161,7 @@ module Stanford
         parts.sub!(/\.$/, '') if parts
 
         result = parts ? preParts + ". " + parts : preParts
+        return nil unless result
         result += "." unless result =~ /[[:punct:]]$/
         result.strip!
         result = nil if result.empty?
