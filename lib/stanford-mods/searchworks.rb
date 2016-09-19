@@ -37,9 +37,8 @@ module Stanford
                     result << SEARCHWORKS_LANGUAGES[v.strip]
                   end
                 end
-              rescue
-                # TODO:  this should be written to a logger
-                p "Couldn't find english name for #{ct.text}"
+              rescue RuntimeError
+                logger.warn "Couldn't find english name for #{ct.text}"
               end
             else
               vals = ct.text.split(/[,|\ ]/).reject { |x| x.strip.empty? }

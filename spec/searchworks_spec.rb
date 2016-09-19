@@ -14,6 +14,28 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
       expect(langs).to include("Persian", "Arabic", "Dutch")
       expect(langs).not_to include("Dutch; Flemish")
     end
+    it "should deal with a missing authority by ignoring it and still looking up the language code" do
+      m = "<mods #{@ns_decl}> <language><languageTerm type='code'>eng</languageTerm></language></mods>"
+      @smods_rec.from_str m
+      langs = @smods_rec.sw_language_facet
+      expect(langs.size).to eq(1)
+      expect(langs).to eq ["English"]
+      expect(langs).not_to include("eng")
+    end
+    it "should deal with an unknown language code by ignoring it and returning nil" do
+      m = "<mods #{@ns_decl}> <language><languageTerm type='code'>bbc</languageTerm></language></mods>"
+      @smods_rec.from_str m
+      langs = @smods_rec.sw_language_facet
+      expect(langs.size).to be 1
+      expect(langs).to eq [nil]
+    end
+    it "should deal with an unspecified language code by ignoring it and returning nothing" do
+      m = "<mods #{@ns_decl}> <language><languageTerm>bbc</languageTerm></language></mods>"
+      @smods_rec.from_str m
+      langs = @smods_rec.sw_language_facet
+      expect(langs.size).to be 0
+      expect(langs).to eq []
+    end    
     it "should not have duplicates" do
       m = "<mods #{@ns_decl}><language><languageTerm type='code' authority='iso639-2b'>eng</languageTerm><languageTerm type='text'>English</languageTerm></language></mods>"
       @smods_rec.from_str m
