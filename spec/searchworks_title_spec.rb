@@ -7,7 +7,7 @@ describe 'title fields (searchworks.rb)' do
     @smods_rec.from_str m
   end
 
-  context 'short title (for title_245a_search, title_245a_display) ' do
+  context 'short title (for title_245a_search, title_245a_display)' do
     it 'should call :short_titles' do
       expect(@smods_rec).to receive(:short_titles) # in Mods gem
       @smods_rec.sw_short_title
@@ -17,6 +17,16 @@ describe 'title fields (searchworks.rb)' do
     end
   end
 
+  context 'blank title node' do
+    it 'should deal with a second blank titleInfo node' do
+      m = "<mods #{@ns_decl}><titleInfo> </titleInfo><otherStuff>goes here</otherStuff><titleInfo><title>Jerk</title><subTitle>A Tale of Tourettes</subTitle><nonSort>The</nonSort></titleInfo></mods>"
+      smods_rec_blank_node = Stanford::Mods::Record.new
+      smods_rec_blank_node.from_str m
+      expect(smods_rec_blank_node.sw_short_title).to eq 'The Jerk'
+      expect(smods_rec_blank_node.sw_full_title).to eq 'The Jerk : A Tale of Tourettes.'
+    end
+  end
+  
   context 'full title (for title_245_search, title_full_display)' do
     it 'should be a String' do
       expect(@smods_rec.sw_full_title).to eq 'The Jerk : A Tale of Tourettes.'
