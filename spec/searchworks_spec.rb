@@ -13,29 +13,50 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
       expect(langs.size).to eq(3)
       expect(langs).to include("Persian", "Arabic", "Dutch")
       expect(langs).not_to include("Dutch; Flemish")
-    end
-    it "should deal with a missing authority by ignoring it and still looking up the language code" do
+    end 
+    it "should return a language string from lookup for a valid language code that has a type=code specified but no authority" do
       m = "<mods #{@ns_decl}> <language><languageTerm type='code'>eng</languageTerm></language></mods>"
       @smods_rec.from_str m
       langs = @smods_rec.sw_language_facet
       expect(langs.size).to eq(1)
       expect(langs).to eq ["English"]
       expect(langs).not_to include("eng")
-    end
-    it "should deal with an unknown language code by ignoring it and returning nil" do
-      m = "<mods #{@ns_decl}> <language><languageTerm type='code'>bbc</languageTerm></language></mods>"
+    end    
+    it "should return nil for a language code that has a type=code specified but no authority" do
+      m = "<mods #{@ns_decl}> <language><languageTerm type='code'>bogus</languageTerm></language></mods>"
       @smods_rec.from_str m
       langs = @smods_rec.sw_language_facet
       expect(langs.size).to be 1
       expect(langs).to eq [nil]
     end
-    it "should deal with an unspecified language code by ignoring it and returning nothing" do
-      m = "<mods #{@ns_decl}> <language><languageTerm>bbc</languageTerm></language></mods>"
+    it "should return nothing when the authority and type=code are specified but the language code cannot be found" do
+      m = "<mods #{@ns_decl}><language><languageTerm authority='iso639-2b' type='code'>bogus</languageTerm></language></mods>"
+      @smods_rec.from_str m
+      expect(@smods_rec.logger).to receive(:warn).with(/Couldn't find english name for bogus/)
+      langs = @smods_rec.sw_language_facet
+      expect(langs.size).to eq(0)
+    end       
+    it "should return nothing for a language code that has no authority or type specified" do
+      m = "<mods #{@ns_decl}> <language><languageTerm>bogus</languageTerm></language></mods>"
       @smods_rec.from_str m
       langs = @smods_rec.sw_language_facet
       expect(langs.size).to be 0
       expect(langs).to eq []
-    end    
+    end  
+    it "should return nothing for a language code that has an unknown authority and doesn't have a type specified" do
+      m = "<mods #{@ns_decl}> <language><languageTerm authority='bogus-authority'>bogus</languageTerm></language></mods>"
+      @smods_rec.from_str m
+      langs = @smods_rec.sw_language_facet
+      expect(langs.size).to be 0
+      expect(langs).to eq []
+    end       
+    it "should return nothing for a blank languageTerm node (even when the authority is valid)" do
+      m = "<mods #{@ns_decl}> <language><languageTerm authority='iso639-2b' type='code'></languageTerm></language></mods>"
+      @smods_rec.from_str m
+      langs = @smods_rec.sw_language_facet
+      expect(langs.size).to be 0
+      expect(langs).to eq []
+    end        
     it "should not have duplicates" do
       m = "<mods #{@ns_decl}><language><languageTerm type='code' authority='iso639-2b'>eng</languageTerm><languageTerm type='text'>English</languageTerm></language></mods>"
       @smods_rec.from_str m

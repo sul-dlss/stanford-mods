@@ -27,18 +27,18 @@ module Stanford
           # get languageTerm codes and add their translations to the result
           n.code_term.each { |ct|
             if ct.authority =~ /^iso639/
-              begin
-                vals = ct.text.split(/[,|\ ]/).reject { |x| x.strip.empty? }
-                vals.each do |v|
+              vals = ct.text.split(/[,|\ ]/).reject { |x| x.strip.empty? }
+              vals.each do |v|
+                if ISO_639.find(v.strip)
                   iso639_val = ISO_639.find(v.strip).english_name
                   if SEARCHWORKS_LANGUAGES.has_value?(iso639_val)
                     result << iso639_val
                   else
                     result << SEARCHWORKS_LANGUAGES[v.strip]
                   end
+                else
+                  logger.warn "Couldn't find english name for #{ct.text}"
                 end
-              rescue RuntimeError
-                logger.warn "Couldn't find english name for #{ct.text}"
               end
             else
               vals = ct.text.split(/[,|\ ]/).reject { |x| x.strip.empty? }
@@ -130,25 +130,38 @@ module Stanford
       end
 
       # @return [Nokogiri::XML::NodeSet] title_info nodes, rejecting ones that just have blank text values
-      def outer_nodes
+      def present_title_info_nodes
         mods_ng_xml.title_info.reject {|node| node.text.strip.empty?}
+      end
+
+      # @return [Nokogiri::XML::Node] the first titleInfo node if present, else nil
+      def first_title_info_node
+        present_title_info_nodes ? present_title_info_nodes.first : nil
+      end
+
+      # @return [String] the nonSort text portion of the titleInfo node as a string (if non-empty, else nil)      
+      def nonSort_title
+        first_title_info_node.nonSort.text.strip.empty? ? nil : first_title_info_node.nonSort.text.strip
+      end
+      
+      # @return [String] the text of the titleInfo node as a string (if non-empty, else nil)
+      def title
+        first_title_info_node.title.text.strip.empty?   ? nil : first_title_info_node.title.text.strip
       end
       
       # @return [String] value for title_245_search, title_full_display
       def sw_full_title
-        outer_node = outer_nodes ? outer_nodes.first : nil
-        return nil unless outer_node
-        nonSort = outer_node.nonSort.text.strip.empty? ? nil : outer_node.nonSort.text.strip
-        title   = outer_node.title.text.strip.empty?   ? nil : outer_node.title.text.strip
-        preSubTitle = nonSort ? [nonSort, title].compact.join(" ") : title
+        
+        return nil unless first_title_info_node        
+        preSubTitle = nonSort_title ? [nonSort_title, title].compact.join(" ") : title
         preSubTitle.sub!(/:$/, '') if preSubTitle # remove trailing colon
 
-        subTitle = outer_node.subTitle.text.strip
+        subTitle = first_title_info_node.subTitle.text.strip
         preParts = subTitle.empty? ? preSubTitle : preSubTitle + " : " + subTitle
         preParts.sub!(/\.$/, '') if preParts # remove trailing period
 
-        partName   = outer_node.partName.text.strip   unless outer_node.partName.text.strip.empty?
-        partNumber = outer_node.partNumber.text.strip unless outer_node.partNumber.text.strip.empty?
+        partName   = first_title_info_node.partName.text.strip   unless first_title_info_node.partName.text.strip.empty?
+        partNumber = first_title_info_node.partNumber.text.strip unless first_title_info_node.partNumber.text.strip.empty?
         partNumber.sub!(/,$/, '') if partNumber # remove trailing comma
         if partNumber && partName
           parts = partNumber + ", " + partName
@@ -186,15 +199,8 @@ module Stanford
       # Returns a sortable version of the main title
       # @return [String] value for title_sort field
       def sw_sort_title
-        # get nonSort piece
-        outer_nodes = mods_ng_xml.title_info
-        outer_node = outer_nodes ? outer_nodes.first : nil
-        if outer_node
-          nonSort = outer_node.nonSort.text.strip.empty? ? nil : outer_node.nonSort.text.strip
-        end
-
         val = '' + (sw_full_title ? sw_full_title : '')
-        val.sub!(Regexp.new("^" + Regexp.escape(nonSort)), '') if nonSort
+        val.sub!(Regexp.new("^" + Regexp.escape(nonSort_title)), '') if nonSort_title
         val.gsub!(/[[:punct:]]*/, '').strip
         val.squeeze(" ").strip
       end
