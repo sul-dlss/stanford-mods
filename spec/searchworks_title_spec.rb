@@ -26,7 +26,18 @@ describe 'title fields (searchworks.rb)' do
       expect(smods_rec_blank_node.sw_full_title).to eq 'The Jerk : A Tale of Tourettes.'
     end
   end
-  
+
+  context 'missing title node' do
+    it 'deals with missing titleInfo node' do
+      m = "<mods #{@ns_decl}></mods>"
+      smods_rec_blank_node = Stanford::Mods::Record.new
+      smods_rec_blank_node.from_str m
+      expect(smods_rec_blank_node.sw_short_title).to be_blank
+      expect(smods_rec_blank_node.sw_full_title).to be_blank
+      expect(smods_rec_blank_node.sw_sort_title).to be_blank
+    end
+  end
+
   context 'full title (for title_245_search, title_full_display)' do
     it 'should be a String' do
       expect(@smods_rec.sw_full_title).to eq 'The Jerk : A Tale of Tourettes.'
