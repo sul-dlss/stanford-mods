@@ -141,11 +141,15 @@ module Stanford
 
       # @return [String] the nonSort text portion of the titleInfo node as a string (if non-empty, else nil)      
       def nonSort_title
+        return unless first_title_info_node && first_title_info_node.nonSort
+
         first_title_info_node.nonSort.text.strip.empty? ? nil : first_title_info_node.nonSort.text.strip
       end
       
       # @return [String] the text of the titleInfo node as a string (if non-empty, else nil)
       def title
+        return unless first_title_info_node && first_title_info_node.title
+
         first_title_info_node.title.text.strip.empty?   ? nil : first_title_info_node.title.text.strip
       end
       
