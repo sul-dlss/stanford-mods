@@ -20,20 +20,11 @@ Gem::Specification.new do |gem|
   # active_support for .ordinalize, eg. 1 -> 1st, 2 -> 2nd for centuries
   gem.add_dependency 'activesupport'
 
-  # Runtime dependencies
-  # gem.add_runtime_dependency 'nokogiri'
-
   # Development dependencies
-  # Bundler WILL install these gems too if you've checked out from git and run 'bundle install'
-  # Bundler WILL NOT add these as dependencies if you gem install or add this gem to your Gemfile
   gem.add_development_dependency "rake"
   # docs
   gem.add_development_dependency "rdoc"
   gem.add_development_dependency "yard"
   # tests
   gem.add_development_dependency 'rspec'
-  # using coveralls with travis now
-  # gem.add_development_dependency 'simplecov'
-  # gem.add_development_dependency 'simplecov-rcov'
-  # gem.add_development_dependency 'ruby-debug19'
 end
