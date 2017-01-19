@@ -16,21 +16,15 @@ module Stanford
         result = term_values([:subject, :geographic]) || []
 
         # hierarchicalGeographic has sub elements
-        @mods_ng_xml.subject.hierarchicalGeographic.each { |hg_node|
-          hg_vals = []
-          hg_node.element_children.each { |e|
-            hg_vals << e.text unless e.text.empty?
-          }
+        mods_ng_xml.subject.hierarchicalGeographic.each { |hg_node|
+          hg_vals = hg_node.element_children.map(&:text).reject(&:empty?)
           result << hg_vals.join(sep) unless hg_vals.empty?
         }
 
-        trans_code_vals = @mods_ng_xml.subject.geographicCode.translated_value
-        if trans_code_vals
-          trans_code_vals.each { |val|
-            result << val unless result.include?(val)
-          }
-        end
-
+        trans_code_vals = mods_ng_xml.subject.geographicCode.translated_value || []
+        trans_code_vals.each { |val|
+          result << val unless result.include?(val)
+        }
         result
       end
 
@@ -40,12 +34,11 @@ module Stanford
       # @param [String] sep - the separator string for joining namePart sub elements
       # @return [Array<String>] values for names inside subject elements or [] if none
       def sw_subject_names(sep = ', ')
-        result = []
-        @mods_ng_xml.subject.name_el.select { |n_el| n_el.namePart }.each { |name_el_w_np|
-          parts = name_el_w_np.namePart.map { |npn| npn.text unless npn.text.empty? }.compact
-          result << parts.join(sep).strip unless parts.empty?
-        }
-        result
+        mods_ng_xml.subject.name_el
+                   .select { |n_el| n_el.namePart }
+                   .map { |name_el_w_np| name_el_w_np.namePart.map(&:text).reject(&:empty?) }
+                   .reject(&:empty?)
+                   .map { |parts| parts.join(sep).strip }
       end
 
       # Values are the contents of:
@@ -54,8 +47,8 @@ module Stanford
       # @return [Array<String>] values for titles inside subject elements or [] if none
       def sw_subject_titles(sep = ' ')
         result = []
-        @mods_ng_xml.subject.titleInfo.each { |ti_el|
-          parts = ti_el.element_children.map { |el| el.text unless el.text.empty? }.compact
+        mods_ng_xml.subject.titleInfo.each { |ti_el|
+          parts = ti_el.element_children.map(&:text).reject(&:empty?)
           result << parts.join(sep).strip unless parts.empty?
         }
         result
@@ -85,10 +78,7 @@ module Stanford
         vals.concat(subject_names) if subject_names
         vals.concat(subject_titles) if subject_titles
         vals.concat(subject_occupations) if subject_occupations
-        vals.map! { |val|
-          v = val.sub(/[\\,;]$/, '')
-          v.strip
-        }
+        vals.map! { |val| val.sub(/[\\,;]$/, '').strip }
         vals.empty? ? nil : vals
       end
 
@@ -119,9 +109,8 @@ module Stanford
           codes = term_values([:subject, :geographicCode])
           if codes && codes.size > xvals.size
             subject.geographicCode.each { |n|
-              if n.authority != 'marcgac' && n.authority != 'marccountry'
-                sw_logger.info("#{druid} has subject geographicCode element with untranslated encoding (#{n.authority}): #{n.to_xml}")
-              end
+              next unless n.authority != 'marcgac' && n.authority != 'marccountry'
+              sw_logger.info("#{druid} has subject geographicCode element with untranslated encoding (#{n.authority}): #{n.to_xml}")
             }
           end
 
