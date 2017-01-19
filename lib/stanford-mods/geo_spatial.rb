@@ -32,6 +32,22 @@ module Stanford
         []
       end
 
+      # @return [Array{String}] values suitable for solr SRPT fields, like "-16.0 28.0"
+      # @note example xml leaf nodes
+      #  <gml:pos>-122.191292 37.4063388</gml:pos>
+      def geo_extensions_point_data
+        mods_ng_xml.extension
+                   .xpath(
+                     '//rdf:RDF/rdf:Description/gmd:centerPoint/gml:Point[gml:pos]',
+                     'gml' => GMLNS,
+                     'gmd' => 'http://www.isotc211.org/2005/gmd',
+                     'rdf' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+                   ).map do |v|
+                     lat, long = v.xpath('gml:pos', 'gml' => GMLNS).text.split
+                     "#{long} #{lat}"
+                   end
+      end
+
       # @return [Array{Stanford::Mods::Coordinate}] valid coordinates as objects
       def coordinates_objects
         coordinates.map { |n| Stanford::Mods::Coordinate.new(n) }.select(&:valid?)
