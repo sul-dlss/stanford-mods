@@ -98,7 +98,7 @@ describe '#geo_extension_as_envelope' do
     expect(mods.geo_extensions_as_envelope).to eq []
   end
 
-  describe 'with data' do
+  describe 'with geo extension bounding-box data' do
     let(:modsbody) do
       <<-EOF
         <extension displayLabel="geo">
@@ -126,6 +126,30 @@ describe '#geo_extension_as_envelope' do
 
     it 'extract envelope strings' do
       expect(mods.geo_extensions_as_envelope).to eq ["ENVELOPE(-122.191292, -122.149475, 37.4435369, 37.4063388)"]
+    end
+  end
+
+  describe 'with geo-extension point data' do
+    let(:modsbody) do
+      <<-EOF
+        <extension displayLabel="geo">
+          <rdf:RDF xmlns:gml="http://www.opengis.net/gml/3.2/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:gmd="http://www.isotc211.org/2005/gmd">
+            <rdf:Description rdf:about="http://www.stanford.edu/cm896kp1291">
+              <dc:format>image/jpeg</dc:format>
+              <dc:type>Image</dc:type>
+              <gmd:centerPoint>
+                <gml:Point gml:id="ID">
+                  <gml:pos>41.8898687280593 12.4913412520789</gml:pos>
+                </gml:Point>
+              </gmd:centerPoint>
+            </rdf:Description>
+          </rdf:RDF>
+        </extension>
+      EOF
+    end
+
+    it 'extract point strings' do
+      expect(mods.geo_extensions_point_data).to eq ["12.4913412520789 41.8898687280593"]
     end
   end
 end
