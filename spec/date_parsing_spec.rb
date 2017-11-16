@@ -19,7 +19,8 @@ describe "date parsing methods" do
     'M. D. LXI',
     '[An 4]',
     '[s.d.]',
-    'Undated'
+    'Undated',
+    '1uuu'
   ]
   # example string as key, expected parsed value as value
   invalid_but_can_get_year = {
@@ -468,7 +469,8 @@ describe "date parsing methods" do
       '9999',
       '2035',
       '0000-00-00',
-      'uuuu'
+      'uuuu',
+      '1uuu'
     ].each do |example|
       it "nil for #{example}" do
         expect(Stanford::Mods::DateParsing.new(example).date_str_for_display).to eq nil
@@ -523,7 +525,8 @@ describe "date parsing methods" do
       '9999',
       '2035',
       '0000-00-00',
-      'uuuu'
+      'uuuu',
+      '1uuu'
     ].each do |example|
       it "nil for #{example}" do
         expect(Stanford::Mods::DateParsing.new(example).year_int_from_date_str).to eq nil
@@ -573,7 +576,8 @@ describe "date parsing methods" do
       '9999',
       '2035',
       '0000-00-00',
-      'uuuu'
+      'uuuu',
+      '1uuu'
     ].each do |example|
       it "nil for #{example}" do
         expect(Stanford::Mods::DateParsing.new(example).sortable_year_string_from_date_str).to eq nil

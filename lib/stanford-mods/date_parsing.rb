@@ -188,7 +188,7 @@ module Stanford
       end
 
       CENTURY_WORD_REGEXP = Regexp.new('(\d{1,2}).*century')
-      CENTURY_4CHAR_REGEXP = Regexp.new('(\d{1,2})[u\-]{2}')
+      CENTURY_4CHAR_REGEXP = Regexp.new('(\d{1,2})[u\-]{2}([^u\-]|$)')
 
       # get first year of century (as String) if we have:  yyuu, yy--, yy--? or xxth century pattern
       #   note that these are the only century patterns found in our actual date strings in MODS records
