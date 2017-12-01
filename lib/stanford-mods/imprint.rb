@@ -37,7 +37,44 @@ module Stanford
         imprint_statements.join('; ') if imprint_statements.present?
       end
 
+      # @return Array<Integer> an array of publication years for the resource
+      def publication_date_for_slider
+        @originInfo_ng_nodeset.map do |origin_info_node|
+
+          date_elements = if origin_info_node.as_object.first.key_dates.any?
+                            origin_info_node.as_object.first.key_dates.map(&:as_object).map(&:first)
+                          else
+                            date_field_keys.map do |date_field|
+                              next unless origin_info_node.respond_to?(date_field)
+                              date_elements = origin_info_node.send(date_field)
+                              date_elements.map(&:as_object).map(&:first) if date_elements.any?
+                            end.first
+                          end
+
+          if date_elements.nil? || date_elements.none?
+            []
+          elsif date_elements.find(&:start?) && date_elements.find(&:end?)
+            start_date = date_elements.find(&:start?)
+            end_date = date_elements.find(&:end?)
+
+            (start_date.as_range.min.year..end_date.as_range.max.year).to_a
+          elsif date_elements.find(&:start?)
+            start_date = date_elements.find(&:start?)
+
+            (start_date.as_range.min.year..Time.now.year).to_a
+          elsif date_elements.one?
+            date_elements.first.to_a.map(&:year)
+          else
+            date_elements.map { |v| v.to_a.map(&:year) }.flatten
+          end
+        end.flatten
+      end
+
       private
+
+      def extract_year(el)
+        DateParsing.year_int_from_date_str(el.text)
+      end
 
       def compact_and_join_with_delimiter(values, delimiter)
         compact_values = values.compact.reject { |v| v.strip.empty? }
