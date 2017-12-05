@@ -9,6 +9,25 @@ describe Stanford::Mods::Imprint do
   let(:mods_origin_info_end_str) { '</originInfo></mods>' }
 
   describe 'date processing' do
+    describe '#publication_date_for_slider' do
+      {
+        '' => [],
+        '<dateIssued>1957</dateIssued>' => [1957],
+        '<dateIssued>195u</dateIssued>' => (1950..1959).to_a,
+        '<dateCreated keyDate="yes">1964</dateCreated><dateIssued>195u</dateIssued>' => [1964],
+        '<dateIssued>1964</dateIssued><dateCreated>195u</dateCreated>' => [1964],
+        '<dateIssued point="start">195u</dateIssued><dateIssued point="end">1964</dateIssued>' => (1950..1964).to_a,
+        '<dateIssued>1964</dateIssued><dateIssued>195u</dateIssued>' => [1964] + (1950..1959).to_a
+      }.each do |example, expected|
+        it 'works' do
+          smods_rec.from_str("#{mods_origin_info_start_str}
+            #{example}
+          #{mods_origin_info_end_str}")
+          imprint = stanford_mods_imprint(smods_rec)
+          expect(imprint.publication_date_for_slider).to eq expected
+        end
+      end
+    end
     describe 'bad dates' do
       it 'ignores bad date values' do
         smods_rec.from_str(mods_origin_info_start_str +
