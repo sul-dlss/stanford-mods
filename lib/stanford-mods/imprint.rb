@@ -40,7 +40,6 @@ module Stanford
       # @return Array<Integer> an array of publication years for the resource
       def publication_date_for_slider
         @originInfo_ng_nodeset.map do |origin_info_node|
-
           date_elements = if origin_info_node.as_object.first.key_dates.any?
                             origin_info_node.as_object.first.key_dates.map(&:as_object).map(&:first)
                           else
@@ -53,12 +52,15 @@ module Stanford
 
           if date_elements.nil? || date_elements.none?
             []
-          elsif date_elements.find(&:start?) && date_elements.find(&:end?)
+          elsif date_elements.find(&:start?) &&
+                date_elements.find(&:start?).as_range &&
+                date_elements.find(&:end?) &&
+                date_elements.find(&:end?).as_range
             start_date = date_elements.find(&:start?)
             end_date = date_elements.find(&:end?)
 
             (start_date.as_range.min.year..end_date.as_range.max.year).to_a
-          elsif date_elements.find(&:start?)
+          elsif date_elements.find(&:start?) && date_elements.find(&:start?).as_range
             start_date = date_elements.find(&:start?)
 
             (start_date.as_range.min.year..Time.now.year).to_a
