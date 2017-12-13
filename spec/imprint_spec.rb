@@ -18,7 +18,8 @@ describe Stanford::Mods::Imprint do
         '<dateCreated keyDate="yes">1964</dateCreated><dateIssued>195u</dateIssued>' => [1964],
         '<dateIssued>1964</dateIssued><dateCreated>195u</dateCreated>' => [1964],
         '<dateIssued point="start">195u</dateIssued><dateIssued point="end">1964</dateIssued>' => (1950..1964).to_a,
-        '<dateIssued>1964</dateIssued><dateIssued>195u</dateIssued>' => [1964] + (1950..1959).to_a
+        '<dateIssued>1964</dateIssued><dateIssued>195u</dateIssued>' => [1964] + (1950..1959).to_a,
+        '<dateCreated keyDate="yes" encoding="w3cdtf" point="start">1966</dateCreated><dateCreated encoding="w3cdtf" point="end">1967</dateCreated>' => [1966,1967]
       }.each do |example, expected|
         it 'works' do
           smods_rec.from_str("#{mods_origin_info_start_str}
