@@ -6,7 +6,7 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 2
+# Offense count: 1
 # Cop supports --auto-correct.
 # Configuration parameters: Include, TreatCommentsAsGroupSeparators.
 # Include: **/*.gemfile, **/Gemfile, **/gems.rb
@@ -134,12 +134,11 @@ Layout/SpaceInsideBlockBraces:
   Exclude:
     - 'lib/stanford-mods/searchworks.rb'
 
-# Offense count: 11
+# Offense count: 6
 # Cop supports --auto-correct.
 # Configuration parameters: AllowInHeredoc.
 Layout/TrailingWhitespace:
   Exclude:
-    - 'lib/stanford-mods/searchworks.rb'
     - 'spec/searchworks_spec.rb'
 
 # Offense count: 33
@@ -290,7 +289,7 @@ RSpec/EmptyLineAfterFinalLet:
     - 'spec/physical_location_spec.rb'
     - 'spec/sw_publication_spec.rb'
 
-# Offense count: 147
+# Offense count: 148
 # Configuration parameters: Max.
 RSpec/ExampleLength:
   Exclude:
@@ -329,7 +328,7 @@ RSpec/FilePath:
 RSpec/HookArgument:
   EnforcedStyle: each
 
-# Offense count: 1102
+# Offense count: 1105
 # Configuration parameters: AssignmentOnly.
 RSpec/InstanceVariable:
   Exclude:
@@ -487,7 +486,7 @@ Style/IfUnlessModifier:
     - 'lib/stanford-mods/date_parsing.rb'
     - 'lib/stanford-mods/imprint.rb'
 
-# Offense count: 3
+# Offense count: 2
 # Cop supports --auto-correct.
 # Configuration parameters: InverseMethods, InverseBlocks.
 Style/InverseMethods:
@@ -576,7 +575,7 @@ Style/StderrPuts:
   Exclude:
     - 'Rakefile'
 
-# Offense count: 13
+# Offense count: 12
 # Cop supports --auto-correct.
 # Configuration parameters: MinSize.
 # SupportedStyles: percent, brackets
