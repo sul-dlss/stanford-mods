@@ -563,6 +563,18 @@ describe 'title fields (searchworks.rb)' do
       @smods_rec.from_str(m)
       expect(@smods_rec.sw_addl_titles).to eq ['Alternative', 'Joke]']
     end
+    it 'excludes weird cases where there is no short title' do
+      m = <<-EOXML
+        <mods #{@ns_decl}>
+        <titleInfo></titleInfo>
+        <titleInfo type="alternative">
+          <title>Sponsored projects report for the year ended</title>
+        </titleInfo>
+        </mods>
+      EOXML
+      @smods_rec.from_str(m)
+      expect(@smods_rec.sw_addl_titles).to be_empty
+    end
   end
 
   context 'sort title' do
