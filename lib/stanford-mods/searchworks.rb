@@ -227,60 +227,6 @@ module Stanford
       # see origin_info.rb  (as all this information comes from top level originInfo element)
       # ---- end PUBLICATION (place, year) ----
 
-      # select one or more format values from the controlled vocabulary here:
-      #   http://searchworks-solr-lb.stanford.edu:8983/solr/select?facet.field=format&rows=0&facet.sort=index
-      # @return <Array[String]> value in the SearchWorks controlled vocabulary
-      # @deprecated - kept for backwards compatibility but not part of SW UI redesign work Summer 2014
-      # @deprecated:  this is no longer used in SW, Revs or Spotlight Jan 2016
-      def format
-        types = term_values(:typeOfResource)
-        return [] unless types
-        genres = term_values(:genre)
-        issuance = term_values([:origin_info, :issuance])
-        val = []
-        types.each do |type|
-          case type
-            when 'cartographic'
-              val << 'Map/Globe'
-            when 'mixed material'
-              val << 'Manuscript/Archive'
-            when 'moving image'
-              val << 'Video'
-            when 'notated music'
-              val << 'Music - Score'
-            when 'software, multimedia'
-              val << 'Computer File'
-            when 'sound recording-musical'
-              val << 'Music - Recording'
-            when 'sound recording-nonmusical', 'sound recording'
-              val << 'Sound Recording'
-            when 'still image'
-              val << 'Image'
-            when 'text'
-              val << 'Book' if issuance && issuance.include?('monographic')
-              book_genres = ['book chapter', 'Book chapter', 'Book Chapter',
-                'issue brief', 'Issue brief', 'Issue Brief',
-                'librettos', 'Librettos',
-                'project report', 'Project report', 'Project Report',
-                'technical report', 'Technical report', 'Technical Report',
-                'working paper', 'Working paper', 'Working Paper']
-              val << 'Book' if genres && !(genres & book_genres).empty?
-              conf_pub = ['conference publication', 'Conference publication', 'Conference Publication']
-              val << 'Conference Proceedings' if genres && !(genres & conf_pub).empty?
-              val << 'Journal/Periodical' if issuance && issuance.include?('continuing')
-              article = ['article', 'Article']
-              val << 'Journal/Periodical' if genres && !(genres & article).empty?
-              stu_proj_rpt = ['student project report', 'Student project report', 'Student Project report', 'Student Project Report']
-              val << 'Other' if genres && !(genres & stu_proj_rpt).empty?
-              thesis = ['thesis', 'Thesis']
-              val << 'Thesis' if genres && !(genres & thesis).empty?
-            when 'three dimensional object'
-              val << 'Other'
-          end
-        end
-        val.uniq
-      end
-
       # select one or more format values from the controlled vocabulary per JVine Summer 2014
       #   http://searchworks-solr-lb.stanford.edu:8983/solr/select?facet.field=format_main_ssim&rows=0&facet.sort=index
       # https://github.com/sul-dlss/stanford-mods/issues/66 - For geodata, the
