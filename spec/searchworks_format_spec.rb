@@ -315,57 +315,57 @@ describe "Format fields (searchworks.rb)" do
   end # format_main
 
   context "sw_genre" do
-    it "ignores values that are not in the prescribed list" do
+    it "includes values that are not in the prescribed list" do
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Not on the list</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq []
+      expect(@smods_rec.sw_genre).to eq ['Not on the list']
     end
     it "Conference proceedings: typeOfResource 'text', genre 'conference publication'" do
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">conference publication</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Conference proceedings']
+      expect(@smods_rec.sw_genre).to eq ['conference publication', 'Conference proceedings']
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Conference publication</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Conference proceedings']
+      expect(@smods_rec.sw_genre).to eq ['Conference publication', 'Conference proceedings']
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Conference Publication</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Conference proceedings']
+      expect(@smods_rec.sw_genre).to eq ['Conference Publication', 'Conference proceedings']
     end
     it "Thesis/Dissertation: typeOfResource 'text', genre 'thesis'" do
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">thesis</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Thesis/Dissertation']
+      expect(@smods_rec.sw_genre).to eq ['thesis', 'Thesis/Dissertation']
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Thesis</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Thesis/Dissertation']
+      expect(@smods_rec.sw_genre).to eq ['Thesis', 'Thesis/Dissertation']
     end
     it "Government Document: typeOfResource 'text', genre 'government publication'" do
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">government publication</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Government document']
+      expect(@smods_rec.sw_genre).to eq ['government publication', 'Government document']
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Government publication</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Government document']
+      expect(@smods_rec.sw_genre).to eq ['Government publication', 'Government document']
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Government Publication</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Government document']
+      expect(@smods_rec.sw_genre).to eq ['Government Publication', 'Government document']
       m = "<mods #{@ns_decl}><genre>government publication</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Government document']
+      expect(@smods_rec.sw_genre).to eq ['government publication', 'Government document']
     end
     it "Technical Report: typeOfResource 'text', genre 'technical report'" do
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">technical report</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Technical report']
+      expect(@smods_rec.sw_genre).to eq ['technical report', 'Technical report']
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Technical report</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
       expect(@smods_rec.sw_genre).to eq ['Technical report']
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Technical Report</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Technical report']
+      expect(@smods_rec.sw_genre).to eq ['Technical Report', 'Technical report']
       m = "<mods #{@ns_decl}><genre>technical report</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Technical report']
+      expect(@smods_rec.sw_genre).to eq ['technical report', 'Technical report']
     end
     it "it does not include Archived website: typeOfResource 'text', genre 'archived website'" do
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">archived website</genre><typeOfResource>text</typeOfResource></mods>"
@@ -375,13 +375,13 @@ describe "Format fields (searchworks.rb)" do
     it "capitalizes the first letter of a genre value" do
       m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre authority=\"marcgt\">technical report</genre></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Technical report']
+      expect(@smods_rec.sw_genre).to eq ['technical report', 'Technical report']
       m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre authority=\"marcgt\">Technical report</genre></mods>"
       @smods_rec.from_str(m)
       expect(@smods_rec.sw_genre).to eq ['Technical report']
       m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre authority=\"marcgt\">Technical Report</genre></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Technical report']
+      expect(@smods_rec.sw_genre).to eq ['Technical Report', 'Technical report']
     end
     # NOTE: may need to remove plurals and/or trailing punctuation in future
     it "returns all genre values" do
@@ -392,7 +392,7 @@ describe "Format fields (searchworks.rb)" do
             <genre>thesis</genre>
           </mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Thesis/Dissertation', 'Conference proceedings', 'Government document']
+      expect(@smods_rec.sw_genre).to eq ['government publication', 'conference publication', 'thesis', 'Thesis/Dissertation', 'Conference proceedings', 'Government document']
     end
     it "doesn't have duplicates" do
       m = "<mods #{@ns_decl}>
@@ -402,7 +402,7 @@ describe "Format fields (searchworks.rb)" do
             <genre>Conference publication</genre>
           </mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Conference proceedings', 'Technical report']
+      expect(@smods_rec.sw_genre).to eq ['conference publication', 'technical report', 'Conference publication', 'Conference proceedings', 'Technical report']
     end
     it "empty Array if no genre values" do
       m = "<mods #{@ns_decl}>

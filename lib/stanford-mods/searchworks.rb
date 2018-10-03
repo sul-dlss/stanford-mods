@@ -291,23 +291,23 @@ module Stanford
         val.uniq
       end
 
-      # https://github.com/sul-dlss/stanford-mods/issues/66
-      # Limit genre values to Government document, Conference proceedings,
-      # Technical report and Thesis/Dissertation
       # @return <Array[String]> values for the genre facet in SearchWorks
       def sw_genre
         genres = term_values(:genre)
         return [] unless genres
         types = term_values(:typeOfResource)
-        val = []
-        val << 'Thesis/Dissertation' if genres.include?('thesis') || genres.include?('Thesis')
+        val = genres.map(&:to_s)
+        thesis_pub = ['thesis', 'Thesis']
+        val << 'Thesis/Dissertation' if (genres & thesis_pub).any?
+
         if genres && types && types.include?('text')
           conf_pub = ['conference publication', 'Conference publication', 'Conference Publication']
           gov_pub  = ['government publication', 'Government publication', 'Government Publication']
           tech_rpt = ['technical report', 'Technical report', 'Technical Report']
-          val << 'Conference proceedings' unless (genres & conf_pub).empty?
-          val << 'Government document' unless (genres & gov_pub).empty?
-          val << 'Technical report' unless (genres & tech_rpt).empty?
+
+          val << 'Conference proceedings' if (genres & conf_pub).any?
+          val << 'Government document' if (genres & gov_pub).any?
+          val << 'Technical report' if (genres & tech_rpt).any?
         end
         val.uniq
       end

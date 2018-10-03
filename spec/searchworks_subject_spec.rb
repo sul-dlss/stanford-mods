@@ -44,9 +44,6 @@ describe "Subject fields (searchworks.rb)" do
       it "should contain subject <topic> subelement data" do
         expect(@smods_rec.topic_search).to include(@topic)
       end
-      it "should contain top level <genre> element data" do
-        expect(@smods_rec.topic_search).to include(@genre)
-      end
       it "should not contain other subject element data" do
         expect(@smods_rec.topic_search).not_to include(@cart_coord)
         expect(@smods_rec.topic_search).not_to include(@s_genre)
@@ -63,12 +60,6 @@ describe "Subject fields (searchworks.rb)" do
         @smods_rec = Stanford::Mods::Record.new
         @smods_rec.from_str(m)
         expect(@smods_rec.topic_search).to eq([@topic])
-      end
-      it "should not be nil if there are only <genre> elements (no subject/topic elements)" do
-        m = "<mods #{@ns_decl}><genre>#{@genre}</genre></mods>"
-        @smods_rec = Stanford::Mods::Record.new
-        @smods_rec.from_str(m)
-        expect(@smods_rec.topic_search).to eq([@genre])
       end
       context "topic subelement" do
         it "should have a separate value for each topic element" do
@@ -279,9 +270,6 @@ describe "Subject fields (searchworks.rb)" do
         @smods_rec = Stanford::Mods::Record.new
         @smods_rec.from_str(@ng_mods_no_subject.to_s)
         expect(@smods_rec.subject_all_search).to be_nil
-      end
-      it "should contain top level <genre> element data" do
-        expect(@smods_rec.subject_all_search).to include(@genre)
       end
       it "should not contain cartographic sub element" do
         expect(@smods_rec.subject_all_search).not_to include(@cart_coord)
