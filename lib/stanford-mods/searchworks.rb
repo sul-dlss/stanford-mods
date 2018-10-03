@@ -233,7 +233,7 @@ module Stanford
       # resource type should be only Map and not include Software, multimedia.
       # @return <Array[String]> value in the SearchWorks controlled vocabulary
       def format_main
-        types = term_values(:typeOfResource)
+        types = typeOfResource
         return [] unless types
         article_genres = ['article', 'Article',
           'book chapter', 'Book chapter', 'Book Chapter',
@@ -249,13 +249,18 @@ module Stanford
           'thesis', 'Thesis'
         ]
         val = []
-        genres = term_values(:genre)
-        issuance = term_values([:origin_info, :issuance])
+        genres = term_values(:genre) || []
+        issuance = term_values([:origin_info, :issuance]) || []
+        frequency = term_values([:origin_info, :frequency]) || []
+
+        val << 'Dataset' if genres.include?('dataset') || genres.include?('Dataset')
+
         types.each do |type|
-          case type
+          val << 'Archive/Manuscript' if type.manuscript == 'yes'
+
+          case type.text
             when 'cartographic'
               val << 'Map'
-              val.delete 'Software/Multimedia'
             when 'mixed material'
               val << 'Archive/Manuscript'
             when 'moving image'
@@ -263,11 +268,7 @@ module Stanford
             when 'notated music'
               val << 'Music score'
             when 'software, multimedia'
-              if genres && (genres.include?('dataset') || genres.include?('Dataset'))
-                val << 'Dataset'
-              elsif !val.include?('Map')
-                val << 'Software/Multimedia'
-              end
+              val << 'Software/Multimedia' unless types.map(&:text).include?('cartographic') || (genres.include?('dataset') || genres.include?('Dataset'))
             when 'sound recording-musical'
               val << 'Music recording'
             when 'sound recording-nonmusical', 'sound recording'
@@ -275,11 +276,14 @@ module Stanford
             when 'still image'
               val << 'Image'
             when 'text'
-              val << 'Book' if genres && !(genres & article_genres).empty?
-              val << 'Book' if issuance && issuance.include?('monographic')
-              val << 'Book' if genres && !(genres & book_genres).empty?
-              val << 'Journal/Periodical' if issuance && issuance.include?('continuing')
-              val << 'Archived website' if genres && genres.include?('archived website')
+              is_explicitly_a_book = type.manuscript != 'yes' && (issuance.include?('monographic') || !(genres & article_genres).empty? || !(genres & book_genres).empty?)
+              is_periodical = issuance.include?('continuing') || issuance.include?('serial') || frequency.any? { |x| !x.empty? }
+              is_archived_website = genres.any? { |x| x.casecmp('archived website') == 0 }
+
+              val << 'Book' if is_explicitly_a_book
+              val << 'Journal/Periodical' if is_periodical
+              val << 'Archived website' if is_archived_website
+              val << 'Book' unless is_explicitly_a_book || is_periodical || is_archived_website
             when 'three dimensional object'
               val << 'Object'
           end

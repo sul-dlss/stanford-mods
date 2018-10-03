@@ -66,10 +66,10 @@ describe "Format fields (searchworks.rb)" do
         @smods_rec.from_str(m)
         expect(@smods_rec.format_main).to eq ['Book']
       end
-      it "'report' isn't valid", jira: 'GRYP-170', github: 'gdor-indexer/#7' do
+      it "'report' isn't valid, so defaults to book", jira: 'GRYP-170', github: 'gdor-indexer/#7' do
         m = "<mods #{@ns_decl}><genre>report</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.format_main).to eq []
+        expect(@smods_rec.format_main).to eq ['Book']
       end
       it "'student project report'", consul: '/NGDE/Format 2014-05-28' do
         m = "<mods #{@ns_decl}><genre authority=\"local\">student project report</genre><typeOfResource>text</typeOfResource></mods>"
@@ -137,10 +137,10 @@ describe "Format fields (searchworks.rb)" do
             @smods_rec.from_str(m)
             expect(@smods_rec.format_main).to eq ['Book']
           end
-          it "'libretto' isn't valid", jira: 'INDEX-98' do
+          it "'libretto' isn't valid, so it defaults to book", jira: 'INDEX-98' do
             m = "<mods #{@ns_decl}><genre>libretto</genre><typeOfResource>text</typeOfResource></mods>"
             @smods_rec.from_str(m)
-            expect(@smods_rec.format_main).to eq []
+            expect(@smods_rec.format_main).to eq ['Book']
           end
           it "'librettos'", jira: 'INDEX-98' do
             m = "<mods #{@ns_decl}><genre>librettos</genre><typeOfResource>text</typeOfResource></mods>"
