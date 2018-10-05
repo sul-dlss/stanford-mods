@@ -139,24 +139,24 @@ module Stanford
         present_title_info_nodes ? present_title_info_nodes.first : nil
       end
 
-      # @return [String] the nonSort text portion of the titleInfo node as a string (if non-empty, else nil)      
+      # @return [String] the nonSort text portion of the titleInfo node as a string (if non-empty, else nil)
       def nonSort_title
         return unless first_title_info_node && first_title_info_node.nonSort
 
         first_title_info_node.nonSort.text.strip.empty? ? nil : first_title_info_node.nonSort.text.strip
       end
-      
+
       # @return [String] the text of the titleInfo node as a string (if non-empty, else nil)
       def title
         return unless first_title_info_node && first_title_info_node.title
 
         first_title_info_node.title.text.strip.empty?   ? nil : first_title_info_node.title.text.strip
       end
-      
+
       # @return [String] value for title_245_search, title_full_display
       def sw_full_title
-        
-        return nil unless first_title_info_node        
+
+        return nil unless first_title_info_node
         preSubTitle = nonSort_title ? [nonSort_title, title].compact.join(" ") : title
         preSubTitle.sub!(/:$/, '') if preSubTitle # remove trailing colon
 
@@ -295,20 +295,18 @@ module Stanford
       def sw_genre
         genres = term_values(:genre)
         return [] unless genres
-        types = term_values(:typeOfResource)
         val = genres.map(&:to_s)
         thesis_pub = ['thesis', 'Thesis']
         val << 'Thesis/Dissertation' if (genres & thesis_pub).any?
 
-        if genres && types && types.include?('text')
-          conf_pub = ['conference publication', 'Conference publication', 'Conference Publication']
-          gov_pub  = ['government publication', 'Government publication', 'Government Publication']
-          tech_rpt = ['technical report', 'Technical report', 'Technical Report']
+        conf_pub = ['conference publication', 'Conference publication', 'Conference Publication']
+        gov_pub  = ['government publication', 'Government publication', 'Government Publication']
+        tech_rpt = ['technical report', 'Technical report', 'Technical Report']
 
-          val << 'Conference proceedings' if (genres & conf_pub).any?
-          val << 'Government document' if (genres & gov_pub).any?
-          val << 'Technical report' if (genres & tech_rpt).any?
-        end
+        val << 'Conference proceedings' if (genres & conf_pub).any?
+        val << 'Government document' if (genres & gov_pub).any?
+        val << 'Technical report' if (genres & tech_rpt).any?
+
         val.uniq
       end
 
