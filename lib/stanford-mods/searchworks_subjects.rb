@@ -55,12 +55,11 @@ module Stanford
       end
 
       # Values are the contents of:
-      #   mods/genre
       #   mods/subject/topic
       # @return [Array<String>] values for the topic_search Solr field for this document or nil if none
       def topic_search
         @topic_search ||= begin
-          vals = term_values(:genre) || []
+          vals = []
           vals.concat(subject_topics) if subject_topics
           vals.empty? ? nil : vals
         end

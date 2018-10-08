@@ -5,269 +5,6 @@ describe "Format fields (searchworks.rb)" do
     @ns_decl = "xmlns='#{Mods::MODS_NS}'"
   end
 
-  # @deprecated:  this is no longer used in SW, Revs or Spotlight Jan 2016
-  context "format" do
-    context "Book:" do
-      context "typeOfResource text," do
-        it 'originInfo/issuance monographic' do
-          m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><originInfo><issuance>monographic</issuance></originInfo></mods>"
-          @smods_rec.from_str(m)
-          expect(@smods_rec.format).to eq ['Book']
-        end
-        context "genre" do
-          it "'book chapter'", email: 'mods-squad 2014-05-22, Joanna Dyla' do
-            m = "<mods #{@ns_decl}><genre>book chapter</genre><typeOfResource>text</typeOfResource></mods>"
-            @smods_rec.from_str(m)
-            expect(@smods_rec.format).to eq ['Book']
-            m = "<mods #{@ns_decl}><genre>Book chapter</genre><typeOfResource>text</typeOfResource></mods>"
-            @smods_rec.from_str(m)
-            expect(@smods_rec.format).to eq ['Book']
-            m = "<mods #{@ns_decl}><genre>Book Chapter</genre><typeOfResource>text</typeOfResource></mods>"
-            @smods_rec.from_str(m)
-            expect(@smods_rec.format).to eq ['Book']
-          end
-          it "'issue brief'", email: 'mods-squad 2014-05-22, Joanna Dyla' do
-            m = "<mods #{@ns_decl}><genre>issue brief</genre><typeOfResource>text</typeOfResource></mods>"
-            @smods_rec.from_str(m)
-            expect(@smods_rec.format).to eq ['Book']
-            m = "<mods #{@ns_decl}><genre>Issue brief</genre><typeOfResource>text</typeOfResource></mods>"
-            @smods_rec.from_str(m)
-            expect(@smods_rec.format).to eq ['Book']
-            m = "<mods #{@ns_decl}><genre>Issue Brief</genre><typeOfResource>text</typeOfResource></mods>"
-            @smods_rec.from_str(m)
-            expect(@smods_rec.format).to eq ['Book']
-          end
-          it "'librettos'", jira: 'INDEX-98' do
-            m = "<mods #{@ns_decl}><genre>librettos</genre><typeOfResource>text</typeOfResource></mods>"
-            @smods_rec.from_str(m)
-            expect(@smods_rec.format).to eq ['Book']
-            m = "<mods #{@ns_decl}><genre>Librettos</genre><typeOfResource>text</typeOfResource></mods>"
-            @smods_rec.from_str(m)
-            expect(@smods_rec.format).to eq ['Book']
-          end
-          it "'libretto' isn't valid", jira: 'INDEX-98' do
-            m = "<mods #{@ns_decl}><genre>libretto</genre><typeOfResource>text</typeOfResource></mods>"
-            @smods_rec.from_str(m)
-            expect(@smods_rec.format).to eq []
-          end
-          it "'project report'", jira: 'GRYP-170', github: 'gdor-indexer/#7' do
-            m = "<mods #{@ns_decl}><genre>project report</genre><typeOfResource>text</typeOfResource></mods>"
-            @smods_rec.from_str(m)
-            expect(@smods_rec.format).to eq ['Book']
-            m = "<mods #{@ns_decl}><genre>Project report</genre><typeOfResource>text</typeOfResource></mods>"
-            @smods_rec.from_str(m)
-            expect(@smods_rec.format).to eq ['Book']
-            m = "<mods #{@ns_decl}><genre>Project Report</genre><typeOfResource>text</typeOfResource></mods>"
-            @smods_rec.from_str(m)
-            expect(@smods_rec.format).to eq ['Book']
-          end
-          it "'report' isn't valid", jira: 'GRYP-170', github: 'gdor-indexer/#7' do
-            m = "<mods #{@ns_decl}><genre>report</genre><typeOfResource>text</typeOfResource></mods>"
-            @smods_rec.from_str(m)
-            expect(@smods_rec.format).to eq []
-          end
-          it "'technical report'", jira: 'GRYPHONDOR-207' do
-            m = "<mods #{@ns_decl}><genre>technical report</genre><typeOfResource>text</typeOfResource></mods>"
-            @smods_rec.from_str(m)
-            expect(@smods_rec.format).to eq ['Book']
-            m = "<mods #{@ns_decl}><genre>Technical report</genre><typeOfResource>text</typeOfResource></mods>"
-            @smods_rec.from_str(m)
-            expect(@smods_rec.format).to eq ['Book']
-            m = "<mods #{@ns_decl}><genre>Technical Report</genre><typeOfResource>text</typeOfResource></mods>"
-            @smods_rec.from_str(m)
-            expect(@smods_rec.format).to eq ['Book']
-          end
-          it "'working paper'", email: 'mods-squad 2014-05-22, Joanna Dyla' do
-            m = "<mods #{@ns_decl}><genre>working paper</genre><typeOfResource>text</typeOfResource></mods>"
-            @smods_rec.from_str(m)
-            expect(@smods_rec.format).to eq ['Book']
-            m = "<mods #{@ns_decl}><genre>Working paper</genre><typeOfResource>text</typeOfResource></mods>"
-            @smods_rec.from_str(m)
-            expect(@smods_rec.format).to eq ['Book']
-            m = "<mods #{@ns_decl}><genre>Working Paper</genre><typeOfResource>text</typeOfResource></mods>"
-            @smods_rec.from_str(m)
-            expect(@smods_rec.format).to eq ['Book']
-          end
-        end
-      end
-    end # 'Book'
-
-    context "Computer File: typeOfResource 'software, multimedia'" do
-      it "no genre (e.g. Dataset)" do
-        m = "<mods #{@ns_decl}><typeOfResource>software, multimedia</typeOfResource></mods>"
-        @smods_rec.from_str(m)
-        expect(@smods_rec.format).to eq ['Computer File']
-      end
-      it "genre 'game'", jira: 'GRYPHONDOR-207' do
-        m = "<mods #{@ns_decl}><genre>game</genre><typeOfResource>software, multimedia</typeOfResource></mods>"
-        @smods_rec.from_str(m)
-        expect(@smods_rec.format).to eq ['Computer File']
-        m = "<mods #{@ns_decl}><genre>Game</genre><typeOfResource>software, multimedia</typeOfResource></mods>"
-        @smods_rec.from_str(m)
-        expect(@smods_rec.format).to eq ['Computer File']
-      end
-    end
-
-    it "Conference Proceedings: typeOfResource 'text', genre 'conference publication'", jira: 'GRYPHONDOR-207' do
-      m = "<mods #{@ns_decl}><genre>conference publication</genre><typeOfResource>text</typeOfResource></mods>"
-      @smods_rec.from_str(m)
-      expect(@smods_rec.format).to eq ['Conference Proceedings']
-      m = "<mods #{@ns_decl}><genre>Conference publication</genre><typeOfResource>text</typeOfResource></mods>"
-      @smods_rec.from_str(m)
-      expect(@smods_rec.format).to eq ['Conference Proceedings']
-      m = "<mods #{@ns_decl}><genre>Conference Publication</genre><typeOfResource>text</typeOfResource></mods>"
-      @smods_rec.from_str(m)
-      expect(@smods_rec.format).to eq ['Conference Proceedings']
-    end
-
-    context "Journal/Periodical: typeOfResource 'text'," do
-      it "genre 'article" do
-        m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre>article</genre></mods>"
-        @smods_rec.from_str(m)
-        expect(@smods_rec.format).to eq ['Journal/Periodical']
-        m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre>Article</genre></mods>"
-        @smods_rec.from_str(m)
-        expect(@smods_rec.format).to eq ['Journal/Periodical']
-      end
-      it "originInfo/issuance 'continuing'" do
-        m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><originInfo><issuance>continuing</issuance></originInfo></mods>"
-        @smods_rec.from_str(m)
-        expect(@smods_rec.format).to eq ['Journal/Periodical']
-      end
-    end
-
-    it "Image: typeOfResource 'still image'" do
-      m = "<mods #{@ns_decl}><typeOfResource>still image</typeOfResource></mods>"
-      @smods_rec.from_str(m)
-      expect(@smods_rec.format).to eq ['Image']
-    end
-
-    it "Manuscript/Archive: typeOfResource 'mixed material'" do
-      m = "<mods #{@ns_decl}><typeOfResource>mixed material</typeOfResource></mods>"
-      @smods_rec.from_str(m)
-      expect(@smods_rec.format).to eq ['Manuscript/Archive']
-    end
-
-    it "Map/Globe: typeOfResource 'cartographic'" do
-      m = "<mods #{@ns_decl}><typeOfResource>cartographic</typeOfResource></mods>"
-      @smods_rec.from_str(m)
-      expect(@smods_rec.format).to eq ['Map/Globe']
-    end
-
-    it "Music - Recording: typeOfResource 'sound recording-musical'", jira: 'GRYPHONDOR-207' do
-      m = "<mods #{@ns_decl}><typeOfResource>sound recording-musical</typeOfResource></mods>"
-      @smods_rec.from_str(m)
-      expect(@smods_rec.format).to eq ['Music - Recording']
-    end
-
-    it "Music - Score: typeOfResource 'notated music'" do
-      m = "<mods #{@ns_decl}><typeOfResource>notated music</typeOfResource></mods>"
-      @smods_rec.from_str(m)
-      expect(@smods_rec.format).to eq ['Music - Score']
-    end
-
-    it "Other: typeOfResource 'text', genre 'student project report'", email: 'from Vitus, August 16, 2013' do
-      m = "<mods #{@ns_decl}><genre>student project report</genre><typeOfResource>text</typeOfResource></mods>"
-      @smods_rec.from_str(m)
-      expect(@smods_rec.format).to eq ['Other']
-      m = "<mods #{@ns_decl}><genre>Student project report</genre><typeOfResource>text</typeOfResource></mods>"
-      @smods_rec.from_str(m)
-      expect(@smods_rec.format).to eq ['Other']
-      m = "<mods #{@ns_decl}><genre>Student Project report</genre><typeOfResource>text</typeOfResource></mods>"
-      @smods_rec.from_str(m)
-      expect(@smods_rec.format).to eq ['Other']
-      m = "<mods #{@ns_decl}><genre>Student Project Report</genre><typeOfResource>text</typeOfResource></mods>"
-      @smods_rec.from_str(m)
-      expect(@smods_rec.format).to eq ['Other']
-    end
-
-    context "Sound Recording:" do
-      it "typeOfResource 'sound recording-nonmusical', genre 'sound", jira: 'GRYPHONDOR-207' do
-        m = "<mods #{@ns_decl}><genre>sound</genre><typeOfResource>sound recording-nonmusical</typeOfResource></mods>"
-        @smods_rec.from_str(m)
-        expect(@smods_rec.format).to eq ['Sound Recording']
-        m = "<mods #{@ns_decl}><genre>Sound</genre><typeOfResource>sound recording-nonmusical</typeOfResource></mods>"
-        @smods_rec.from_str(m)
-        expect(@smods_rec.format).to eq ['Sound Recording']
-      end
-      it "typeOfResource 'sound recording', genre 'sound", jira: 'INDEX-94' do
-        m = "<mods #{@ns_decl}><genre>sound</genre><typeOfResource>sound recording</typeOfResource></mods>"
-        @smods_rec.from_str(m)
-        expect(@smods_rec.format).to eq ['Sound Recording']
-        m = "<mods #{@ns_decl}><genre>Sound</genre><typeOfResource>sound recording</typeOfResource></mods>"
-        @smods_rec.from_str(m)
-        expect(@smods_rec.format).to eq ['Sound Recording']
-      end
-    end
-
-    it "Thesis: typeOfResource 'text', genre 'thesis'" do
-      m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre>thesis</genre></mods>"
-      @smods_rec.from_str(m)
-      expect(@smods_rec.format).to eq ['Thesis']
-      m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre>Thesis</genre></mods>"
-      @smods_rec.from_str(m)
-      expect(@smods_rec.format).to eq ['Thesis']
-    end
-
-    context "Video: typeOfResource 'moving image'" do
-      it "no genre" do
-        m = "<mods #{@ns_decl}><typeOfResource>moving image</typeOfResource></mods>"
-        @smods_rec.from_str(m)
-        expect(@smods_rec.format).to eq ['Video']
-      end
-      it "genre 'motion picture'", jira: 'GRYPHONDOR-207' do
-        m = "<mods #{@ns_decl}><genre>motion picture</genre><typeOfResource>moving image</typeOfResource></mods>"
-        @smods_rec.from_str(m)
-        expect(@smods_rec.format).to eq ['Video']
-        m = "<mods #{@ns_decl}><genre>Motion Picture</genre><typeOfResource>moving image</typeOfResource></mods>"
-        @smods_rec.from_str(m)
-        expect(@smods_rec.format).to eq ['Video']
-        m = "<mods #{@ns_decl}><genre>Motion Picture</genre><typeOfResource>moving image</typeOfResource></mods>"
-        @smods_rec.from_str(m)
-        expect(@smods_rec.format).to eq ['Video']
-      end
-    end
-
-    context "multiple format values", jira: 'INDEX-32' do
-      it "multiple typeOfResource elements" do
-        m = "<mods #{@ns_decl}><typeOfResource>moving image</typeOfResource><typeOfResource>sound recording</typeOfResource></mods>"
-        @smods_rec.from_str(m)
-        expect(@smods_rec.format).to eq ['Video', 'Sound Recording']
-      end
-      it "multiple genre elements, single typeOfResource" do
-        m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre>librettos</genre><genre>article</genre></mods>"
-        @smods_rec.from_str(m)
-        expect(@smods_rec.format).to eq ['Book', 'Journal/Periodical']
-      end
-      it "mish mash" do
-        m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><typeOfResource>still image</typeOfResource><genre>librettos</genre><genre>article</genre></mods>"
-        @smods_rec.from_str(m)
-        expect(@smods_rec.format).to eq ['Book', 'Journal/Periodical', 'Image']
-      end
-      it "doesn't give duplicate values" do
-        m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre>librettos</genre><genre>issue brief</genre></mods>"
-        @smods_rec.from_str(m)
-        expect(@smods_rec.format).to eq ['Book']
-      end
-    end
-
-    it "empty Array if no typeOfResource field" do
-      m = "<mods #{@ns_decl}><originInfo>
-      <dateCreated>1904</dateCreated>
-      </originInfo></mods>"
-      @smods_rec.from_str(m)
-      expect(@smods_rec.format).to eq []
-    end
-
-    it "empty Array if weird typeOfResource value" do
-      m = "<mods #{@ns_decl}>
-      <typeOfResource>foo</typeOfResource>
-      </mods>"
-      @smods_rec.from_str(m)
-      expect(@smods_rec.format).to eq []
-    end
-  end # format
-
   context "format_main" do
     it "3D object: typeOfResource 'three dimensional object'" do
       m = "<mods #{@ns_decl}><typeOfResource>three dimensional object</typeOfResource></mods>"
@@ -329,10 +66,10 @@ describe "Format fields (searchworks.rb)" do
         @smods_rec.from_str(m)
         expect(@smods_rec.format_main).to eq ['Book']
       end
-      it "'report' isn't valid", jira: 'GRYP-170', github: 'gdor-indexer/#7' do
+      it "'report' isn't valid, so defaults to book", jira: 'GRYP-170', github: 'gdor-indexer/#7' do
         m = "<mods #{@ns_decl}><genre>report</genre><typeOfResource>text</typeOfResource></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.format_main).to eq []
+        expect(@smods_rec.format_main).to eq ['Book']
       end
       it "'student project report'", consul: '/NGDE/Format 2014-05-28' do
         m = "<mods #{@ns_decl}><genre authority=\"local\">student project report</genre><typeOfResource>text</typeOfResource></mods>"
@@ -400,10 +137,10 @@ describe "Format fields (searchworks.rb)" do
             @smods_rec.from_str(m)
             expect(@smods_rec.format_main).to eq ['Book']
           end
-          it "'libretto' isn't valid", jira: 'INDEX-98' do
+          it "'libretto' isn't valid, so it defaults to book", jira: 'INDEX-98' do
             m = "<mods #{@ns_decl}><genre>libretto</genre><typeOfResource>text</typeOfResource></mods>"
             @smods_rec.from_str(m)
-            expect(@smods_rec.format_main).to eq []
+            expect(@smods_rec.format_main).to eq ['Book']
           end
           it "'librettos'", jira: 'INDEX-98' do
             m = "<mods #{@ns_decl}><genre>librettos</genre><typeOfResource>text</typeOfResource></mods>"
@@ -578,57 +315,57 @@ describe "Format fields (searchworks.rb)" do
   end # format_main
 
   context "sw_genre" do
-    it "ignores values that are not in the prescribed list" do
+    it "includes values that are not in the prescribed list" do
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Not on the list</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq []
+      expect(@smods_rec.sw_genre).to eq ['Not on the list']
     end
     it "Conference proceedings: typeOfResource 'text', genre 'conference publication'" do
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">conference publication</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Conference proceedings']
+      expect(@smods_rec.sw_genre).to eq ['conference publication', 'Conference proceedings']
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Conference publication</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Conference proceedings']
+      expect(@smods_rec.sw_genre).to eq ['Conference publication', 'Conference proceedings']
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Conference Publication</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Conference proceedings']
+      expect(@smods_rec.sw_genre).to eq ['Conference Publication', 'Conference proceedings']
     end
     it "Thesis/Dissertation: typeOfResource 'text', genre 'thesis'" do
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">thesis</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Thesis/Dissertation']
+      expect(@smods_rec.sw_genre).to eq ['thesis', 'Thesis/Dissertation']
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Thesis</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Thesis/Dissertation']
+      expect(@smods_rec.sw_genre).to eq ['Thesis', 'Thesis/Dissertation']
     end
     it "Government Document: typeOfResource 'text', genre 'government publication'" do
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">government publication</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Government document']
+      expect(@smods_rec.sw_genre).to eq ['government publication', 'Government document']
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Government publication</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Government document']
+      expect(@smods_rec.sw_genre).to eq ['Government publication', 'Government document']
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Government Publication</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Government document']
+      expect(@smods_rec.sw_genre).to eq ['Government Publication', 'Government document']
       m = "<mods #{@ns_decl}><genre>government publication</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Government document']
+      expect(@smods_rec.sw_genre).to eq ['government publication', 'Government document']
     end
     it "Technical Report: typeOfResource 'text', genre 'technical report'" do
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">technical report</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Technical report']
+      expect(@smods_rec.sw_genre).to eq ['technical report', 'Technical report']
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Technical report</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
       expect(@smods_rec.sw_genre).to eq ['Technical report']
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">Technical Report</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Technical report']
+      expect(@smods_rec.sw_genre).to eq ['Technical Report', 'Technical report']
       m = "<mods #{@ns_decl}><genre>technical report</genre><typeOfResource>text</typeOfResource></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Technical report']
+      expect(@smods_rec.sw_genre).to eq ['technical report', 'Technical report']
     end
     it "it does not include Archived website: typeOfResource 'text', genre 'archived website'" do
       m = "<mods #{@ns_decl}><genre authority=\"marcgt\">archived website</genre><typeOfResource>text</typeOfResource></mods>"
@@ -638,13 +375,13 @@ describe "Format fields (searchworks.rb)" do
     it "capitalizes the first letter of a genre value" do
       m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre authority=\"marcgt\">technical report</genre></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Technical report']
+      expect(@smods_rec.sw_genre).to eq ['technical report', 'Technical report']
       m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre authority=\"marcgt\">Technical report</genre></mods>"
       @smods_rec.from_str(m)
       expect(@smods_rec.sw_genre).to eq ['Technical report']
       m = "<mods #{@ns_decl}><typeOfResource>text</typeOfResource><genre authority=\"marcgt\">Technical Report</genre></mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Technical report']
+      expect(@smods_rec.sw_genre).to eq ['Technical Report', 'Technical report']
     end
     # NOTE: may need to remove plurals and/or trailing punctuation in future
     it "returns all genre values" do
@@ -655,7 +392,7 @@ describe "Format fields (searchworks.rb)" do
             <genre>thesis</genre>
           </mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Thesis/Dissertation', 'Conference proceedings', 'Government document']
+      expect(@smods_rec.sw_genre).to eq ['government publication', 'conference publication', 'thesis', 'Thesis/Dissertation', 'Conference proceedings', 'Government document']
     end
     it "doesn't have duplicates" do
       m = "<mods #{@ns_decl}>
@@ -665,7 +402,7 @@ describe "Format fields (searchworks.rb)" do
             <genre>Conference publication</genre>
           </mods>"
       @smods_rec.from_str(m)
-      expect(@smods_rec.sw_genre).to eq ['Conference proceedings', 'Technical report']
+      expect(@smods_rec.sw_genre).to eq ['conference publication', 'technical report', 'Conference publication', 'Conference proceedings', 'Technical report']
     end
     it "empty Array if no genre values" do
       m = "<mods #{@ns_decl}>

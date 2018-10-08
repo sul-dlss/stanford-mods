@@ -139,24 +139,24 @@ module Stanford
         present_title_info_nodes ? present_title_info_nodes.first : nil
       end
 
-      # @return [String] the nonSort text portion of the titleInfo node as a string (if non-empty, else nil)      
+      # @return [String] the nonSort text portion of the titleInfo node as a string (if non-empty, else nil)
       def nonSort_title
         return unless first_title_info_node && first_title_info_node.nonSort
 
         first_title_info_node.nonSort.text.strip.empty? ? nil : first_title_info_node.nonSort.text.strip
       end
-      
+
       # @return [String] the text of the titleInfo node as a string (if non-empty, else nil)
       def title
         return unless first_title_info_node && first_title_info_node.title
 
         first_title_info_node.title.text.strip.empty?   ? nil : first_title_info_node.title.text.strip
       end
-      
+
       # @return [String] value for title_245_search, title_full_display
       def sw_full_title
-        
-        return nil unless first_title_info_node        
+
+        return nil unless first_title_info_node
         preSubTitle = nonSort_title ? [nonSort_title, title].compact.join(" ") : title
         preSubTitle.sub!(/:$/, '') if preSubTitle # remove trailing colon
 
@@ -227,67 +227,13 @@ module Stanford
       # see origin_info.rb  (as all this information comes from top level originInfo element)
       # ---- end PUBLICATION (place, year) ----
 
-      # select one or more format values from the controlled vocabulary here:
-      #   http://searchworks-solr-lb.stanford.edu:8983/solr/select?facet.field=format&rows=0&facet.sort=index
-      # @return <Array[String]> value in the SearchWorks controlled vocabulary
-      # @deprecated - kept for backwards compatibility but not part of SW UI redesign work Summer 2014
-      # @deprecated:  this is no longer used in SW, Revs or Spotlight Jan 2016
-      def format
-        types = term_values(:typeOfResource)
-        return [] unless types
-        genres = term_values(:genre)
-        issuance = term_values([:origin_info, :issuance])
-        val = []
-        types.each do |type|
-          case type
-            when 'cartographic'
-              val << 'Map/Globe'
-            when 'mixed material'
-              val << 'Manuscript/Archive'
-            when 'moving image'
-              val << 'Video'
-            when 'notated music'
-              val << 'Music - Score'
-            when 'software, multimedia'
-              val << 'Computer File'
-            when 'sound recording-musical'
-              val << 'Music - Recording'
-            when 'sound recording-nonmusical', 'sound recording'
-              val << 'Sound Recording'
-            when 'still image'
-              val << 'Image'
-            when 'text'
-              val << 'Book' if issuance && issuance.include?('monographic')
-              book_genres = ['book chapter', 'Book chapter', 'Book Chapter',
-                'issue brief', 'Issue brief', 'Issue Brief',
-                'librettos', 'Librettos',
-                'project report', 'Project report', 'Project Report',
-                'technical report', 'Technical report', 'Technical Report',
-                'working paper', 'Working paper', 'Working Paper']
-              val << 'Book' if genres && !(genres & book_genres).empty?
-              conf_pub = ['conference publication', 'Conference publication', 'Conference Publication']
-              val << 'Conference Proceedings' if genres && !(genres & conf_pub).empty?
-              val << 'Journal/Periodical' if issuance && issuance.include?('continuing')
-              article = ['article', 'Article']
-              val << 'Journal/Periodical' if genres && !(genres & article).empty?
-              stu_proj_rpt = ['student project report', 'Student project report', 'Student Project report', 'Student Project Report']
-              val << 'Other' if genres && !(genres & stu_proj_rpt).empty?
-              thesis = ['thesis', 'Thesis']
-              val << 'Thesis' if genres && !(genres & thesis).empty?
-            when 'three dimensional object'
-              val << 'Other'
-          end
-        end
-        val.uniq
-      end
-
       # select one or more format values from the controlled vocabulary per JVine Summer 2014
       #   http://searchworks-solr-lb.stanford.edu:8983/solr/select?facet.field=format_main_ssim&rows=0&facet.sort=index
       # https://github.com/sul-dlss/stanford-mods/issues/66 - For geodata, the
       # resource type should be only Map and not include Software, multimedia.
       # @return <Array[String]> value in the SearchWorks controlled vocabulary
       def format_main
-        types = term_values(:typeOfResource)
+        types = typeOfResource
         return [] unless types
         article_genres = ['article', 'Article',
           'book chapter', 'Book chapter', 'Book Chapter',
@@ -303,13 +249,18 @@ module Stanford
           'thesis', 'Thesis'
         ]
         val = []
-        genres = term_values(:genre)
-        issuance = term_values([:origin_info, :issuance])
+        genres = term_values(:genre) || []
+        issuance = term_values([:origin_info, :issuance]) || []
+        frequency = term_values([:origin_info, :frequency]) || []
+
+        val << 'Dataset' if genres.include?('dataset') || genres.include?('Dataset')
+
         types.each do |type|
-          case type
+          val << 'Archive/Manuscript' if type.manuscript == 'yes'
+
+          case type.text
             when 'cartographic'
               val << 'Map'
-              val.delete 'Software/Multimedia'
             when 'mixed material'
               val << 'Archive/Manuscript'
             when 'moving image'
@@ -317,11 +268,7 @@ module Stanford
             when 'notated music'
               val << 'Music score'
             when 'software, multimedia'
-              if genres && (genres.include?('dataset') || genres.include?('Dataset'))
-                val << 'Dataset'
-              elsif !val.include?('Map')
-                val << 'Software/Multimedia'
-              end
+              val << 'Software/Multimedia' unless types.map(&:text).include?('cartographic') || (genres.include?('dataset') || genres.include?('Dataset'))
             when 'sound recording-musical'
               val << 'Music recording'
             when 'sound recording-nonmusical', 'sound recording'
@@ -329,11 +276,14 @@ module Stanford
             when 'still image'
               val << 'Image'
             when 'text'
-              val << 'Book' if genres && !(genres & article_genres).empty?
-              val << 'Book' if issuance && issuance.include?('monographic')
-              val << 'Book' if genres && !(genres & book_genres).empty?
-              val << 'Journal/Periodical' if issuance && issuance.include?('continuing')
-              val << 'Archived website' if genres && genres.include?('archived website')
+              is_explicitly_a_book = type.manuscript != 'yes' && (issuance.include?('monographic') || !(genres & article_genres).empty? || !(genres & book_genres).empty?)
+              is_periodical = issuance.include?('continuing') || issuance.include?('serial') || frequency.any? { |x| !x.empty? }
+              is_archived_website = genres.any? { |x| x.casecmp('archived website') == 0 }
+
+              val << 'Book' if is_explicitly_a_book
+              val << 'Journal/Periodical' if is_periodical
+              val << 'Archived website' if is_archived_website
+              val << 'Book' unless is_explicitly_a_book || is_periodical || is_archived_website
             when 'three dimensional object'
               val << 'Object'
           end
@@ -341,24 +291,22 @@ module Stanford
         val.uniq
       end
 
-      # https://github.com/sul-dlss/stanford-mods/issues/66
-      # Limit genre values to Government document, Conference proceedings,
-      # Technical report and Thesis/Dissertation
       # @return <Array[String]> values for the genre facet in SearchWorks
       def sw_genre
         genres = term_values(:genre)
         return [] unless genres
-        types = term_values(:typeOfResource)
-        val = []
-        val << 'Thesis/Dissertation' if genres.include?('thesis') || genres.include?('Thesis')
-        if genres && types && types.include?('text')
-          conf_pub = ['conference publication', 'Conference publication', 'Conference Publication']
-          gov_pub  = ['government publication', 'Government publication', 'Government Publication']
-          tech_rpt = ['technical report', 'Technical report', 'Technical Report']
-          val << 'Conference proceedings' unless (genres & conf_pub).empty?
-          val << 'Government document' unless (genres & gov_pub).empty?
-          val << 'Technical report' unless (genres & tech_rpt).empty?
-        end
+        val = genres.map(&:to_s)
+        thesis_pub = ['thesis', 'Thesis']
+        val << 'Thesis/Dissertation' if (genres & thesis_pub).any?
+
+        conf_pub = ['conference publication', 'Conference publication', 'Conference Publication']
+        gov_pub  = ['government publication', 'Government publication', 'Government Publication']
+        tech_rpt = ['technical report', 'Technical report', 'Technical Report']
+
+        val << 'Conference proceedings' if (genres & conf_pub).any?
+        val << 'Government document' if (genres & gov_pub).any?
+        val << 'Technical report' if (genres & tech_rpt).any?
+
         val.uniq
       end
 
