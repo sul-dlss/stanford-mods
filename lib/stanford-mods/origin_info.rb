@@ -82,6 +82,7 @@ module Stanford
       def year_display_str(date_el_array)
         result = date_parsing_result(date_el_array, :date_str_for_display)
         return result if result
+
         _ignore, orig_str_to_parse = self.class.earliest_year_str(date_el_array)
         DateParsing.date_str_for_display(orig_str_to_parse) if orig_str_to_parse
       end
@@ -93,6 +94,7 @@ module Stanford
       def year_int(date_el_array)
         result = date_parsing_result(date_el_array, :year_int_from_date_str)
         return result if result
+
         year_int, _ignore = self.class.earliest_year_int(date_el_array)
         year_int if year_int
       end
@@ -104,6 +106,7 @@ module Stanford
       def year_sort_str(date_el_array)
         result = date_parsing_result(date_el_array, :sortable_year_string_from_date_str)
         return result if result
+
         sortable_str, _ignore = self.class.earliest_year_str(date_el_array)
         sortable_str if sortable_str
       end
@@ -115,6 +118,7 @@ module Stanford
       def date_created_elements(ignore_approximate = false)
         date_created_nodeset = mods_ng_xml.origin_info.dateCreated
         return self.class.remove_approximate(date_created_nodeset) if ignore_approximate
+
         date_created_nodeset.to_a
       end
 
@@ -125,6 +129,7 @@ module Stanford
       def date_issued_elements(ignore_approximate = false)
         date_issued_nodeset = mods_ng_xml.origin_info.dateIssued
         return self.class.remove_approximate(date_issued_nodeset) if ignore_approximate
+
         date_issued_nodeset.to_a
       end
 
@@ -194,6 +199,7 @@ module Stanford
       # @return [Integer, String] year as a String or Integer, depending on method_sym
       def date_parsing_result(date_el_array, method_sym)
         return if date_el_array.empty?
+
         # prefer keyDate
         key_date_el = self.class.keyDate(date_el_array)
         DateParsing.send(method_sym, key_date_el.content) if key_date_el
@@ -239,6 +245,7 @@ module Stanford
         return nil unless pub_date
         return "#{pub_date.to_i + 1000} B.C." if pub_date.start_with?('-')
         return pub_date unless pub_date.include? '--'
+
         "#{pub_date[0, 2].to_i + 1}th century"
       end
 
@@ -251,6 +258,7 @@ module Stanford
           pd = pd.gsub('--', '00')
         end
         fail "pub_date_sort was about to return a non 4 digit value #{pd}!" if pd && pd.length != 4
+
         pd
       end
 
@@ -261,6 +269,7 @@ module Stanford
       def pub_date_display
         return dates_no_marc_encoding.first unless dates_no_marc_encoding.empty?
         return dates_marc_encoding.first unless dates_marc_encoding.empty?
+
         nil
       end
 
@@ -274,6 +283,7 @@ module Stanford
         # use the cached year if there is one
         if @pub_year
           return nil if @pub_year == ''
+
           return @pub_year
         end
 
@@ -307,6 +317,7 @@ module Stanford
       def pub_dates
         return dates_marc_encoding unless dates_marc_encoding.empty?
         return dates_no_marc_encoding unless dates_no_marc_encoding.empty?
+
         nil
       end
 
@@ -410,6 +421,7 @@ module Stanford
         dates.each do |f_date|
           matches = f_date.scan(/\d{1}th/)
           next if matches.empty?
+
           if matches.length == 1
             @pub_year = (matches.first[0, 2].to_i - 1).to_s + '--'
             return @pub_year
@@ -436,6 +448,7 @@ module Stanford
         dates.each do |f_date|
           matches = f_date.scan(/\d{2}th/)
           next if matches.empty?
+
           if matches.length == 1
             @pub_year = (matches.first[0, 2].to_i - 1).to_s + '--'
             return @pub_year
@@ -464,6 +477,7 @@ module Stanford
           # Single digit u notation
           matches = f_date.scan(/\d{3}u/)
           return matches.first.tr('u', '0') if matches.length == 1
+
           # Double digit u notation
           matches = f_date.scan(/\d{2}u{2}/)
           return matches.first.tr('u', '-') if matches.length == 1

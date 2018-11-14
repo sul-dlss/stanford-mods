@@ -45,6 +45,7 @@ module Stanford
         result = []
         mods_ng_xml.personal_name.map do |n|
           next if n.role.size.zero?
+
           n.role.each { |r|
             result << n.display_value_w_date unless includes_marc_relator_collector_role?(r)
           }
@@ -58,6 +59,7 @@ module Stanford
         result = []
         mods_ng_xml.personal_name.each do |n|
           next if n.role.size.zero?
+
           n.role.each { |r|
             result << n.display_value_w_date if includes_marc_relator_collector_role?(r)
           }

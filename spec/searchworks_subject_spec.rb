@@ -240,6 +240,7 @@ describe "Subject fields (searchworks.rb)" do
           expect(@smods_rec.subject_other_subvy_search).to be_nil
         end
       end
+
       context "genre subelement" do
         it "should have a separate value for each genre element" do
           m = "<mods #{@ns_decl}>
@@ -266,6 +267,7 @@ describe "Subject fields (searchworks.rb)" do
       before :each do
         allow(@smods_rec.sw_logger).to receive(:info).with(/ has subject geographicCode element with untranslated encoding \(iso3166\): <geographicCode authority=.*>us<\/geographicCode>/)
       end
+
       it "should be nil if there are no values in the MODS" do
         @smods_rec = Stanford::Mods::Record.new
         @smods_rec.from_str(@ng_mods_no_subject.to_s)

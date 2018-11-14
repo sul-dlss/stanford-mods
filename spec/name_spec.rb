@@ -284,6 +284,7 @@ describe "name/author concepts" do
         expect(smods_rec.non_collector_person_authors).to eq [name]
       end
     end
+
     it 'nil if only collectors' do
       name_snippet =
         <<-EOF
@@ -345,6 +346,7 @@ describe "name/author concepts" do
         expect(smods_rec.collectors_w_dates).to eq [collector_name]
       end
     end
+
     context 'no valueURI for roleTerm' do
       it 'collector marc relator code' do
         name_snippet =
@@ -373,6 +375,7 @@ describe "name/author concepts" do
         expect(smods_rec.collectors_w_dates).to eq [collector_name]
       end
     end
+
     it 'does not include non-collectors' do
       name_snippet =
         <<-EOF

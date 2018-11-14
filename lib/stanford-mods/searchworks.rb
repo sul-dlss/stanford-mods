@@ -179,6 +179,7 @@ module Stanford
 
         result = parts ? preParts + ". " + parts : preParts
         return nil unless result
+
         result += "." unless result =~ /[[:punct:]]$/
         result.strip!
         result = nil if result.empty?
@@ -192,6 +193,7 @@ module Stanford
       def sw_title_display
         result = sw_full_title
         return nil unless result
+
         result.sub(/[\.,;:\/\\]+$/, '').strip
       end
 
@@ -242,6 +244,7 @@ module Stanford
       def format_main
         types = typeOfResource
         return [] unless types
+
         article_genres = ['article', 'Article',
           'book chapter', 'Book chapter', 'Book Chapter',
           'issue brief', 'Issue brief', 'Issue Brief',
@@ -302,6 +305,7 @@ module Stanford
       def sw_genre
         genres = term_values(:genre)
         return [] unless genres
+
         val = genres.map(&:to_s)
         thesis_pub = ['thesis', 'Thesis']
         val << 'Thesis/Dissertation' if (genres & thesis_pub).any?
@@ -321,6 +325,7 @@ module Stanford
       def catkey
         catkey = term_values([:record_info, :recordIdentifier])
         return nil unless catkey && !catkey.empty?
+
         catkey.first.tr('a', '') # ensure catkey is numeric only
       end
     end # class Record

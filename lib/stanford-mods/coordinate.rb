@@ -16,12 +16,14 @@ module Stanford
       # @return [String] the coordinate in WKT/CQL ENVELOPE representation
       def as_envelope
         return unless valid?
+
         "ENVELOPE(#{bounds[:min_x]}, #{bounds[:max_x]}, #{bounds[:max_y]}, #{bounds[:min_y]})"
       end
 
       # @return [String] the coordinate in Solr 4.x+ bbox-format representation
       def as_bbox
         return unless valid?
+
         "#{bounds[:min_x]} #{bounds[:min_y]} #{bounds[:max_x]} #{bounds[:max_y]}"
       end
 
@@ -44,6 +46,7 @@ module Stanford
         @bounds ||= begin
           matches = cleaner_coordinate(value).match %r{\A(?<lat>[EW].+-+.+)\s*/\s*(?<lng>[NS].+-+.+)\Z}
           return {} unless matches
+
           min_x, max_x = matches['lat'].split(/-+/).map { |x| coord_to_decimal(x) }.minmax
           min_y, max_y = matches['lng'].split(/-+/).map { |y| coord_to_decimal(y) }.minmax
           { min_x: min_x, min_y: min_y, max_x: max_x, max_y: max_y }

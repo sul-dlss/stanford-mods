@@ -128,6 +128,7 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
               </mods>"
           @smods_rec.from_str m
         end
+
         it "uses a ', ' as the separator by default" do
           expect(@smods_rec.sw_subject_names).to eq ['first, second']
         end
@@ -192,6 +193,7 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
               </mods>"
           @smods_rec.from_str m
         end
+
         it "uses a ' ' as the separator by default" do
           expect(@smods_rec.sw_subject_titles).to eq ['first second']
         end
@@ -276,6 +278,7 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
           expect(@smods_rec.sw_geographic_search).to eq([])
         end
       end
+
       context "hierarchicalGeographic subelement" do
         it "should have a separate value for each hierarchicalGeographic element" do
           m = "<mods #{@ns_decl}>
@@ -305,6 +308,7 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
             </subject></mods>"
             @smods_rec.from_str m
           end
+
           it "uses a space as the separator by default" do
             expect(@smods_rec.sw_geographic_search).to eq ['Canada British Columbia Vancouver']
           end
@@ -313,6 +317,7 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
           end
         end
       end # hierarchicalGeographic
+
       context "geographicCode subelement" do
         before(:all) do
           m = "<mods #{@ns_decl}>
@@ -324,6 +329,7 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
           @smods_rec.from_str m
           @geo_search_from_codes = @smods_rec.sw_geographic_search
         end
+
         it "should not add untranslated values" do
           expect(@geo_search_from_codes).not_to include('n-us-md')
           expect(@geo_search_from_codes).not_to include('e-er')

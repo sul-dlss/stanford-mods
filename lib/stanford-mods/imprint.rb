@@ -45,6 +45,7 @@ module Stanford
                           else
                             date_field_keys.map do |date_field|
                               next unless origin_info_node.respond_to?(date_field)
+
                               date_elements = origin_info_node.send(date_field)
                               date_elements.map(&:as_object).map(&:first) if date_elements.any?
                             end.first
@@ -82,6 +83,7 @@ module Stanford
         compact_values = values.compact.reject { |v| v.strip.empty? }
         return compact_values.join(delimiter) if compact_values.length == 1 ||
                                                  !ends_in_terminating_punctuation?(delimiter)
+
         compact_values.each_with_index.map do |value, i|
           if (compact_values.length - 1) == i || # last item?
              ends_in_terminating_punctuation?(value)
@@ -104,6 +106,7 @@ module Stanford
 
       def publisher_vals_str(origin_info_node)
         return if origin_info_node.publisher.text.strip.empty?
+
         publishers = origin_info_node.publisher.reject do |p|
           p.text.strip.empty?
         end.map(&:text)
@@ -114,6 +117,7 @@ module Stanford
 
       def place_vals_str(origin_info_node)
         return if origin_info_node.place.text.strip.empty?
+
         places = place_terms(origin_info_node).reject do |p|
           p.text.strip.empty?
         end.map(&:text)
@@ -130,6 +134,7 @@ module Stanford
       def place_terms(origin_info_element)
         return [] unless origin_info_element.respond_to?(:place) &&
                          origin_info_element.place.respond_to?(:placeTerm)
+
         if unencoded_place_terms?(origin_info_element)
           origin_info_element.place.placeTerm.select do |term|
             !term.attributes['type'].respond_to?(:value) ||
@@ -142,6 +147,7 @@ module Stanford
                         term.attributes['authority'].respond_to?(:value) &&
                         term.attributes['authority'].value == 'marccountry' &&
                         MARC_COUNTRIES.include?(term.text.strip)
+
             term = term.clone
             term.content = MARC_COUNTRIES[term.text.strip]
             term
@@ -154,12 +160,14 @@ module Stanford
       def date_str(origin_info_node)
         date_vals = origin_info_date_vals(origin_info_node)
         return if date_vals.empty?
+
         date_vals.map(&:strip).join(' ')
       end
 
       def origin_info_date_vals(origin_info_node)
         date_field_keys.map do |date_field|
           next unless origin_info_node.respond_to?(date_field)
+
           date_elements = origin_info_node.send(date_field)
           date_elements_display_vals(date_elements) if date_elements.present?
         end.compact.flatten
@@ -338,8 +346,8 @@ module Stanford
           else
             ng_date_element.content
           end
-        rescue
-          ng_date_element.content
+                                  rescue
+                                    ng_date_element.content
         end
         ng_date_element
       end
@@ -352,8 +360,8 @@ module Stanford
           else
             ng_date_element.content
           end
-        rescue
-          ng_date_element.content
+                                  rescue
+                                    ng_date_element.content
         end
         ng_date_element
       end
@@ -376,8 +384,8 @@ module Stanford
           else
             my_ng_date_element.content
           end
-        rescue
-          my_ng_date_element.content
+                                     rescue
+                                       my_ng_date_element.content
         end
         my_ng_date_element
       end
@@ -398,8 +406,8 @@ module Stanford
           else
             my_ng_date_element.content
           end
-        rescue
-          my_ng_date_element.content
+                                     rescue
+                                       my_ng_date_element.content
         end
         my_ng_date_element
       end
