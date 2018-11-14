@@ -27,6 +27,19 @@ describe 'title fields (searchworks.rb)' do
     end
   end
 
+  context 'when titleInfo contains a subTitle but no title' do
+    let(:record) do
+      m = "<mods #{@ns_decl}><titleInfo><subTitle>An overview from 1942-1950</subTitle></titleInfo></mods>"
+      rec = Stanford::Mods::Record.new
+      rec.from_str m
+      rec
+    end
+
+    it 'returns nil' do
+      expect(record.sw_full_title).to be_nil
+    end
+  end
+
   context 'missing title node' do
     it 'deals with missing titleInfo node' do
       m = "<mods #{@ns_decl}></mods>"

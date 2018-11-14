@@ -153,12 +153,13 @@ module Stanford
         first_title_info_node.title.text.strip.empty?   ? nil : first_title_info_node.title.text.strip
       end
 
+      # Searchworks requires that the MODS has a '//titleInfo/title'
       # @return [String] value for title_245_search, title_full_display
       def sw_full_title
+        return nil if !first_title_info_node || !title
 
-        return nil unless first_title_info_node
         preSubTitle = nonSort_title ? [nonSort_title, title].compact.join(" ") : title
-        preSubTitle.sub!(/:$/, '') if preSubTitle # remove trailing colon
+        preSubTitle.sub!(/:$/, '')
 
         subTitle = first_title_info_node.subTitle.text.strip
         preParts = subTitle.empty? ? preSubTitle : preSubTitle + " : " + subTitle
