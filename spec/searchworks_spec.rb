@@ -97,6 +97,7 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
       </mods>"
       @smods_rec.from_str(m)
     end
+
     it "main author (for author_1xx_search)" do
       expect(@smods_rec).to receive(:main_author_w_date) # in stanford-mods.rb
       @smods_rec.sw_main_author

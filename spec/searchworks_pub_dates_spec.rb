@@ -212,6 +212,7 @@ describe "Date methods (searchworks.rb)" do
       expect(smods_rec.send(:pub_date)).to eq('8--')
     end
   end # pub_date
+
   context "pub_dates (protected)" do
     it "puts dateIssued values before dateCreated values" do
       m = "<mods #{ns_decl}><originInfo>

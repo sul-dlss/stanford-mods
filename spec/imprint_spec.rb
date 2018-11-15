@@ -30,6 +30,7 @@ describe Stanford::Mods::Imprint do
         end
       end
     end
+
     describe 'bad dates' do
       it 'ignores bad date values' do
         smods_rec.from_str(mods_origin_info_start_str +

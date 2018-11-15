@@ -66,6 +66,7 @@ describe "computations from /originInfo field" do
       SPOTLIGHT_PUB_DATE_DATA.each_pair.each do |coll_name, coll_data|
         # papyri - the only Spotlight data with BC dates
         next if coll_name == 'papyri' && method_sym == :pub_year_int
+
         coll_data.each_pair do |mods_str, exp_vals|
           expected = exp_vals[exp_val_position]
           it "#{expected} for rec in #{coll_name}" do
@@ -303,6 +304,7 @@ describe "computations from /originInfo field" do
           end
         end
       end
+
       context "retains element when attribute qualifer=" do
         ['inferred', 'invalid_attr_val'].each do |attr_val|
           let(:qual_attr_val) { attr_val }
@@ -372,6 +374,7 @@ describe "computations from /originInfo field" do
           end
         end
       end
+
       context "retains element when attribute qualifer=" do
         ['inferred', 'invalid_attr_val'].each do |attr_val|
           let(:qual_attr_val) { attr_val }

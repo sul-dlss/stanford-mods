@@ -74,6 +74,7 @@ describe "Physical Location for series, box, folder" do
             expect(@smods_rec.box).to eq expected
           end
         end
+
         context 'in /relatedItem/location/physicalLocation' do
           it "has the expected box label '#{expected}'" do
             @smods_rec.from_str(mods_rel_item_loc_phys_loc)
@@ -131,6 +132,7 @@ describe "Physical Location for series, box, folder" do
             expect(@smods_rec.folder).to eq expected
           end
         end
+
         context 'in /relatedItem/location/physicalLocation' do
           it "has the expected folder label '#{expected}'" do
             @smods_rec.from_str(mods_rel_item_loc_phys_loc)
@@ -179,12 +181,14 @@ describe "Physical Location for series, box, folder" do
             expect(@smods_rec.physical_location_str).to eq expected
           end
         end
+
         context 'in /relatedItem/location/physicalLocation' do
           it "has the expected location '#{expected}'" do
             @smods_rec.from_str(mods_rel_item_loc_phys_loc)
             expect(@smods_rec.physical_location_str).to eq expected
           end
         end
+
         context 'with multiple physicalLocation elements' do
           it "has the expected location '#{expected}'" do
             @smods_rec.from_str(mods_loc_multiple_phys_loc)
@@ -233,12 +237,14 @@ describe "Physical Location for series, box, folder" do
             expect(@smods_rec.series).to eq expected
           end
         end
+
         context 'in /relatedItem/location/physicalLocation' do
           it "has the expected series name '#{expected}'" do
             @smods_rec.from_str(mods_rel_item_loc_phys_loc)
             expect(@smods_rec.series).to eq expected
           end
         end
+
         context 'with multiple physicalLocation elements' do
           it "has the expected series name '#{expected}'" do
             @smods_rec.from_str(mods_loc_multiple_phys_loc)

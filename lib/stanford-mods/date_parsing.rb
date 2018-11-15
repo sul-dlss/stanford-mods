@@ -32,6 +32,7 @@ module Stanford
       # @return [Boolean] true if the year is between -999 and (current year + 1); false otherwise
       def self.year_str_valid?(year_str)
         return false unless year_str && (year_str.match(/^\d{1,4}$/) || year_str.match(/^-\d{1,3}$/))
+
         (-1000 < year_str.to_i) && (year_str.to_i < Date.today.year + 2)
       end
 
@@ -39,6 +40,7 @@ module Stanford
       # @return [Boolean] true if the year is between -9999 and (current year + 1); false otherwise
       def self.year_int_valid?(year)
         return false unless year.is_a? Integer
+
         (-1000 < year.to_i) && (year < Date.today.year + 2)
       end
 
@@ -59,6 +61,7 @@ module Stanford
         return display_str_for_bc if orig_date_str.match(BC_REGEX)
         # decade next in case there are 4 digits, e.g. 1950s
         return display_str_for_decade if orig_date_str.match(DECADE_4CHAR_REGEXP) || orig_date_str.match(DECADE_S_REGEXP)
+
         result = sortable_year_for_yyyy_or_yy
         unless result
           # try removing brackets between digits in case we have 169[5] or [18]91
@@ -81,6 +84,7 @@ module Stanford
         return if orig_date_str == '0000-00-00' # shpc collection has these useless dates
         # B.C. first in case there are 4 digits, e.g. 1600 B.C.
         return sortable_year_int_for_bc if orig_date_str.match(BC_REGEX)
+
         result = sortable_year_for_yyyy_or_yy
         result ||= sortable_year_for_decade # 19xx or 20xx
         result ||= sortable_year_for_century
@@ -102,6 +106,7 @@ module Stanford
         return if orig_date_str == '0000-00-00' # shpc collection has these useless dates
         # B.C. first in case there are 4 digits, e.g. 1600 B.C.
         return sortable_year_str_for_bc if orig_date_str.match(BC_REGEX)
+
         result = sortable_year_for_yyyy_or_yy
         result ||= sortable_year_for_decade # 19xx or 20xx
         result ||= sortable_year_for_century
@@ -144,6 +149,7 @@ module Stanford
       # @return [String, nil] 4 digit year (e.g. 1865, 0950) if orig_date_str matches pattern, nil otherwise
       def sortable_year_for_yy
         return unless orig_date_str
+
         slash_matches = orig_date_str.match(/\d{1,2}\/\d{1,2}\/\d{2}/)
         if slash_matches
           date_obj = Date.strptime(orig_date_str, '%m/%d/%y')
@@ -196,6 +202,7 @@ module Stanford
       def sortable_year_for_century
         return unless orig_date_str
         return if orig_date_str =~ /B\.C\./
+
         century_matches = orig_date_str.match(CENTURY_4CHAR_REGEXP)
         if century_matches
           return $1 + '00' if $1.length == 2
@@ -215,6 +222,7 @@ module Stanford
       def display_str_for_century
         return unless orig_date_str
         return if orig_date_str =~ /B\.C\./
+
         century_str_matches = orig_date_str.match(CENTURY_WORD_REGEXP)
         return century_str_matches.to_s if century_str_matches
 
@@ -262,6 +270,7 @@ module Stanford
       # @return [String, nil] String sortable -ddd if orig_date_str matches pattern; nil otherwise
       def sortable_year_str_for_early_numeric
         return unless orig_date_str.match(EARLY_NUMERIC)
+
         if orig_date_str =~ /^\-/
           # negative number becomes x - 1000 for sorting; -005 for -995
           num = orig_date_str[1..-1].to_i - 1000
@@ -275,6 +284,7 @@ module Stanford
       # @return [Integer, nil] Integer sortable -ddd if orig_date_str matches pattern; nil otherwise
       def sortable_year_int_for_early_numeric
         return orig_date_str.to_i if orig_date_str.match(EARLY_NUMERIC)
+
         orig_date_str.to_i if orig_date_str =~ /^-\d{4}$/
       end
 
@@ -290,6 +300,7 @@ module Stanford
         return '1 B.C.' if orig_date_str == '0'
         # negative number becomes B.C.
         return "#{orig_date_str[1..-1].to_i + 1} B.C." if orig_date_str =~ /^\-/
+
         # remove leading 0s from early dates
         "#{orig_date_str.to_i} A.D."
       end
@@ -304,6 +315,7 @@ module Stanford
         # need more in string than only 2 digits
         return if orig_date_str.match(/^\d\d$/) || orig_date_str.match(/^\D*\d\d\D*$/)
         return if orig_date_str =~ /\d\s*B.C./ # skip B.C. dates
+
         date_obj = Date.parse(orig_date_str)
         date_obj.year.to_s
       rescue ArgumentError

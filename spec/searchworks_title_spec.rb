@@ -93,6 +93,7 @@ describe 'title fields (searchworks.rb)' do
           expect(@smods_rec.sw_full_title).to eq 'The Olympics!'
         end
       end # no subtitle
+
       context 'subtitle' do
         it 'end title with a colon' do
           m = "<mods #{@ns_decl}>
@@ -136,6 +137,7 @@ describe 'title fields (searchworks.rb)' do
           expect(@smods_rec.sw_full_title).to eq 'The Olympics : a history?'
         end
       end # subtitle
+
       context 'partName' do
         context 'no partNumber' do
           it 'end partName with period' do
@@ -175,6 +177,7 @@ describe 'title fields (searchworks.rb)' do
             expect(@smods_rec.sw_full_title).to eq 'cfb. Appendix.'
           end
         end # no partNumber
+
         context 'partNumber' do
           it 'end partNumber with comma' do
             m = "<mods #{@ns_decl}>
@@ -218,6 +221,7 @@ describe 'title fields (searchworks.rb)' do
           end
         end
       end # partName
+
       context 'no partName, but partNumber' do
         it 'end partNumber with period' do
           m = "<mods #{@ns_decl}>
@@ -335,6 +339,7 @@ describe 'title fields (searchworks.rb)' do
         expect(@smods_rec.sw_title_display).to eq 'The Jerk'
       end
     end
+
     context 'no subtitle' do
       it 'end title with a period' do
         m = "<mods #{@ns_decl}>
@@ -364,6 +369,7 @@ describe 'title fields (searchworks.rb)' do
         expect(@smods_rec.sw_title_display).to eq 'The Olympics!'
       end
     end # no subtitle
+
     context 'subtitle' do
       it 'end title with a colon' do
         m = "<mods #{@ns_decl}>
@@ -407,6 +413,7 @@ describe 'title fields (searchworks.rb)' do
         expect(@smods_rec.sw_title_display).to eq 'The Olympics : a history?'
       end
     end # subtitle
+
     context 'partName' do
       context 'no partNumber' do
         it 'end partName with period' do
@@ -446,6 +453,7 @@ describe 'title fields (searchworks.rb)' do
           expect(@smods_rec.sw_title_display).to eq 'cfb. Appendix'
         end
       end # no partNumber
+
       context 'partNumber' do
         it 'end partNumber with comma' do
           m = "<mods #{@ns_decl}>
@@ -489,6 +497,7 @@ describe 'title fields (searchworks.rb)' do
         end
       end
     end # partName
+
     context 'no partName, but partNumber' do
       it 'end partNumber with period' do
         m = "<mods #{@ns_decl}>
@@ -557,6 +566,7 @@ describe 'title fields (searchworks.rb)' do
       @smods_rec.from_str(m)
       @addl_titles = @smods_rec.sw_addl_titles
     end
+
     it 'should not include the main title' do
       expect(@addl_titles.size).to eq 2
       expect(@addl_titles).not_to include(@smods_rec.sw_full_title)
@@ -655,6 +665,7 @@ describe 'title fields (searchworks.rb)' do
         </titleInfo></mods>"
       @all_smods_rec.from_str(all)
     end
+
     it 'short titles' do
       expect(@mccarthy_smods_rec.sw_short_title).to eql 'McCarthy, John'
       expect(@insp_general_smods_rec.sw_short_title).to eql 'Semiannual report to Congress'

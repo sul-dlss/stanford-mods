@@ -109,12 +109,14 @@ module Stanford
           if codes && codes.size > xvals.size
             subject.geographicCode.each { |n|
               next unless n.authority != 'marcgac' && n.authority != 'marccountry'
+
               sw_logger.info("#{druid} has subject geographicCode element with untranslated encoding (#{n.authority}): #{n.to_xml}")
             }
           end
 
           # FIXME:  stanford-mods should be returning [], not nil ...
           return nil if !result || result.empty?
+
           result
         end
       end

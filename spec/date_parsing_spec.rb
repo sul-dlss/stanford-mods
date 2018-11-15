@@ -394,12 +394,14 @@ describe "date parsing methods" do
       Stanford::Mods::DateParsing.date_str_for_display('1666')
     end
   end
+
   context '*sortable_year_string_from_date_str' do
     it 'calls instance method sortable_year_string_from_date_str' do
       expect_any_instance_of(Stanford::Mods::DateParsing).to receive(:sortable_year_string_from_date_str)
       Stanford::Mods::DateParsing.sortable_year_string_from_date_str('1666')
     end
   end
+
   context '*year_int_from_date_str' do
     it 'calls instance method year_int_from_date_str' do
       expect_any_instance_of(Stanford::Mods::DateParsing).to receive(:year_int_from_date_str)
