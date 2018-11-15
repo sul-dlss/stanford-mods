@@ -6,9 +6,5 @@ gemspec
 group :test, :development do
   gem 'rubocop', require: false
   gem 'rubocop-rspec', require: false
-  gem 'pry-byebug', require: false, platform: [:ruby_20, :ruby_21]
   gem 'coveralls', require: false
 end
-
-# Pin to activesupport 4.x for older versions of ruby
-gem 'activesupport', '~> 4.2' if RUBY_VERSION < '2.2.2'

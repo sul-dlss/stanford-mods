@@ -198,7 +198,13 @@ module Stanford
       # this includes all titles except
       # @return [Array<String>] values for title_variant_search
       def sw_addl_titles
-        full_titles.select { |s| s !~ Regexp.new(Regexp.escape(sw_short_title)) }
+        excluded_title = sw_short_title || sw_title_display
+        if excluded_title.present?
+          title_regex = Regexp.new(Regexp.escape(excluded_title))
+          full_titles.reject { |s| s =~ title_regex }.reject(&:blank?)
+        else
+          full_titles.reject(&:blank?)
+        end
       end
 
       # Returns a sortable version of the main title

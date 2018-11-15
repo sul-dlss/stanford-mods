@@ -2,11 +2,11 @@ language: ruby
 script: rake
 rvm:
   - 2.4.4
-  - 2.3.1
+  - 2.3.7
   # we used to use jruby for merged DOR + MARC records, but no more ...
-  - jruby-9.2.0.0
+  - jruby-9.2.4.0
 matrix:
   allow_failures:
-    - rvm: jruby-9.2.0.0
+    - rvm: jruby-9.2.4.0
 notifications: false
 sudo: false
