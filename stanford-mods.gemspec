@@ -27,4 +27,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "yard"
   # tests
   gem.add_development_dependency 'rspec'
+  gem.add_development_dependency 'rubocop', '~> 0.60'
+  gem.add_development_dependency 'rubocop-rspec'
+  gem.add_development_dependency 'simplecov'
 end
