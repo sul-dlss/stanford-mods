@@ -1293,7 +1293,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <dateIssued>1500 CE</dateIssued>
         <issuance>monographic</issuance>' +
         mods_origin_info_end_str => 'Italy, 1500 CE'
-    },
+    }
   # water
   # wilpf?
   # yotsuba

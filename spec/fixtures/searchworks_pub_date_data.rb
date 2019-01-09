@@ -972,7 +972,7 @@ SEARCHWORKS_PUB_DATE_DATA = {
       mods_origin_info_start_str +
         '<dateIssued>1500 CE</dateIssued>' +
         mods_origin_info_end_str => [1500, '1500']
-    },
+    }
   # water
   # wilpf?
   # yotsuba
