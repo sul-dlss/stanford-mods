@@ -48,7 +48,7 @@ module Stanford
 
                               date_elements = origin_info_node.send(date_field)
                               date_elements.map(&:as_object).map(&:first) if date_elements.any?
-                            end.first
+                            end.compact.first
                           end
 
           if date_elements.nil? || date_elements.none?
