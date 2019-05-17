@@ -14,6 +14,7 @@ describe Stanford::Mods::Imprint do
         '' => [],
         '<dateIssued point="start">unparsable</dateIssued>' => [],
         '<dateIssued>1957</dateIssued>' => [1957],
+        '<dateCreated>1957</dateCreated>' => [1957],
         '<dateIssued>195u</dateIssued>' => (1950..1959).to_a,
         '<dateCreated keyDate="yes">1964</dateCreated><dateIssued>195u</dateIssued>' => [1964],
         '<dateIssued>1964</dateIssued><dateCreated>195u</dateCreated>' => [1964],
