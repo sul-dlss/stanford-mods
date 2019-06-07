@@ -73,6 +73,15 @@ module Stanford
         end.flatten
       end
 
+      def publisher_vals_str(origin_info_node)
+        return if origin_info_node.publisher.text.strip.empty?
+
+        publishers = origin_info_node.publisher.reject do |p|
+          p.text.strip.empty?
+        end.map(&:text)
+        compact_and_join_with_delimiter(publishers, ' : ')
+      end
+
       private
 
       def extract_year(el)
@@ -102,15 +111,6 @@ module Stanford
         origin_info_node.edition.reject do |e|
           e.text.strip.empty?
         end.map(&:text).join(' ').strip
-      end
-
-      def publisher_vals_str(origin_info_node)
-        return if origin_info_node.publisher.text.strip.empty?
-
-        publishers = origin_info_node.publisher.reject do |p|
-          p.text.strip.empty?
-        end.map(&:text)
-        compact_and_join_with_delimiter(publishers, ' : ')
       end
 
       # PLACE processing methods ------
