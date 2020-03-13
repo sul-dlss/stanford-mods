@@ -2,7 +2,7 @@ inherit_from: .rubocop_todo.yml
 
 require: rubocop-rspec
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 200
 
 # shut hound up re: quote styles
