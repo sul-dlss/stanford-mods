@@ -1,5 +1,6 @@
 # Language Values used by SearchWorks
 # From  https://github.com/solrmarc/stanford-solr-marc/blob/master/stanford-sw/translation_maps/language_map.properties
+# code 'ase' from iso639-3
 SEARCHWORKS_LANGUAGES = {
   'aaa' => 'Afar',
   'abk' => 'Abkhaz',
@@ -30,6 +31,7 @@ SEARCHWORKS_LANGUAGES = {
   'arp' => 'Arapaho',
   'art' => 'Artificial (Other)',
   'arw' => 'Arawak',
+  'ase' => 'American Sign Language',
   'asm' => 'Assamese',
   'ast' => 'Bable',
   'ath' => 'Athapascan (Other)',
