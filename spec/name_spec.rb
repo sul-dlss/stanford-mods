@@ -11,7 +11,7 @@ describe "name/author concepts" do
                           </name>" }
     let(:plain_creator_text) { "<name>
                               <namePart>plain_creator_text</namePart>
-                              <role><roleTerm type='text' authority='marcrelator'>Creator</roleTerm></role>
+                              <role><roleTerm type='text' authority='marcrelator'>creator</roleTerm></role>
                           </name>" }
     let(:plain_creator_non_mr) { "<name>
                               <namePart>plain_creator_non_mr</namePart>
@@ -23,7 +23,7 @@ describe "name/author concepts" do
                           </name>" }
     let(:plain_author_text) { "<name>
                               <namePart>plain_author_text</namePart>
-                              <role><roleTerm type='text' authority='marcrelator'>Author</roleTerm></role>
+                              <role><roleTerm type='text' authority='marcrelator'>author</roleTerm></role>
                           </name>" }
     let(:plain_author_non_mr) { "<name>
                               <namePart>plain_author_non_mr</namePart>

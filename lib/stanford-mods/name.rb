@@ -17,7 +17,7 @@ module Stanford
           first_wo_role ||= n if n.role.empty?
           n.role.each { |r|
             if r.authority.include?('marcrelator') &&
-                  (r.value.include?('Creator') || r.value.include?('Author'))
+                 r.value.any? { |v| v.match(/creator/i) || v.match?(/author/i) }
               result ||= n.display_value_w_date
             end
           }
