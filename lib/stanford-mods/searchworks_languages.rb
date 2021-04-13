@@ -1,6 +1,7 @@
 # Language Values used by SearchWorks
 # From  https://github.com/solrmarc/stanford-solr-marc/blob/master/stanford-sw/translation_maps/language_map.properties
 # code 'ase' from iso639-3
+# code egy-Egyd from rfc5646
 SEARCHWORKS_LANGUAGES = {
   'aaa' => 'Afar',
   'abk' => 'Abkhaz',
@@ -125,6 +126,7 @@ SEARCHWORKS_LANGUAGES = {
   'dzo' => 'Dzongkha',
   'efi' => 'Efik',
   'egy' => 'Egyptian',
+  'egy-Egyd' => 'Egyptian, Demotic',
   'eka' => 'Ekajuk',
   'elx' => 'Elamite',
   'eng' => 'English',
