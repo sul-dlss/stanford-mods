@@ -272,7 +272,7 @@ describe "date parsing methods" do
     '10/1/90' => '1990',
     '10/21/08' => '2008',
     '5-1-59' => '1959',
-    '5-1-21' => '1921',
+    '5-1-29' => '1929',
     '5-1-14' => '2014'
   }
   # example string as key, expected parsed value as value
