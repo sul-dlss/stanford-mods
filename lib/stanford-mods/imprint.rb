@@ -1,3 +1,5 @@
+require 'active_support/core_ext/integer/inflections'
+
 module Stanford
   module Mods
     ##
@@ -400,7 +402,6 @@ module Stanford
           # note:  not calling DateParsing.display_str_for_century directly because non-year text is lost
           century_matches = orig_date_str.match(CENTURY_4CHAR_REGEXP) if orig_date_str
           if century_matches
-            require 'active_support/core_ext/integer/inflections'
             new_century_str = "#{(century_matches[3].to_i + 1).ordinalize} century"
             my_ng_date_element.content = "#{century_matches[1]}#{new_century_str}#{century_matches[4]}"
           else

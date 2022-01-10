@@ -1,3 +1,4 @@
+require 'active_support'
 require 'mods'
 require 'stanford-mods/date_parsing'
 require 'stanford-mods/coordinate'
