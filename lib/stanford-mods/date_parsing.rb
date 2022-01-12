@@ -1,3 +1,5 @@
+require 'active_support/core_ext/integer/inflections'
+
 module Stanford
   module Mods
     # Parsing date strings
@@ -228,7 +230,6 @@ module Stanford
 
         century_matches = orig_date_str.match(CENTURY_4CHAR_REGEXP)
         if century_matches
-          require 'active_support/core_ext/integer/inflections'
           return "#{($1.to_i + 1).ordinalize} century"
         end
       end
