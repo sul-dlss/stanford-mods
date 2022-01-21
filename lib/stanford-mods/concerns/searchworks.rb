@@ -1,25 +1,9 @@
-# encoding: UTF-8
-require 'stanford-mods/searchworks_languages'
-require 'stanford-mods/searchworks_subjects'
-require 'logger'
-require 'mods'
+# frozen_string_literal: true
 
 # SearchWorks specific wranglings of MODS metadata as a mixin to the Stanford::Mods::Record object
 module Stanford
   module Mods
-    class Record < ::Mods::Record
-      attr_writer :druid
-      attr_writer :logger
-
-      def druid
-        @druid || 'Unknown item'
-      end
-
-      def logger
-        @logger ||= Logger.new(STDOUT)
-      end
-      alias sw_logger logger
-
+    module Searchworks
       # include langagues known to SearchWorks; try to error correct when possible (e.g. when ISO-639 disagrees with MARC standard)
       def sw_language_facet
         result = []

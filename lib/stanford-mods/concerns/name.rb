@@ -1,10 +1,9 @@
-# encoding: UTF-8
-require 'mods'
+# frozen_string_literal: true
 
 # NON-SearchWorks specific wranglings of MODS <name> metadata as a mixin to the Stanford::Mods::Record object
 module Stanford
   module Mods
-    class Record < ::Mods::Record
+    module Name
       # the first encountered <mods><name> element with marcrelator flavor role of 'Creator' or 'Author'.
       # if no marcrelator 'Creator' or 'Author', the first name without a role.
       # if no name without a role, then nil

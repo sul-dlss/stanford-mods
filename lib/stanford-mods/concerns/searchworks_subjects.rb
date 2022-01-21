@@ -1,11 +1,9 @@
-# encoding: UTF-8
-require 'logger'
-require 'mods'
+# frozen_string_literal: true
 
 # SearchWorks specific wranglings of MODS  *subject* metadata as a mixin to the Stanford::Mods::Record object
 module Stanford
   module Mods
-    class Record < ::Mods::Record
+    module SearchworksSubjects
       # Values are the contents of:
       #   subject/geographic
       #   subject/hierarchicalGeographic
@@ -110,7 +108,7 @@ module Stanford
             subject.geographicCode.each { |n|
               next unless n.authority != 'marcgac' && n.authority != 'marccountry'
 
-              sw_logger.info("#{druid} has subject geographicCode element with untranslated encoding (#{n.authority}): #{n.to_xml}")
+              logger.info("#{druid} has subject geographicCode element with untranslated encoding (#{n.authority}): #{n.to_xml}")
             }
           end
 
@@ -147,7 +145,7 @@ module Stanford
 
           # print a message for any temporal encodings
           subject.temporal.each { |n|
-            sw_logger.info("#{druid} has subject temporal element with untranslated encoding: #{n.to_xml}") unless n.encoding.empty?
+            logger.info("#{druid} has subject temporal element with untranslated encoding: #{n.to_xml}") unless n.encoding.empty?
           }
 
           vals.empty? ? nil : vals

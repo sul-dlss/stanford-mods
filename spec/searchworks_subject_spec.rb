@@ -95,7 +95,7 @@ describe "Subject fields (searchworks.rb)" do
         m = "<mods #{@ns_decl}><subject><geographicCode authority='iso3166'>ca</geographicCode></subject></mods>"
         @smods_rec = Stanford::Mods::Record.new
         @smods_rec.from_str(m)
-        expect(@smods_rec.sw_logger).to receive(:info).with(/ has subject geographicCode element with untranslated encoding \(iso3166\): <geographicCode authority=.*>ca<\/geographicCode>/)
+        expect(@smods_rec.logger).to receive(:info).with(/ has subject geographicCode element with untranslated encoding \(iso3166\): <geographicCode authority=.*>ca<\/geographicCode>/)
         @smods_rec.geographic_search
       end
     end # geographic_search
@@ -230,7 +230,7 @@ describe "Subject fields (searchworks.rb)" do
           m = "<mods #{@ns_decl}><subject><temporal encoding='iso8601'>197505</temporal></subject></mods>"
           @smods_rec = Stanford::Mods::Record.new
           @smods_rec.from_str(m)
-          expect(@smods_rec.sw_logger).to receive(:info).with(/ has subject temporal element with untranslated encoding: <temporal encoding=.*>197505<\/temporal>/)
+          expect(@smods_rec.logger).to receive(:info).with(/ has subject temporal element with untranslated encoding: <temporal encoding=.*>197505<\/temporal>/)
           @smods_rec.subject_other_subvy_search
         end
         it "should be nil if there are only empty values in the MODS" do
@@ -265,7 +265,7 @@ describe "Subject fields (searchworks.rb)" do
 
     context "subject_all_search" do
       before :each do
-        allow(@smods_rec.sw_logger).to receive(:info).with(/ has subject geographicCode element with untranslated encoding \(iso3166\): <geographicCode authority=.*>us<\/geographicCode>/)
+        allow(@smods_rec.logger).to receive(:info).with(/ has subject geographicCode element with untranslated encoding \(iso3166\): <geographicCode authority=.*>us<\/geographicCode>/)
       end
 
       it "should be nil if there are no values in the MODS" do
@@ -283,7 +283,7 @@ describe "Subject fields (searchworks.rb)" do
         @smods_rec = Stanford::Mods::Record.new
         @smods_rec.from_str(@subject_mods)
         ## need to re-allow/expect :info message with newly assigned object
-        expect(@smods_rec.sw_logger).to receive(:info).with(/ has subject geographicCode element with untranslated encoding \(iso3166\): <geographicCode authority=.*>us<\/geographicCode>/)
+        expect(@smods_rec.logger).to receive(:info).with(/ has subject geographicCode element with untranslated encoding \(iso3166\): <geographicCode authority=.*>us<\/geographicCode>/)
         expect(@smods_rec.subject_all_search).to include(@s_genre)
         expect(@smods_rec.subject_all_search).to include(@geo)
         expect(@smods_rec.subject_all_search).to include(@hier_geo_country)
