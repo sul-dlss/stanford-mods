@@ -1,4 +1,4 @@
-require 'mods'
+# frozen_string_literal: true
 
 module Stanford
   module Mods
@@ -7,7 +7,7 @@ module Stanford
     # Note: mods_ng_xml_location.physicalLocation should find top level and relatedItem.
     # Each method here expects to find at most ONE matching element.  Subsequent potential matches
     # are ignored.
-    class Record < ::Mods::Record
+    module PhysicalLocation
       # data in location/physicalLocation or in relatedItem/location/physicalLocation
       # so use _location to get the data from either one of them
       # @return [String] box number (note: single valued and might be something like 35A)

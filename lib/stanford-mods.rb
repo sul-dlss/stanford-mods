@@ -1,20 +1,22 @@
 require 'active_support'
+require 'active_support/core_ext/integer/inflections'
 require 'mods'
+require 'logger'
 require 'stanford-mods/date_parsing'
 require 'stanford-mods/coordinate'
-require 'stanford-mods/geo_spatial'
-require 'stanford-mods/geo_utils'
 require 'stanford-mods/imprint'
-require 'stanford-mods/name'
-require 'stanford-mods/origin_info'
-require 'stanford-mods/physical_location'
-require 'stanford-mods/searchworks'
+require 'stanford-mods/vocabularies/marc_countries'
+require 'stanford-mods/vocabularies/searchworks_languages'
+require 'stanford-mods/concerns/geo_spatial'
+require 'stanford-mods/concerns/name'
+require 'stanford-mods/concerns/origin_info'
+require 'stanford-mods/concerns/physical_location'
+require 'stanford-mods/concerns/searchworks'
+require 'stanford-mods/concerns/searchworks_subjects'
+require 'stanford-mods/record'
 require 'stanford-mods/version'
 
-# Stanford specific wranglings of MODS metadata as an extension of the Mods::Record object
 module Stanford
   module Mods
-    class Record < ::Mods::Record
-    end # Record class
-  end # Mods module
-end # Stanford module
+  end
+end

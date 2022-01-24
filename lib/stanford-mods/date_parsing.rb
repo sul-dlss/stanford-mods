@@ -1,5 +1,3 @@
-require 'active_support/core_ext/integer/inflections'
-
 module Stanford
   module Mods
     # Parsing date strings

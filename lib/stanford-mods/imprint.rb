@@ -1,5 +1,3 @@
-require 'active_support/core_ext/integer/inflections'
-
 module Stanford
   module Mods
     ##
@@ -14,8 +12,6 @@ module Stanford
       def initialize(originInfo_ng_nodeset)
         @originInfo_ng_nodeset = originInfo_ng_nodeset
       end
-
-      require 'marc_countries'
 
       # @return Array<String> each String is an imprint statement from a single originInfo element
       def imprint_statements

@@ -1,10 +1,9 @@
-# encoding: UTF-8
-require 'mods'
+# frozen_string_literal: true
 
 module Stanford
   module Mods
     # NON-SearchWorks specific wranglings of MODS cartographics metadata
-    class Record < ::Mods::Record
+    module Geospatial
       GMLNS = 'http://www.opengis.net/gml/3.2/'.freeze
 
       # @return [Array{String}] subject cartographic coordinates values

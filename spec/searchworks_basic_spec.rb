@@ -1,6 +1,4 @@
-# require 'spec_helper'
-# not using spec_helper here: testing require
-require 'stanford-mods/searchworks'
+require 'spec_helper'
 
 describe 'Basic construction' do
   before(:each) do
