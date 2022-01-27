@@ -11,6 +11,7 @@ require 'stanford-mods/concerns/origin_info'
 require 'stanford-mods/concerns/physical_location'
 require 'stanford-mods/concerns/searchworks'
 require 'stanford-mods/concerns/searchworks_subjects'
+require 'stanford-mods/concerns/title'
 require 'stanford-mods/record'
 require 'stanford-mods/version'
 

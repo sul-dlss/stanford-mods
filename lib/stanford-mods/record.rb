@@ -8,6 +8,7 @@ module Stanford
       include Stanford::Mods::PhysicalLocation
       include Stanford::Mods::SearchworksSubjects
       include Stanford::Mods::Searchworks
+      include Stanford::Mods::Title
 
       attr_writer :druid
 
