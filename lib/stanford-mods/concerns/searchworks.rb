@@ -88,22 +88,6 @@ module Stanford
         val.gsub(/[[:punct:]]*/, '').strip
       end
 
-      def main_author_w_date_test
-        result = nil
-        first_wo_role = nil
-        plain_name.each { |n|
-          first_wo_role ||= n if n.role.empty?
-          n.role.each { |r|
-            if r.authority.include?('marcrelator') &&
-              (r.value.include?('Creator') || r.value.include?('Author'))
-              result ||= n.display_value_w_date
-            end
-          }
-        }
-        result = first_wo_role.display_value_w_date if !result && first_wo_role
-        result
-      end
-
       # ---- end AUTHOR ----
 
       # ---- TITLE ----
@@ -200,14 +184,6 @@ module Stanford
         val.sub!(Regexp.new("^" + Regexp.escape(nonSort_title)), '') if nonSort_title
         val.gsub!(/[[:punct:]]*/, '').strip
         val.squeeze(" ").strip
-      end
-
-      # remove trailing commas
-      # @deprecated in favor of sw_title_display
-      def sw_full_title_without_commas
-        result = sw_full_title
-        result.sub!(/,$/, '') if result
-        result
       end
 
       # ---- end TITLE ----
