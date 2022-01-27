@@ -97,18 +97,6 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
       @smods_rec.from_str(m)
     end
 
-    it "main author (for author_1xx_search)" do
-      expect(@smods_rec).to receive(:main_author_w_date) # in stanford-mods.rb
-      @smods_rec.sw_main_author
-    end
-    it "additional authors (for author_7xx_search)" do
-      expect(@smods_rec).to receive(:additional_authors_w_dates) # in stanford-mods.rb
-      @smods_rec.sw_addl_authors
-    end
-    it "person authors (for author_person_facet, author_person_display)" do
-      expect(@smods_rec).to receive(:personal_names_w_dates) # in Mods gem
-      @smods_rec.sw_person_authors
-    end
     it "non-person authors (for author_other_facet)" do
       expect(@smods_rec.sw_impersonal_authors).to eq(['Watchful Eye, 1850-', 'Exciting Prints', 'plain', 'conference', 'family'])
     end
@@ -121,14 +109,6 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
     context "sort author" do
       it "should be a String" do
         expect(@smods_rec.sw_sort_author).to eq('qJerk')
-      end
-      it "should include the main author, as retrieved by :main_author_w_date" do
-        expect(@smods_rec).to receive(:main_author_w_date) # in stanford-mods.rb
-        @smods_rec.sw_sort_author
-      end
-      it "should append the sort title, as retrieved by :sort_title" do
-        expect(@smods_rec).to receive(:sort_title) # in Mods gem
-        @smods_rec.sw_sort_author
       end
       it "should not begin or end with whitespace" do
         expect(@smods_rec.sw_sort_author).to eq(@smods_rec.sw_sort_author.strip)
