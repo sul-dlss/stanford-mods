@@ -13,15 +13,12 @@ module Stanford
             if ct.authority =~ /^iso639/
               vals = ct.text.split(/[,|\ ]/).reject { |x| x.strip.empty? }
               vals.each do |v|
-                if ISO_639.find(v.strip)
-                  iso639_val = ISO_639.find(v.strip).english_name
-                  if SEARCHWORKS_LANGUAGES.has_value?(iso639_val)
-                    result << iso639_val
-                  else
-                    result << SEARCHWORKS_LANGUAGES[v.strip]
-                  end
+                next unless ISO_639.find(v.strip)
+                iso639_val = ISO_639.find(v.strip).english_name
+                if SEARCHWORKS_LANGUAGES.has_value?(iso639_val)
+                  result << iso639_val
                 else
-                  logger.warn "Couldn't find english name for #{ct.text}"
+                  result << SEARCHWORKS_LANGUAGES[v.strip]
                 end
               end
             else

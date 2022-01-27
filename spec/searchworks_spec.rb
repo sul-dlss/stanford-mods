@@ -32,7 +32,6 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
     it "should return nothing when the authority and type=code are specified but the language code cannot be found" do
       m = "<mods #{@ns_decl}><language><languageTerm authority='iso639-2b' type='code'>bogus</languageTerm></language></mods>"
       @smods_rec.from_str m
-      expect(@smods_rec.logger).to receive(:warn).with(/Couldn't find english name for bogus/)
       langs = @smods_rec.sw_language_facet
       expect(langs.size).to eq(0)
     end       

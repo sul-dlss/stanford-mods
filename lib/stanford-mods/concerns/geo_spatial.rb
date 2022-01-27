@@ -26,8 +26,7 @@ module Stanford
                      lowers = v.xpath('gml:lowerCorner', 'gml' => GMLNS).text.split
                      "ENVELOPE(#{lowers[0]}, #{uppers[0]}, #{uppers[1]}, #{lowers[1]})"
                    end
-      rescue RuntimeError => e
-        logger.warn "failure parsing <extension> element: #{e.message}"
+      rescue RuntimeError
         []
       end
 
