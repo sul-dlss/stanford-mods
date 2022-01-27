@@ -86,27 +86,7 @@ describe "Subject fields (searchworks.rb)" do
       end
     end # topic_search
 
-    context "geographic_search" do
-      it "should call sw_geographic_search (from stanford-mods gem)" do
-        m = "<mods #{@ns_decl}><subject><geographic>#{@geo}</geographic></subject></mods>"
-        @smods_rec = Stanford::Mods::Record.new
-        @smods_rec.from_str(m)
-        expect(@smods_rec).to receive(:sw_geographic_search)
-        @smods_rec.geographic_search
-      end
-    end # geographic_search
-
     context "subject_other_search" do
-      it "should call sw_subject_names (from stanford-mods gem)" do
-        smods_rec = Stanford::Mods::Record.new
-        smods_rec.from_str(@subject_mods)
-        expect(smods_rec).to receive(:sw_subject_names).and_return([])
-        smods_rec.subject_other_search
-      end
-      it "should call sw_subject_titles (from stanford-mods gem)" do
-        expect(@smods_rec).to receive(:sw_subject_titles).and_return([])
-        @smods_rec.subject_other_search
-      end
       it "should be nil if there are no values in the MODS" do
         m = "<mods #{@ns_decl}></mods>"
         @smods_rec = Stanford::Mods::Record.new
