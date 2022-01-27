@@ -1,45 +1,23 @@
 module Stanford
   module Mods
     module Title
-
       # @return [String] value for title_245a_search field
       def sw_short_title
-        short_titles ? short_titles.compact.reject(&:empty?).first : nil
-      end
-
-      # @return [Nokogiri::XML::Node] the first titleInfo node if present, else nil
-      # @private
-      def first_title_info_node
-        non_blank_nodes = mods_ng_xml.title_info.reject { |node| node.text.strip.empty? }
-        non_blank_nodes.find { |node| node.type_at != 'alternative' } || non_blank_nodes.first
-      end
-
-      # @return [String] the nonSort text portion of the titleInfo node as a string (if non-empty, else nil)
-      # @private
-      def nonSort_title
-        return unless first_title_info_node && first_title_info_node.nonSort
-
-        first_title_info_node.nonSort.text.strip.empty? ? nil : first_title_info_node.nonSort.text.strip
-      end
-
-      # @return [String] the text of the titleInfo node as a string (if non-empty, else nil)
-      # @private
-      def title
-        return unless first_title_info_node && first_title_info_node.title
-
-        first_title_info_node.title.text.strip.empty?   ? nil : first_title_info_node.title.text.strip
+        short_titles&.compact&.reject(&:empty?)&.first
       end
 
       # Searchworks requires that the MODS has a '//titleInfo/title'
       # @return [String] value for title_245_search, title_full_display
       def sw_full_title(sortable: false)
-        return nil if !first_title_info_node || !title
+        return unless first_title_info_node
 
-        preSubTitle = if !sortable && nonSort_title
-          [nonSort_title, title].compact.join(" ")
-        else
-          title
-        end
+        title = first_title_info_node.title&.text&.strip
+
+        return if title.nil? || title.empty?
+
+        nonSort_title = first_title_info_node.nonSort&.text&.strip
+
+        preSubTitle = [(nonSort_title unless sortable), title].compact.join(' ')
 
         preSubTitle.sub!(/:$/, '')
 
@@ -87,6 +65,14 @@ module Stanford
       def sw_sort_title
         val = sw_full_title(sortable: true) || ''
         val.gsub(/[[:punct:]]*/, '').squeeze(" ").strip
+      end
+
+      private
+
+      # @return [Nokogiri::XML::Node] the first titleInfo node if present, else nil
+      def first_title_info_node
+        non_blank_nodes = mods_ng_xml.title_info.reject { |node| node.text.strip.empty? }
+        non_blank_nodes.find { |node| node.type_at != 'alternative' } || non_blank_nodes.first
       end
     end
   end
