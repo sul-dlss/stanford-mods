@@ -680,7 +680,7 @@ describe 'title fields (searchworks.rb)' do
     end
     it 'additional titles' do
       expect(@mccarthy_smods_rec.sw_addl_titles).to eql []
-      expect(@insp_general_smods_rec.sw_addl_titles).to eql []
+      expect(@insp_general_smods_rec.sw_addl_titles).to eql ['Semiannual report to Congress (Online)']
       expect(@cfb_smods_rec.sw_addl_titles).to eql []
       expect(@all_smods_rec.sw_addl_titles).to eql []
     end

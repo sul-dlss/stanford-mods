@@ -97,14 +97,10 @@ module Stanford
         short_titles ? short_titles.compact.reject(&:empty?).first : nil
       end
 
-      # @return [Nokogiri::XML::NodeSet] title_info nodes, rejecting ones that just have blank text values
-      def present_title_info_nodes
-        mods_ng_xml.title_info.reject {|node| node.text.strip.empty?}
-      end
-
       # @return [Nokogiri::XML::Node] the first titleInfo node if present, else nil
       def first_title_info_node
-        present_title_info_nodes ? present_title_info_nodes.first : nil
+        non_blank_nodes = mods_ng_xml.title_info.reject { |node| node.text.strip.empty? }
+        non_blank_nodes.find { |node| node.type_at != 'alternative' } || non_blank_nodes.first
       end
 
       # @return [String] the nonSort text portion of the titleInfo node as a string (if non-empty, else nil)
@@ -170,13 +166,7 @@ module Stanford
       # this includes all titles except
       # @return [Array<String>] values for title_variant_search
       def sw_addl_titles
-        excluded_title = sw_short_title || sw_title_display
-        if excluded_title.present?
-          title_regex = Regexp.new(Regexp.escape(excluded_title))
-          full_titles.reject { |s| s =~ title_regex }.reject(&:blank?)
-        else
-          full_titles.reject(&:blank?)
-        end
+        (full_titles - first_title_info_node.full_title).reject(&:blank?)
       end
 
       # Returns a sortable version of the main title
