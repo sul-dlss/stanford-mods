@@ -65,17 +65,17 @@ module Stanford
       # return the display_value_w_date for all <mods><name> elements that do not have type='personal'
       # @return [Array<String>] values for author_other_facet
       def sw_impersonal_authors
-        mods_ng_xml.plain_name.select { |n| n.type_at != 'personal' }.map { |n| n.display_value_w_date }
+        mods_ng_xml.plain_name.select { |n| n.type_at != 'personal' }.map(&:display_value_w_date)
       end
 
       # @return [Array<String>] values for author_corp_display
       def sw_corporate_authors
-        mods_ng_xml.plain_name.select { |n| n.type_at == 'corporate' }.map { |n| n.display_value_w_date }
+        mods_ng_xml.corporate_name.map(&:display_value_w_date)
       end
 
       # @return [Array<String>] values for author_meeting_display
       def sw_meeting_authors
-        mods_ng_xml.plain_name.select { |n| n.type_at == 'conference' }.map { |n| n.display_value_w_date }
+        mods_ng_xml.conference_name.map(&:display_value_w_date)
       end
 
       # Returns a sortable version of the main_author:
