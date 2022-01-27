@@ -69,10 +69,14 @@ module Stanford
         # {}"other_year_isi"         => "Date",
       end
 
+      # @return [Array<Stanford::Mods::Imprint>] array of imprint objects
+      def imprints
+        origin_info.map { |el| Stanford::Mods::Imprint.new(el) }
+      end
+
       # @return [String] single String containing imprint information for display
       def imprint_display_str
-        imp = Stanford::Mods::Imprint.new(origin_info)
-        imp.display_str
+        imprints.map(&:display_str).reject(&:empty?).join('; ')
       end
 
       # given the passed date elements, look for a single keyDate and use it if there is one;

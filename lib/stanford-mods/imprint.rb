@@ -10,67 +10,65 @@ module Stanford
     # however, the date_parsing class only does years, and this does finer tuned dates and also
     # reformats them according to the encoding.
     class Imprint
-      # @param [Nokogiri::XML::NodeSet] originInfo_ng_nodeset of originInfo nodes
-      def initialize(originInfo_ng_nodeset)
-        @originInfo_ng_nodeset = originInfo_ng_nodeset
+      attr_reader :element
+
+      # @param [Nokogiri::XML::Node] an originInfo node
+      def initialize(element)
+        @element = element
       end
 
-      # @return Array<String> each String is an imprint statement from a single originInfo element
       def imprint_statements
-        results = []
-        @originInfo_ng_nodeset.each do |origin_info_node|
-          edition = edition_vals_str(origin_info_node)
-          place = place_vals_str(origin_info_node)
-          publisher = publisher_vals_str(origin_info_node)
-          dates = date_str(origin_info_node)
-
-          place_pub = compact_and_join_with_delimiter([place, publisher], ' : ')
-          edition_place_pub = compact_and_join_with_delimiter([edition, place_pub], ' - ')
-          ed_place_pub_dates = compact_and_join_with_delimiter([edition_place_pub, dates], ', ')
-
-          results << ed_place_pub_dates unless ed_place_pub_dates.empty?
-        end
-        results
+        display_str
       end
 
+      # @return <String> an imprint statement from a single originInfo element
       def display_str
-        imprint_statements.join('; ') if imprint_statements.present?
+        edition = edition_vals_str
+        place = place_vals_str
+        publisher = publisher_vals_str
+        dates = date_str
+
+        place_pub = compact_and_join_with_delimiter([place, publisher], ' : ')
+        edition_place_pub = compact_and_join_with_delimiter([edition, place_pub], ' - ')
+        ed_place_pub_dates = compact_and_join_with_delimiter([edition_place_pub, dates], ', ')
+
+        ed_place_pub_dates
       end
 
       # @return Array<Integer> an array of publication years for the resource
       def publication_date_for_slider
-        @originInfo_ng_nodeset.map do |origin_info_node|
-          date_elements = if origin_info_node.as_object.first.key_dates.any?
-                            origin_info_node.as_object.first.key_dates.map(&:as_object).map(&:first)
-                          else
-                            date_field_keys.map do |date_field|
-                              next unless origin_info_node.respond_to?(date_field)
+        date_elements = if element.as_object.first.key_dates.any?
+                          element.as_object.first.key_dates.map(&:as_object).map(&:first)
+                        else
+                          date_field_keys.map do |date_field|
+                            next unless element.respond_to?(date_field)
 
-                              date_elements = origin_info_node.send(date_field)
-                              date_elements.map(&:as_object).map(&:first) if date_elements.any?
-                            end.compact.first
-                          end
+                            date_elements = element.send(date_field)
+                            date_elements.map(&:as_object).map(&:first) if date_elements.any?
+                          end.compact.first
+                        end
 
-          if date_elements.nil? || date_elements.none?
-            []
-          elsif date_elements.find(&:start?) &&
-                date_elements.find(&:start?).as_range &&
-                date_elements.find(&:end?) &&
-                date_elements.find(&:end?).as_range
-            start_date = date_elements.find(&:start?)
-            end_date = date_elements.find(&:end?)
+        dates = if date_elements.nil? || date_elements.none?
+          []
+        elsif date_elements.find(&:start?) &&
+              date_elements.find(&:start?).as_range &&
+              date_elements.find(&:end?) &&
+              date_elements.find(&:end?).as_range
+          start_date = date_elements.find(&:start?)
+          end_date = date_elements.find(&:end?)
 
-            (start_date.as_range.min.year..end_date.as_range.max.year).to_a
-          elsif date_elements.find(&:start?) && date_elements.find(&:start?).as_range
-            start_date = date_elements.find(&:start?)
+          (start_date.as_range.min.year..end_date.as_range.max.year).to_a
+        elsif date_elements.find(&:start?) && date_elements.find(&:start?).as_range
+          start_date = date_elements.find(&:start?)
 
-            (start_date.as_range.min.year..Time.now.year).to_a
-          elsif date_elements.one?
-            date_elements.first.to_a.map(&:year)
-          else
-            date_elements.map { |v| v.to_a.map(&:year) }.flatten
-          end
-        end.flatten
+          (start_date.as_range.min.year..Time.now.year).to_a
+        elsif date_elements.one?
+          date_elements.first.to_a.map(&:year)
+        else
+          date_elements.map { |v| v.to_a.map(&:year) }
+        end
+
+        dates.flatten
       end
 
       private
@@ -98,16 +96,16 @@ module Stanford
         value.strip.end_with?('.', ',', ':', ';')
       end
 
-      def edition_vals_str(origin_info_node)
-        origin_info_node.edition.reject do |e|
+      def edition_vals_str
+        element.edition.reject do |e|
           e.text.strip.empty?
         end.map(&:text).join(' ').strip
       end
 
-      def publisher_vals_str(origin_info_node)
-        return if origin_info_node.publisher.text.strip.empty?
+      def publisher_vals_str
+        return if element.publisher.text.strip.empty?
 
-        publishers = origin_info_node.publisher.reject do |p|
+        publishers = element.publisher.reject do |p|
           p.text.strip.empty?
         end.map(&:text)
         compact_and_join_with_delimiter(publishers, ' : ')
@@ -115,10 +113,10 @@ module Stanford
 
       # PLACE processing methods ------
 
-      def place_vals_str(origin_info_node)
-        return if origin_info_node.place.text.strip.empty?
+      def place_vals_str
+        return if element.place.text.strip.empty?
 
-        places = place_terms(origin_info_node).reject do |p|
+        places = place_terms.reject do |p|
           p.text.strip.empty?
         end.map(&:text)
         compact_and_join_with_delimiter(places, ' : ')
@@ -131,17 +129,17 @@ module Stanford
         end
       end
 
-      def place_terms(origin_info_element)
-        return [] unless origin_info_element.respond_to?(:place) &&
-                         origin_info_element.place.respond_to?(:placeTerm)
+      def place_terms
+        return [] unless element.respond_to?(:place) &&
+                         element.place.respond_to?(:placeTerm)
 
-        if unencoded_place_terms?(origin_info_element)
-          origin_info_element.place.placeTerm.select do |term|
+        if unencoded_place_terms?(element)
+          element.place.placeTerm.select do |term|
             !term.attributes['type'].respond_to?(:value) ||
               term.attributes['type'].value == 'text'
           end.compact
         else
-          origin_info_element.place.placeTerm.map do |term|
+          element.place.placeTerm.map do |term|
             next unless term.attributes['type'].respond_to?(:value) &&
                         term.attributes['type'].value == 'code' &&
                         term.attributes['authority'].respond_to?(:value) &&
@@ -158,18 +156,18 @@ module Stanford
 
       # DATE processing methods ------
 
-      def date_str(origin_info_node)
-        date_vals = origin_info_date_vals(origin_info_node)
+      def date_str
+        date_vals = origin_info_date_vals
         return if date_vals.empty?
 
         date_vals.map(&:strip).join(' ')
       end
 
-      def origin_info_date_vals(origin_info_node)
+      def origin_info_date_vals
         date_field_keys.map do |date_field|
-          next unless origin_info_node.respond_to?(date_field)
+          next unless element.respond_to?(date_field)
 
-          date_elements = origin_info_node.send(date_field)
+          date_elements = element.send(date_field)
           date_elements_display_vals(date_elements) if date_elements.present?
         end.compact.flatten
       end
