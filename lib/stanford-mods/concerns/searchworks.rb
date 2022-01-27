@@ -123,10 +123,15 @@ module Stanford
 
       # Searchworks requires that the MODS has a '//titleInfo/title'
       # @return [String] value for title_245_search, title_full_display
-      def sw_full_title
+      def sw_full_title(sortable: false)
         return nil if !first_title_info_node || !title
 
-        preSubTitle = nonSort_title ? [nonSort_title, title].compact.join(" ") : title
+        preSubTitle = if !sortable && nonSort_title
+          [nonSort_title, title].compact.join(" ")
+        else
+          title
+        end
+
         preSubTitle.sub!(/:$/, '')
 
         subTitle = first_title_info_node.subTitle.text.strip
@@ -177,10 +182,8 @@ module Stanford
       # Returns a sortable version of the main title
       # @return [String] value for title_sort field
       def sw_sort_title
-        val = '' + (sw_full_title ? sw_full_title : '')
-        val.sub!(Regexp.new("^" + Regexp.escape(nonSort_title)), '') if nonSort_title
-        val.gsub!(/[[:punct:]]*/, '').strip
-        val.squeeze(" ").strip
+        val = sw_full_title(sortable: true) || ''
+        val.gsub(/[[:punct:]]*/, '').squeeze(" ").strip
       end
 
       # ---- end TITLE ----
