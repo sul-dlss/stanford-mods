@@ -1,3 +1,5 @@
+require 'mods/marc_country_codes'
+
 module Stanford
   module Mods
     ##
@@ -144,10 +146,11 @@ module Stanford
                         term.attributes['type'].value == 'code' &&
                         term.attributes['authority'].respond_to?(:value) &&
                         term.attributes['authority'].value == 'marccountry' &&
-                        MARC_COUNTRIES.include?(term.text.strip)
+                        !['xx', 'vp'].include?(term.text.strip) &&
+                        MARC_COUNTRY.include?(term.text.strip)
 
             term = term.clone
-            term.content = MARC_COUNTRIES[term.text.strip]
+            term.content = MARC_COUNTRY[term.text.strip]
             term
           end.compact
         end
