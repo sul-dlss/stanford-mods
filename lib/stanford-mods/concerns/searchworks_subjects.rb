@@ -10,6 +10,7 @@ module Stanford
       #   subject/geographicCode  (only include the translated value if it isn't already present from other mods geo fields)
       # @param [String] sep - the separator string for joining hierarchicalGeographic sub elements
       # @return [Array<String>] values for geographic_search Solr field for this document or [] if none
+      # @private
       def sw_geographic_search(sep = ' ')
         result = term_values([:subject, :geographic]) || []
 
@@ -29,6 +30,7 @@ module Stanford
       #  "Values from namePart subelements should be concatenated in the order they appear (e.g. "Shakespeare, William, 1564-1616")"
       # @param [String] sep - the separator string for joining namePart sub elements
       # @return [Array<String>] values for names inside subject elements or [] if none
+      # @private
       def sw_subject_names(sep = ', ')
         mods_ng_xml.subject.name_el
                    .select { |n_el| n_el.namePart }
@@ -41,6 +43,7 @@ module Stanford
       #   subject/titleInfo/(subelements)
       # @param [String] sep - the separator string for joining titleInfo sub elements
       # @return [Array<String>] values for titles inside subject elements or [] if none
+      # @private
       def sw_subject_titles(sep = ' ')
         mods_ng_xml.subject.titleInfo.map do |ti_el|
           parts = ti_el.element_children.map(&:text).reject(&:empty?)
