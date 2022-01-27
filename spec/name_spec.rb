@@ -302,7 +302,7 @@ describe "name/author concepts" do
           </name>
         EOF
       smods_rec.from_str(mods_start + name_snippet + mods_end)
-      expect(smods_rec.non_collector_person_authors).to eq nil
+      expect(smods_rec.non_collector_person_authors).to eq []
     end
     it 'no role present' do
       name_snippet =
@@ -312,7 +312,7 @@ describe "name/author concepts" do
           </name>
         EOF
       smods_rec.from_str(mods_start + name_snippet + mods_end)
-      expect(smods_rec.non_collector_person_authors).to eq nil
+      expect(smods_rec.non_collector_person_authors).to eq []
     end
   end
 
@@ -426,7 +426,7 @@ describe "name/author concepts" do
           </name>
         EOF
       smods_rec.from_str(mods_start + name_snippet + mods_end)
-      expect(smods_rec.collectors_w_dates).to eq nil
+      expect(smods_rec.collectors_w_dates).to eq []
     end
     it 'no role present' do
       name_snippet =
@@ -436,7 +436,7 @@ describe "name/author concepts" do
           </name>
         EOF
       smods_rec.from_str(mods_start + name_snippet + mods_end)
-      expect(smods_rec.collectors_w_dates).to eq nil
+      expect(smods_rec.collectors_w_dates).to eq []
     end
   end
 end
