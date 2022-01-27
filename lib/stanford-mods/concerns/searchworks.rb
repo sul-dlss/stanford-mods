@@ -6,41 +6,38 @@ module Stanford
     module Searchworks
       # include langagues known to SearchWorks; try to error correct when possible (e.g. when ISO-639 disagrees with MARC standard)
       def sw_language_facet
-        result = []
-        mods_ng_xml.language.each { |n|
+        mods_ng_xml.language.flat_map do |n|
           # get languageTerm codes and add their translations to the result
-          n.code_term.each { |ct|
+          result = n.code_term.flat_map do |ct|
             if ct.authority =~ /^iso639/
               vals = ct.text.split(/[,|\ ]/).reject { |x| x.strip.empty? }
-              vals.each do |v|
-                next unless ISO_639.find(v.strip)
+              vals.select { |v| ISO_639.find(v.strip) }.map do |v|
                 iso639_val = ISO_639.find(v.strip).english_name
+
                 if SEARCHWORKS_LANGUAGES.has_value?(iso639_val)
-                  result << iso639_val
+                  iso639_val
                 else
-                  result << SEARCHWORKS_LANGUAGES[v.strip]
+                  SEARCHWORKS_LANGUAGES[v.strip]
                 end
               end
             else
               vals = ct.text.split(/[,|\ ]/).reject { |x| x.strip.empty? }
-              vals.each do |v|
-                result << SEARCHWORKS_LANGUAGES[v.strip]
+
+              vals.map do |v|
+                SEARCHWORKS_LANGUAGES[v.strip]
               end
             end
-          }
+          end
+
           # add languageTerm text values
-          n.text_term.each { |tt|
-            val = tt.text.strip
-            result << val if !val.empty? && SEARCHWORKS_LANGUAGES.has_value?(val)
-          }
+          result.concat(n.text_term.map { |tt| tt.text.strip }.select { |val| !val.empty? && SEARCHWORKS_LANGUAGES.has_value?(val) })
 
           # add language values that aren't in languageTerm subelement
-          if n.languageTerm.empty?
-            result << n.text if SEARCHWORKS_LANGUAGES.has_value?(n.text)
-          end
-        }
-        result.uniq
-      end # language_facet
+          result << n.text if n.languageTerm.empty? && SEARCHWORKS_LANGUAGES.has_value?(n.text)
+
+          result
+        end.uniq
+      end
 
       # select one or more format values from the controlled vocabulary per JVine Summer 2014
       #   http://searchworks-solr-lb.stanford.edu:8983/solr/select?facet.field=format_main_ssim&rows=0&facet.sort=index
@@ -51,60 +48,50 @@ module Stanford
         types = typeOfResource
         return [] unless types
 
-        article_genres = ['article', 'Article',
-          'book chapter', 'Book chapter', 'Book Chapter',
-          'issue brief', 'Issue brief', 'Issue Brief',
-          'project report', 'Project report', 'Project Report',
-          'student project report', 'Student project report', 'Student Project report', 'Student Project Report',
-          'technical report', 'Technical report', 'Technical Report',
-          'working paper', 'Working paper', 'Working Paper'
-        ]
-        book_genres = ['conference publication', 'Conference publication', 'Conference Publication',
-          'instruction', 'Instruction',
-          'librettos', 'Librettos',
-          'thesis', 'Thesis'
-        ]
         val = []
         genres = term_values(:genre) || []
         issuance = term_values([:origin_info, :issuance]) || []
         frequency = term_values([:origin_info, :frequency]) || []
 
         val << 'Dataset' if genres.include?('dataset') || genres.include?('Dataset')
+        val << 'Archive/Manuscript' if types.any? { |t| t.manuscript == 'yes' }
 
-        types.each do |type|
-          val << 'Archive/Manuscript' if type.manuscript == 'yes'
-
+        val.concat(types.flat_map do |type|
           case type.text
             when 'cartographic'
-              val << 'Map'
+              'Map'
             when 'mixed material'
-              val << 'Archive/Manuscript'
+              'Archive/Manuscript'
             when 'moving image'
-              val << 'Video'
+              'Video'
             when 'notated music'
-              val << 'Music score'
+              'Music score'
             when 'software, multimedia'
-              val << 'Software/Multimedia' unless types.map(&:text).include?('cartographic') || (genres.include?('dataset') || genres.include?('Dataset'))
+              'Software/Multimedia' unless types.map(&:text).include?('cartographic') || (genres.include?('dataset') || genres.include?('Dataset'))
             when 'sound recording-musical'
-              val << 'Music recording'
+              'Music recording'
             when 'sound recording-nonmusical', 'sound recording'
-              val << 'Sound recording'
+              'Sound recording'
             when 'still image'
-              val << 'Image'
+              'Image'
             when 'text'
-              is_explicitly_a_book = type.manuscript != 'yes' && (issuance.include?('monographic') || !(genres & article_genres).empty? || !(genres & book_genres).empty?)
               is_periodical = issuance.include?('continuing') || issuance.include?('serial') || frequency.any? { |x| !x.empty? }
               is_archived_website = genres.any? { |x| x.casecmp('archived website') == 0 }
 
-              val << 'Book' if is_explicitly_a_book
-              val << 'Journal/Periodical' if is_periodical
-              val << 'Archived website' if is_archived_website
-              val << 'Book' unless is_explicitly_a_book || is_periodical || is_archived_website
+              if is_periodical || is_archived_website
+                [
+                  ('Journal/Periodical' if is_periodical),
+                  ('Archived website' if is_archived_website)
+                ].compact
+              else
+                'Book'
+              end
             when 'three dimensional object'
-              val << 'Object'
+              'Object'
           end
-        end
-        val.uniq
+        end)
+
+        val.compact.uniq
       end
 
       # @return <Array[String]> values for the genre facet in SearchWorks

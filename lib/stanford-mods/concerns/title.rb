@@ -8,25 +8,25 @@ module Stanford
 
       # Searchworks requires that the MODS has a '//titleInfo/title'
       # @return [String] value for title_245_search, title_full_display
-      def sw_full_title(sortable: false)
-        return unless first_title_info_node
+      def sw_full_title(title_info = first_title_info_node, sortable: false)
+        return unless title_info
 
-        title = first_title_info_node.title&.text&.strip
+        title = title_info.title&.text&.strip
 
         return if title.nil? || title.empty?
 
-        nonSort_title = first_title_info_node.nonSort&.text&.strip
+        nonSort_title = title_info.nonSort&.text&.strip
 
         preSubTitle = [(nonSort_title unless sortable), title].compact.join(' ')
 
         preSubTitle.sub!(/:$/, '')
 
-        subTitle = first_title_info_node.subTitle.text.strip
+        subTitle = title_info.subTitle.text.strip
         preParts = subTitle.empty? ? preSubTitle : preSubTitle + " : " + subTitle
         preParts.sub!(/\.$/, '') if preParts # remove trailing period
 
-        partName   = first_title_info_node.partName.text.strip   unless first_title_info_node.partName.text.strip.empty?
-        partNumber = first_title_info_node.partNumber.text.strip unless first_title_info_node.partNumber.text.strip.empty?
+        partName   = title_info.partName.text.strip   unless title_info.partName.text.strip.empty?
+        partNumber = title_info.partNumber.text.strip unless title_info.partNumber.text.strip.empty?
         partNumber.sub!(/,$/, '') if partNumber # remove trailing comma
         if partNumber && partName
           parts = partNumber + ", " + partName
