@@ -42,51 +42,6 @@ module Stanford
         result.uniq
       end # language_facet
 
-      # ---- AUTHOR ----
-
-      # @return [String] value for author_1xx_search field
-      def sw_main_author
-        main_author_w_date
-      end
-
-      # @return [Array<String>] values for author_7xx_search field
-      def sw_addl_authors
-        additional_authors_w_dates
-      end
-
-      # @return [Array<String>] values for author_person_facet, author_person_display
-      def sw_person_authors
-        personal_names_w_dates
-      end
-
-      # return the display_value_w_date for all <mods><name> elements that do not have type='personal'
-      # @return [Array<String>] values for author_other_facet
-      def sw_impersonal_authors
-        mods_ng_xml.plain_name.select { |n| n.type_at != 'personal' }.map(&:display_value_w_date)
-      end
-
-      # @return [Array<String>] values for author_corp_display
-      def sw_corporate_authors
-        mods_ng_xml.corporate_name.map(&:display_value_w_date)
-      end
-
-      # @return [Array<String>] values for author_meeting_display
-      def sw_meeting_authors
-        mods_ng_xml.conference_name.map(&:display_value_w_date)
-      end
-
-      # Returns a sortable version of the main_author:
-      #  main_author + sorting title
-      # which is the mods approximation of the value created for a marc record
-      # @return [String] value for author_sort field
-      def sw_sort_author
-        #  substitute java Character.MAX_CODE_POINT for nil main_author so missing main authors sort last
-        val = '' + (main_author_w_date ? main_author_w_date : "\u{10FFFF} ") + (sort_title ? sort_title : '')
-        val.gsub(/[[:punct:]]*/, '').strip
-      end
-
-      # ---- end AUTHOR ----
-
       # select one or more format values from the controlled vocabulary per JVine Summer 2014
       #   http://searchworks-solr-lb.stanford.edu:8983/solr/select?facet.field=format_main_ssim&rows=0&facet.sort=index
       # https://github.com/sul-dlss/stanford-mods/issues/66 - For geodata, the
