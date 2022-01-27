@@ -159,10 +159,7 @@ module Stanford
       #    title_display = custom, removeTrailingPunct(245abdefghijklmnopqrstuvwxyz, [\\\\,/;:], ([A-Za-z]{4}|[0-9]{3}|\\)|\\,))
       # @return [String] value for title_display (like title_full_display without trailing punctuation)
       def sw_title_display
-        result = sw_full_title
-        return nil unless result
-
-        result.sub(/[\.,;:\/\\]+$/, '').strip
+        sw_full_title&.sub(/[\.,;:\/\\]+$/, '')&.strip
       end
 
       # this includes all titles except
@@ -284,9 +281,8 @@ module Stanford
       # @return [String] value with the numeric catkey in it, or nil if none exists
       def catkey
         catkey = term_values([:record_info, :recordIdentifier])
-        return nil unless catkey && !catkey.empty?
 
-        catkey.first.tr('a', '') # ensure catkey is numeric only
+        catkey.first&.tr('a', '') # ensure catkey is numeric only
       end
     end # class Record
   end # Module Mods
