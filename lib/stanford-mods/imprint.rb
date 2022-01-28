@@ -74,7 +74,7 @@ module Stanford
       private
 
       def extract_year(el)
-        DateParsing.year_int_from_date_str(el.text)
+        DateParsing.new(el.text).year_int_from_date_str
       end
 
       def compact_and_join_with_delimiter(values, delimiter)
