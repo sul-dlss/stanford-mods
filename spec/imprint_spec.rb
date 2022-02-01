@@ -30,10 +30,10 @@ describe Stanford::Mods::Imprint do
       end
       it 'handles invalid dates by returning the original value' do
         smods_rec.from_str(mods_origin_info_start_str +
-          '<dateCreated encoding="w3cdtf">1920-09-00</dateCreated>' +
+          '<dateCreated encoding="w3cdtf">1920-09-32</dateCreated>' +
           mods_origin_info_end_str)
         imprint_strs = stanford_mods_imprint(smods_rec).display_str
-        expect(imprint_strs).to eq '1920-09-00'
+        expect(imprint_strs).to eq '1920-09-32'
       end
     end
 
