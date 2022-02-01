@@ -720,14 +720,14 @@ SEARCHWORKS_PUB_DATE_DATA = {
       # coll rec jr022nf7673 has no dates
       # jx555jt0710
       mods_origin_info_start_str +
-        '<dateCreated encoding="w3cdtf" keyDate="yes" point="start" qualifier="approximate">199 B.C.</dateCreated>' +
-        '<dateCreated encoding="w3cdtf" keyDate="yes" point="end" qualifier="approximate">100 B.C.</dateCreated>' +
-        mods_origin_info_end_str => [-199, '199 B.C. - 100 B.C.'],
+        '<dateCreated keyDate="yes" point="start" qualifier="approximate">199 B.C.</dateCreated>' +
+        '<dateCreated keyDate="yes" point="end" qualifier="approximate">100 B.C.</dateCreated>' +
+        mods_origin_info_end_str => [-198, '199 B.C. - 100 B.C.'],
       # ww728rz0477
       mods_origin_info_start_str +
-        '<dateCreated encoding="w3cdtf" keyDate="yes" point="start" qualifier="approximate">211 B.C.</dateCreated>' +
-        '<dateCreated encoding="w3cdtf" keyDate="yes" point="end" qualifier="approximate">150 B.C.</dateCreated>' +
-        mods_origin_info_end_str => [-211, '211 B.C. - 150 B.C.']
+        '<dateCreated keyDate="yes" point="start" qualifier="approximate">211 B.C.</dateCreated>' +
+        '<dateCreated keyDate="yes" point="end" qualifier="approximate">150 B.C.</dateCreated>' +
+        mods_origin_info_end_str => [-210, '211 B.C. - 150 B.C.']
     },
   # pcc
   # peace

@@ -92,20 +92,20 @@ describe "computations from /originInfo field" do
     it '-200 for 200 B.C.' do
       # hd778hw9236
       mods_str = mods_origin_info_start_str +
-        '<dateCreated encoding="w3cdtf" keyDate="yes" point="start" qualifier="approximate">200 B.C.</dateCreated>' +
-        '<dateCreated encoding="w3cdtf" keyDate="yes" point="end" qualifier="approximate">180 B.C.</dateCreated>' +
+        '<dateCreated keyDate="yes" point="start" qualifier="approximate">200 B.C.</dateCreated>' +
+        '<dateCreated keyDate="yes" point="end" qualifier="approximate">180 B.C.</dateCreated>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_year_int).to eq(-200)
+      expect(smods_rec.pub_year_int).to eq(-199)
     end
     it '-211 for 211 B.C.' do
       # ww728rz0477
       mods_str = mods_origin_info_start_str +
-        '<dateCreated encoding="w3cdtf" keyDate="yes" point="start" qualifier="approximate">211 B.C.</dateCreated>' +
-        '<dateCreated encoding="w3cdtf" keyDate="yes" point="end" qualifier="approximate">150 B.C.</dateCreated>' +
+        '<dateCreated keyDate="yes" point="start" qualifier="approximate">211 B.C.</dateCreated>' +
+        '<dateCreated keyDate="yes" point="end" qualifier="approximate">150 B.C.</dateCreated>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_year_int).to eq(-211)
+      expect(smods_rec.pub_year_int).to eq(-210)
     end
   end
 
