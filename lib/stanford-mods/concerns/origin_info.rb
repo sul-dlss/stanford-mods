@@ -92,8 +92,8 @@ module Stanford
       def self.best_or_earliest_year(date_el_array)
         key_dates, other_dates = date_el_array.partition { |node| node['keyDate'] == 'yes' }
 
-        sortable_dates = key_dates.map { |x| DateParsing.new(x.content) }.select(&:sortable_year_string_from_date_str)
-        sortable_dates = other_dates.map { |x| DateParsing.new(x.content) }.select(&:sortable_year_string_from_date_str) if sortable_dates.empty?
+        sortable_dates = key_dates.map { |x| DateParsing.new(x) }.select(&:sortable_year_string_from_date_str)
+        sortable_dates = other_dates.map { |x| DateParsing.new(x) }.select(&:sortable_year_string_from_date_str) if sortable_dates.empty?
         results = {}
 
         # this is a little weird; instead of just the earliest sorting date, if there are multiple

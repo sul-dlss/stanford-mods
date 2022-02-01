@@ -51,7 +51,7 @@ SPOTLIGHT_PUB_DATE_DATA = {
         mods_origin_info_end_str => ['2001', '2001'],
       # yt809jk3834, qb375hy6817
       mods_origin_info_start_str +
-        '<dateCreated encoding="w3cdtf" keyDate="yes">3/25/1998</dateCreated>' +
+        '<dateCreated encoding="w3cdtf" keyDate="yes">1998-03-25</dateCreated>' +
         mods_origin_info_end_str => ['1998', '1998'],
       # mg505sz9327, mx006md9511, sy619vt7106
       mods_origin_info_start_str +
@@ -234,14 +234,14 @@ SPOTLIGHT_PUB_DATE_DATA = {
     { # key is mods_xml;  values = [pub date sortable facet value, pub date single string facet value]
       # hd778hw9236
       mods_origin_info_start_str +
-        '<dateCreated encoding="w3cdtf" keyDate="yes" point="start" qualifier="approximate">200 B.C.</dateCreated>' +
-        '<dateCreated encoding="w3cdtf" keyDate="yes" point="end" qualifier="approximate">180 B.C.</dateCreated>' +
-        mods_origin_info_end_str => ['-800', '200 B.C.'],
+        '<dateCreated keyDate="yes" point="start" qualifier="approximate">200 B.C.</dateCreated>' +
+        '<dateCreated keyDate="yes" point="end" qualifier="approximate">180 B.C.</dateCreated>' +
+        mods_origin_info_end_str => ['-801', '200 B.C.'],
       # ww728rz0477
       mods_origin_info_start_str +
-        '<dateCreated encoding="w3cdtf" keyDate="yes" point="start" qualifier="approximate">211 B.C.</dateCreated>' +
-        '<dateCreated encoding="w3cdtf" keyDate="yes" point="end" qualifier="approximate">150 B.C.</dateCreated>' +
-        mods_origin_info_end_str => ['-789', '211 B.C.']
+        '<dateCreated keyDate="yes" point="start" qualifier="approximate">211 B.C.</dateCreated>' +
+        '<dateCreated keyDate="yes" point="end" qualifier="approximate">150 B.C.</dateCreated>' +
+        mods_origin_info_end_str => ['-790', '211 B.C.']
     },
   'renaissance' =>
     { # key is mods_xml;  values = [pub date sortable facet value, pub date single string facet value]

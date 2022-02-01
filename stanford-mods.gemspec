@@ -16,7 +16,7 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^spec/})
   gem.require_paths = ["lib"]
 
-  gem.add_dependency 'mods', '>= 3.0.0.alpha1', '< 4'
+  gem.add_dependency 'mods', '~> 3.0', '>= 3.0.1'
   # active_support for .ordinalize, eg. 1 -> 1st, 2 -> 2nd for centuries
   gem.add_dependency 'activesupport'
 
