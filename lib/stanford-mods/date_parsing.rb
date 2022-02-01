@@ -6,34 +6,13 @@ module Stanford
     #     - we may want an integer or date sort field as well as lexical
     #     - we could add methods like my_date.bc?
     class DateParsing
-      # get display value for year, generally an explicit year or "17th century" or "5 B.C." or "1950s" or '845 A.D.'
-      # @return [String, nil] display value for year if we could parse one, nil otherwise
-      def self.date_str_for_display(date_str)
-        DateParsing.new(date_str).date_str_for_display
-      end
-
-      # get year as Integer if we can parse date_str to get a year.
-      # @return [Integer, nil] Integer year if we could parse one, nil otherwise
-      def self.year_int_from_date_str(date_str)
-        DateParsing.new(date_str).year_int_from_date_str
-      end
-
-      # get String sortable value year if we can parse date_str to get a year.
-      #   SearchWorks currently uses a string field for pub date sorting; thus so does Spotlight.
-      #   The values returned must *lexically* sort in chronological order, so the B.C. dates are tricky
-      # @return [String, nil] String sortable year if we could parse one, nil otherwise
-      #  note that these values must *lexically* sort to create a chronological sort.
-      def self.sortable_year_string_from_date_str(date_str)
-        DateParsing.new(date_str).sortable_year_string_from_date_str
-      end
-
       # true if the year is between -999 and (current year + 1)
       # @param [String] year_str String containing a date in format: -yyy, -yy, -y, y, yy, yyy, yyyy
       # @return [Boolean] true if the year is between -999 and (current year + 1); false otherwise
       def self.year_str_valid?(year_str)
         return false unless year_str && (year_str.match(/^\d{1,4}$/) || year_str.match(/^-\d{1,3}$/))
 
-        (-1000 < year_str.to_i) && (year_str.to_i < Date.today.year + 2)
+        year_int_valid? year_str.to_i
       end
 
       # true if the year is between -9999 and (current year + 1)

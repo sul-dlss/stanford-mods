@@ -8,16 +8,12 @@ module Stanford
       include Stanford::Mods::PhysicalLocation
       include Stanford::Mods::SearchworksSubjects
       include Stanford::Mods::Searchworks
+      include Stanford::Mods::Title
 
       attr_writer :druid
-      attr_writer :logger
 
       def druid
         @druid || 'Unknown item'
-      end
-
-      def logger
-        @logger ||= Logger.new(STDOUT)
       end
     end # Record class
   end # Mods module

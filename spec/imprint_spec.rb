@@ -1,5 +1,5 @@
 def stanford_mods_imprint(smods_rec)
-  Stanford::Mods::Imprint.new(smods_rec.origin_info)
+  Stanford::Mods::Imprint.new(smods_rec.origin_info.first)
 end
 
 # unit / functional tests for imprint class
@@ -48,15 +48,15 @@ describe Stanford::Mods::Imprint do
              0000-00-00
            </dateIssued>' +
           mods_origin_info_end_str)
-        imprint_strs = stanford_mods_imprint(smods_rec).imprint_statements
-        expect(imprint_strs).to eq(['Spain'])
+        imprint_strs = stanford_mods_imprint(smods_rec).display_str
+        expect(imprint_strs).to eq 'Spain'
       end
       it 'handles invalid dates by returning the original value' do
         smods_rec.from_str(mods_origin_info_start_str +
           '<dateCreated encoding="w3cdtf">1920-09-00</dateCreated>' +
           mods_origin_info_end_str)
-        imprint_strs = stanford_mods_imprint(smods_rec).imprint_statements
-        expect(imprint_strs.first).to match('1920-09-00')
+        imprint_strs = stanford_mods_imprint(smods_rec).display_str
+        expect(imprint_strs).to eq '1920-09-00'
       end
     end
 
@@ -231,8 +231,8 @@ describe Stanford::Mods::Imprint do
           <publisher>Chronicle Books,</publisher>
           <dateIssued>2015.</dateIssued>' +
         mods_origin_info_end_str)
-      imprint_strs = stanford_mods_imprint(smods_rec).imprint_statements
-      expect(imprint_strs).to eq ['San Francisco : Chronicle Books, 2015.']
+      imprint_strs = stanford_mods_imprint(smods_rec).display_str
+      expect(imprint_strs).to eq 'San Francisco : Chronicle Books, 2015.'
     end
   end
 
@@ -246,8 +246,8 @@ describe Stanford::Mods::Imprint do
            <placeTerm type="text" authority="marccountry">[Amsterdam]</placeTerm>
          </place>' +
         mods_origin_info_end_str)
-      imprint_strs = stanford_mods_imprint(smods_rec).imprint_statements
-      expect(imprint_strs).to eq ['[Amsterdam]']
+      imprint_strs = stanford_mods_imprint(smods_rec).display_str
+      expect(imprint_strs).to eq '[Amsterdam]'
     end
     it "translates encoded place if there isn't a text (or non-typed) value available" do
       smods_rec.from_str(mods_origin_info_start_str +
@@ -255,8 +255,8 @@ describe Stanford::Mods::Imprint do
           <placeTerm type="code" authority="marccountry">ne</placeTerm>
         </place>' +
         mods_origin_info_end_str)
-      imprint_strs = stanford_mods_imprint(smods_rec).imprint_statements
-      expect(imprint_strs).to eq ['Netherlands']
+      imprint_strs = stanford_mods_imprint(smods_rec).display_str
+      expect(imprint_strs).to eq 'Netherlands'
     end
     it "ignores 'xx' country code" do
       smods_rec.from_str(mods_origin_info_start_str +
@@ -265,8 +265,8 @@ describe Stanford::Mods::Imprint do
          </place>
          <dateIssued>1994</dateIssued>' +
         mods_origin_info_end_str)
-      imprint_strs = stanford_mods_imprint(smods_rec).imprint_statements
-      expect(imprint_strs).to eq(['1994'])
+      imprint_strs = stanford_mods_imprint(smods_rec).display_str
+      expect(imprint_strs).to eq('1994')
     end
   end
 end

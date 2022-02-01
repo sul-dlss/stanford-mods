@@ -7,72 +7,50 @@ module Stanford
       # the first encountered <mods><name> element with marcrelator flavor role of 'Creator' or 'Author'.
       # if no marcrelator 'Creator' or 'Author', the first name without a role.
       # if no name without a role, then nil
-      # @return [String] a name in the display_value_w_date form
-      # see Mods::Record.name  in nom_terminology for details on the display_value algorithm
-      def main_author_w_date
-        result = nil
-        first_wo_role = nil
-        mods_ng_xml.plain_name.each { |n|
-          first_wo_role ||= n if n.role.empty?
-          n.role.each { |r|
-            if r.authority.include?('marcrelator') &&
-                 r.value.any? { |v| v.match(/creator/i) || v.match?(/author/i) }
-              result ||= n.display_value_w_date
-            end
-          }
-        }
-        result = first_wo_role.display_value_w_date if !result && first_wo_role
-        result
-      end # main_author
+      # @return [String] value for author_1xx_search field
+      def sw_main_author
+        result = mods_ng_xml.plain_name.find { |n| n.role.any? { |r| r.authority.include?('marcrelator') && r.value.any? { |v| v.match(/creator/i) || v.match?(/author/i) } } }
+        result ||= mods_ng_xml.plain_name.find { |n| n.role.empty? }
+
+        result&.display_value_w_date
+      end
 
       # all names, in display form, except the main_author
       #  names will be the display_value_w_date form
       #  see Mods::Record.name  in nom_terminology for details on the display_value algorithm
-      def additional_authors_w_dates
-        results = []
-        mods_ng_xml.plain_name.each { |n|
-          results << n.display_value_w_date
-        }
-        results.delete(main_author_w_date)
-        results
+      # @return [Array<String>] values for author_7xx_search field
+      def sw_addl_authors
+        mods_ng_xml.plain_name.map(&:display_value_w_date) - [sw_main_author]
       end
 
-      # @return Array of Strings, each containing the computed display value of a personal name
-      #   except for the collector role (see mods gem nom_terminology for display value algorithm)
-      # FIXME:  this is broken if there are multiple role codes and some of them are not marcrelator
-      def non_collector_person_authors
-        result = []
-        mods_ng_xml.personal_name.map do |n|
-          next if n.role.size.zero?
-
-          n.role.each { |r|
-            result << n.display_value_w_date unless includes_marc_relator_collector_role?(r)
-          }
-        end
-        result unless result.empty?
+      # @return [Array<String>] values for author_person_facet, author_person_display
+      def sw_person_authors
+        mods_ng_xml.personal_names.map(&:display_value_w_date)
       end
 
-      # @return Array of Strings, each containing the computed display value of
-      #  a personal name with the role of Collector (see mods gem nom_terminology for display value algorithm)
-      def collectors_w_dates
-        result = []
-        mods_ng_xml.personal_name.each do |n|
-          next if n.role.size.zero?
-
-          n.role.each { |r|
-            result << n.display_value_w_date if includes_marc_relator_collector_role?(r)
-          }
-        end
-        result unless result.empty?
+      # return the display_value_w_date for all <mods><name> elements that do not have type='personal'
+      # @return [Array<String>] values for author_other_facet
+      def sw_impersonal_authors
+        mods_ng_xml.plain_name.select { |n| n.type_at != 'personal' }.map(&:display_value_w_date)
       end
 
-      COLLECTOR_ROLE_URI = 'http://id.loc.gov/vocabulary/relators/col'.freeze
+      # @return [Array<String>] values for author_corp_display
+      def sw_corporate_authors
+        mods_ng_xml.corporate_name.map(&:display_value_w_date)
+      end
 
-      # @param Nokogiri::XML::Node role_node the role node from a parent name node
-      # @return true if there is a MARC relator collector role assigned
-      def includes_marc_relator_collector_role?(role_node)
-        (role_node.authority.include?('marcrelator') && role_node.value.include?('Collector')) ||
-        role_node.roleTerm.valueURI.first == COLLECTOR_ROLE_URI
+      # @return [Array<String>] values for author_meeting_display
+      def sw_meeting_authors
+        mods_ng_xml.conference_name.map(&:display_value_w_date)
+      end
+
+      # Returns a sortable version of the main_author:
+      #  main_author + sorting title
+      # which is the mods approximation of the value created for a marc record
+      # @return [String] value for author_sort field
+      def sw_sort_author
+        #  substitute java Character.MAX_CODE_POINT for nil main_author so missing main authors sort last
+        "#{sw_main_author || "\u{10FFFF} " }#{sort_title}".gsub(/[[:punct:]]*/, '').strip
       end
     end # class Record
   end # Module Mods

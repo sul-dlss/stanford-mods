@@ -26,11 +26,14 @@ describe "Subject fields (searchworks.rb)" do
           <subject><titleInfo><title>#{@s_title}</title></titleInfo></subject>
           <subject><topic>#{@topic}</topic></subject>
         </mods>"
+    m_no_subject = "<mods #{@ns_decl}><note>notit</note></mods>"
+    @ng_mods_no_subject = Nokogiri::XML(m_no_subject)
+  end
+
+  before(:each) do
     @smods_rec = Stanford::Mods::Record.new
     @smods_rec.from_str(@subject_mods)
     @ng_mods = Nokogiri::XML(@subject_mods)
-    m_no_subject = "<mods #{@ns_decl}><note>notit</note></mods>"
-    @ng_mods_no_subject = Nokogiri::XML(m_no_subject)
   end
 
   context "search fields" do
@@ -39,7 +42,7 @@ describe "Subject fields (searchworks.rb)" do
         m = "<mods #{@ns_decl}></mods>"
         @smods_rec = Stanford::Mods::Record.new
         @smods_rec.from_str(m)
-        expect(@smods_rec.topic_search).to be_nil
+        expect(@smods_rec.topic_search).to eq []
       end
       it "should contain subject <topic> subelement data" do
         expect(@smods_rec.topic_search).to include(@topic)
@@ -74,48 +77,21 @@ describe "Subject fields (searchworks.rb)" do
           @smods_rec.from_str(m)
           expect(@smods_rec.topic_search).to eq(['first', 'second', 'third'])
         end
-        it "should be nil if there are only empty values in the MODS" do
+        it "should be empty if there are only empty values in the MODS" do
           m = "<mods #{@ns_decl}><subject><topic/></subject><note>notit</note></mods>"
           @smods_rec = Stanford::Mods::Record.new
           @smods_rec.from_str(m)
-          expect(@smods_rec.topic_search).to be_nil
+          expect(@smods_rec.topic_search).to eq []
         end
       end
     end # topic_search
 
-    context "geographic_search" do
-      it "should call sw_geographic_search (from stanford-mods gem)" do
-        m = "<mods #{@ns_decl}><subject><geographic>#{@geo}</geographic></subject></mods>"
-        @smods_rec = Stanford::Mods::Record.new
-        @smods_rec.from_str(m)
-        expect(@smods_rec).to receive(:sw_geographic_search)
-        @smods_rec.geographic_search
-      end
-      it "should log an info message when it encounters a geographicCode encoding it doesn't translate" do
-        m = "<mods #{@ns_decl}><subject><geographicCode authority='iso3166'>ca</geographicCode></subject></mods>"
-        @smods_rec = Stanford::Mods::Record.new
-        @smods_rec.from_str(m)
-        expect(@smods_rec.logger).to receive(:info).with(/ has subject geographicCode element with untranslated encoding \(iso3166\): <geographicCode authority=.*>ca<\/geographicCode>/)
-        @smods_rec.geographic_search
-      end
-    end # geographic_search
-
     context "subject_other_search" do
-      it "should call sw_subject_names (from stanford-mods gem)" do
-        smods_rec = Stanford::Mods::Record.new
-        smods_rec.from_str(@subject_mods)
-        expect(smods_rec).to receive(:sw_subject_names)
-        smods_rec.subject_other_search
-      end
-      it "should call sw_subject_titles (from stanford-mods gem)" do
-        expect(@smods_rec).to receive(:sw_subject_titles)
-        @smods_rec.subject_other_search
-      end
       it "should be nil if there are no values in the MODS" do
         m = "<mods #{@ns_decl}></mods>"
         @smods_rec = Stanford::Mods::Record.new
         @smods_rec.from_str(m)
-        expect(@smods_rec.subject_other_search).to be_nil
+        expect(@smods_rec.subject_other_search).to eq []
       end
       it "should contain subject <name> SUBelement data" do
         expect(@smods_rec.subject_other_search).to include(@s_name)
@@ -173,7 +149,7 @@ describe "Subject fields (searchworks.rb)" do
           m = "<mods #{@ns_decl}><subject><occupation/></subject><note>notit</note></mods>"
           @smods_rec = Stanford::Mods::Record.new
           @smods_rec.from_str(m)
-          expect(@smods_rec.subject_other_search).to be_nil
+          expect(@smods_rec.subject_other_search).to eq []
         end
       end
     end # subject_other_search
@@ -182,7 +158,7 @@ describe "Subject fields (searchworks.rb)" do
       it "should be nil if there are no values in the MODS" do
         @smods_rec = Stanford::Mods::Record.new
         @smods_rec.from_str(@ng_mods_no_subject.to_s)
-        expect(@smods_rec.subject_other_subvy_search).to be_nil
+        expect(@smods_rec.subject_other_subvy_search).to eq []
       end
       it "should contain subject <temporal> subelement data" do
         expect(@smods_rec.subject_other_subvy_search).to include(@temporal)
@@ -226,18 +202,11 @@ describe "Subject fields (searchworks.rb)" do
           @smods_rec.from_str(m)
           expect(@smods_rec.subject_other_subvy_search).to eq(['1890-1910', '20th century', 'another'])
         end
-        it "should log an info message when it encounters an encoding it doesn't translate" do
-          m = "<mods #{@ns_decl}><subject><temporal encoding='iso8601'>197505</temporal></subject></mods>"
-          @smods_rec = Stanford::Mods::Record.new
-          @smods_rec.from_str(m)
-          expect(@smods_rec.logger).to receive(:info).with(/ has subject temporal element with untranslated encoding: <temporal encoding=.*>197505<\/temporal>/)
-          @smods_rec.subject_other_subvy_search
-        end
         it "should be nil if there are only empty values in the MODS" do
           m = "<mods #{@ns_decl}><subject><temporal/></subject><note>notit</note></mods>"
           @smods_rec = Stanford::Mods::Record.new
           @smods_rec.from_str(m)
-          expect(@smods_rec.subject_other_subvy_search).to be_nil
+          expect(@smods_rec.subject_other_subvy_search).to eq []
         end
       end
 
@@ -258,20 +227,16 @@ describe "Subject fields (searchworks.rb)" do
           m = "<mods #{@ns_decl}><subject><genre/></subject><note>notit</note></mods>"
           @smods_rec = Stanford::Mods::Record.new
           @smods_rec.from_str(m)
-          expect(@smods_rec.subject_other_subvy_search).to be_nil
+          expect(@smods_rec.subject_other_subvy_search).to eq []
         end
       end
     end # subject_other_subvy_search
 
     context "subject_all_search" do
-      before :each do
-        allow(@smods_rec.logger).to receive(:info).with(/ has subject geographicCode element with untranslated encoding \(iso3166\): <geographicCode authority=.*>us<\/geographicCode>/)
-      end
-
       it "should be nil if there are no values in the MODS" do
         @smods_rec = Stanford::Mods::Record.new
         @smods_rec.from_str(@ng_mods_no_subject.to_s)
-        expect(@smods_rec.subject_all_search).to be_nil
+        expect(@smods_rec.subject_all_search).to eq []
       end
       it "should not contain cartographic sub element" do
         expect(@smods_rec.subject_all_search).not_to include(@cart_coord)
@@ -283,7 +248,6 @@ describe "Subject fields (searchworks.rb)" do
         @smods_rec = Stanford::Mods::Record.new
         @smods_rec.from_str(@subject_mods)
         ## need to re-allow/expect :info message with newly assigned object
-        expect(@smods_rec.logger).to receive(:info).with(/ has subject geographicCode element with untranslated encoding \(iso3166\): <geographicCode authority=.*>us<\/geographicCode>/)
         expect(@smods_rec.subject_all_search).to include(@s_genre)
         expect(@smods_rec.subject_all_search).to include(@geo)
         expect(@smods_rec.subject_all_search).to include(@hier_geo_country)
@@ -327,7 +291,7 @@ describe "Subject fields (searchworks.rb)" do
       it "should be nil if there are no values" do
         @smods_rec = Stanford::Mods::Record.new
         @smods_rec.from_str(@ng_mods_no_subject.to_s)
-        expect(@smods_rec.topic_facet).to be_nil
+        expect(@smods_rec.topic_facet).to eq []
       end
     end
 
@@ -351,10 +315,10 @@ describe "Subject fields (searchworks.rb)" do
         expect(@smods_rec.geographic_facet).to include('backslash')
         expect(@smods_rec.geographic_facet).to include('internal, punct;uation')
       end
-      it "should be nil if there are no values" do
+      it "should be empty if there are no values" do
         @smods_rec = Stanford::Mods::Record.new
         @smods_rec.from_str(@ng_mods_no_subject.to_s)
-        expect(@smods_rec.geographic_facet).to be_nil
+        expect(@smods_rec.geographic_facet).to eq []
       end
     end
 
@@ -373,10 +337,10 @@ describe "Subject fields (searchworks.rb)" do
         expect(@smods_rec.era_facet).to include('backslash')
         expect(@smods_rec.era_facet).to include('internal, punct;uation')
       end
-      it "should be nil if there are no values" do
+      it "should be empty if there are no values" do
         @smods_rec = Stanford::Mods::Record.new
         @smods_rec.from_str(@ng_mods_no_subject.to_s)
-        expect(@smods_rec.era_facet).to be_nil
+        expect(@smods_rec.era_facet).to eq []
       end
     end
   end # facet fields
