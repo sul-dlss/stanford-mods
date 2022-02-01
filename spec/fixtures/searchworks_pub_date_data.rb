@@ -80,7 +80,7 @@ SEARCHWORKS_PUB_DATE_DATA = {
       mods_origin_info_start_str +
         '<dateIssued>1860?]</dateIssued>' +
         '<dateIssued encoding="marc">186?</dateIssued>' +
-        mods_origin_info_end_str => [1860, '1860s'],
+        mods_origin_info_end_str => [1860, '1860'],
       # cw097mp1488
       mods_origin_info_start_str +
         '<dateIssued>1877?</dateIssued>' +
