@@ -117,7 +117,7 @@ describe "computations from /originInfo field" do
         '<dateIssued>1753]</dateIssued>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(Stanford::Mods::OriginInfo.best_or_earliest_year(smods_rec.origin_info.dateIssued).orig_date_str).to eq '1753]'
+      expect(Stanford::Mods::OriginInfo.best_or_earliest_year(smods_rec.origin_info.dateIssued).xml.text).to eq '1753]'
     end
     it 'ignores encoding' do
       # encoding matters for choosing display, not for parsing year
@@ -127,21 +127,21 @@ describe "computations from /originInfo field" do
         '<dateIssued encoding="w3cdtf">1300</dateIssued>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(Stanford::Mods::OriginInfo.best_or_earliest_year(smods_rec.origin_info.dateIssued).orig_date_str).to eq '1100'
+      expect(Stanford::Mods::OriginInfo.best_or_earliest_year(smods_rec.origin_info.dateIssued).xml.text).to eq '1100'
       mods_str = mods_origin_info_start_str +
         '<dateIssued>1200</dateIssued>' +
         '<dateIssued encoding="marc">1300</dateIssued>' +
         '<dateIssued encoding="w3cdtf">1100</dateIssued>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(Stanford::Mods::OriginInfo.best_or_earliest_year(smods_rec.origin_info.dateIssued).orig_date_str).to eq '1100'
+      expect(Stanford::Mods::OriginInfo.best_or_earliest_year(smods_rec.origin_info.dateIssued).xml.text).to eq '1100'
       mods_str = mods_origin_info_start_str +
         '<dateIssued>1300</dateIssued>' +
         '<dateIssued encoding="marc">1100</dateIssued>' +
         '<dateIssued encoding="w3cdtf">1200</dateIssued>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
-      expect(Stanford::Mods::OriginInfo.best_or_earliest_year(smods_rec.origin_info.dateIssued).orig_date_str).to eq '1100'
+      expect(Stanford::Mods::OriginInfo.best_or_earliest_year(smods_rec.origin_info.dateIssued).xml.text).to eq '1100'
     end
   end
 

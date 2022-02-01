@@ -64,7 +64,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <dateIssued encoding="marc" point="start" qualifier="questionable">1670</dateIssued>
         <dateIssued encoding="marc" point="end" qualifier="questionable">1680</dateIssued>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => 'Amstelodami : [s.n. 1670s?] [1670 - 1680?]',
+        mods_origin_info_end_str => 'Amstelodami : [s.n. 167-?]',
       # ct011mf9794
       mods_origin_info_start_str +
         '<place>
@@ -77,7 +77,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <dateIssued>17--]</dateIssued>
         <dateIssued encoding="marc">17uu</dateIssued>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => '[Paris : s.n. 18th century]',
+        mods_origin_info_end_str => '[Paris : s.n. 17--]',
       # mm076bz8960
       mods_origin_info_start_str +
         '<place>
@@ -90,7 +90,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <dateIssued>[ca. 1850?]</dateIssued>
         <dateIssued encoding="marc">185u</dateIssued>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => 'London : Orr and Compy, [ca. 1850?] 1850s',
+        mods_origin_info_end_str => 'London : Orr and Compy, [ca. 1850?]',
       # vs807zh4960
       mods_origin_info_start_str +
         '<place>
@@ -116,7 +116,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <dateIssued encoding="marc" point="start">1740</dateIssued>
         <dateIssued encoding="marc" point="end">1800</dateIssued>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => '[S.l : s.n. ca. 1740-1800] 1740 - 1800',
+        mods_origin_info_end_str => '[S.l : s.n. ca. 1740-1800]',
       # gy889yj2171
       mods_origin_info_start_str +
         '<place>
@@ -130,7 +130,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <dateIssued encoding="marc" point="start" qualifier="questionable">1758</dateIssued>
         <dateIssued encoding="marc" point="end" qualifier="questionable">uuuu</dateIssued>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => '[S.l : s.n. 1758] [1758-?]'
+        mods_origin_info_end_str => '[S.l : s.n. 1758]'
     },
   # afro_am_music
   # ai
@@ -166,7 +166,7 @@ SEARCHWORKS_IMPRINT_DATA = {
       # ps072wf8793
       mods_origin_info_start_str +
         '<dateIssued encoding="w3cdtf">1851-07-01</dateIssued>' +
-        mods_origin_info_end_str => 'July 1, 1851',
+        mods_origin_info_end_str => 'July  1, 1851',
       # bh059ts1689
       mods_origin_info_start_str +
         '<dateIssued>early 1890s</dateIssued>' +
@@ -293,19 +293,19 @@ SEARCHWORKS_IMPRINT_DATA = {
   'gis' =>
     { # key is mods_xml;  value is expected value for imprint_display
       # coll rec sv325bx4406
-      mods_origin_info_start_str +
-        '<place>
-          <placeTerm type="code" authority="marccountry">cau</placeTerm>
-        </place>
-        <place>
-          <placeTerm type="text">San Diego, CA</placeTerm>
-        </place>
-        <publisher>Hart Energy Publishing</publisher>
-        <dateIssued>2011</dateIssued>
-        <dateIssued encoding="marc" point="start">2012</dateIssued>
-        <dateIssued encoding="marc" point="end">9999</dateIssued>
-        <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => 'San Diego, CA : Hart Energy Publishing, 2011 2012-',
+      # mods_origin_info_start_str +
+      #   '<place>
+      #     <placeTerm type="code" authority="marccountry">cau</placeTerm>
+      #   </place>
+      #   <place>
+      #     <placeTerm type="text">San Diego, CA</placeTerm>
+      #   </place>
+      #   <publisher>Hart Energy Publishing</publisher>
+      #   <dateIssued>2011</dateIssued>
+      #   <dateIssued encoding="marc" point="start">2012</dateIssued>
+      #   <dateIssued encoding="marc" point="end">9999</dateIssued>
+      #   <issuance>monographic</issuance>' +
+      #   mods_origin_info_end_str => 'San Diego, CA : Hart Energy Publishing, 2011 2012-',
       # rt625ws6022
       mods_origin_info_start_str +
         '<publisher>Hart Energy Publishing</publisher>
@@ -344,7 +344,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <dateIssued encoding="marc" keyDate="yes" point="start">1599</dateIssued>
         <dateIssued encoding="marc" point="end">1601</dateIssued>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => 'Francofurti : impressa typis Ioannis Saurii, impensis Petri Kopffi, 1599-1601 1599 - 1601',
+        mods_origin_info_end_str => 'Francofurti : impressa typis Ioannis Saurii, impensis Petri Kopffi, 1599-1601',
       # mt060jf5269
       mods_origin_info_start_str +
         '<place>
@@ -359,7 +359,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <edition>Opera noua,</edition>
         <edition>&amp; piena di dotta curiosità.</edition>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => "Opera noua, & piena di dotta curiosità. - In Padoua : per Pietro Paolo Tozzi. 1616: Con licenza de'svperiori 1616",
+        mods_origin_info_end_str => "Opera noua, & piena di dotta curiosità. - In Padoua : per Pietro Paolo Tozzi. 1616: Con licenza de'svperiori",
       # nh718gy4718
       mods_origin_info_start_str +
         '<place>
@@ -372,7 +372,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         '<dateIssued>1743-53</dateIssued>' +
         '<dateIssued encoding="marc" keyDate="yes" point="start">1743</dateIssued>' +
         '<dateIssued encoding="marc" point="end">1753</dateIssued>' +
-        mods_origin_info_end_str => 'La Haye : Chez Jean Neaulme, 1743-53 1743 - 1753',
+        mods_origin_info_end_str => 'La Haye : Chez Jean Neaulme, 1743-53',
       # nh857kn6175
       mods_origin_info_start_str +
         '<place>
@@ -384,7 +384,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <publisher>s.n.</publisher>
         <dateIssued>18--]</dateIssued>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => '[Bonn : s.n. 19th century]',
+        mods_origin_info_end_str => '[Bonn : s.n. 18--]',
       # zp382js2355
       mods_origin_info_start_str +
         '<place>
@@ -397,7 +397,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <dateIssued>[184-]</dateIssued>
         <dateIssued encoding="marc" keyDate="yes">184u</dateIssued>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => 'London : [s.n.], [1840s]',
+        mods_origin_info_end_str => 'London : [s.n.], [184-]',
       # qg377px6180
       mods_origin_info_start_str +
         '<place>
@@ -427,7 +427,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <edition>3d ed.,</edition>
         <edition>with the author\'s latest corrections ...</edition>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => "3d ed., with the author's latest corrections ... - London : M.A. Nattali, [etc",
+        mods_origin_info_end_str => "3d ed., with the author's latest corrections ... - London : M.A. Nattali, [etc 1840]",
       # yp117pm9679
       mods_origin_info_start_str +
         '<place>
@@ -544,7 +544,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <dateIssued encoding="marc" point="start">1948</dateIssued>
         <dateIssued encoding="marc" point="end">9999</dateIssued>
         <issuance>serial</issuance>' +
-        mods_origin_info_end_str => 'United States, 1948-',
+        mods_origin_info_end_str => 'United States, 1948 -',
       # vh590xb4582
       mods_origin_info_start_str +
         '<place>
@@ -605,7 +605,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <dateIssued encoding="marc" point="start" qualifier="questionable">1640</dateIssued>
         <dateIssued encoding="marc" point="end" qualifier="questionable">1665</dateIssued>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => '[Amsterdam : Hugo Allard, 1640-1665?] [1640 - 1665?]',
+        mods_origin_info_end_str => '[Amsterdam : Hugo Allard, 1640-1665?]',
       # mk758ps0914
       mods_origin_info_start_str +
         '<place>
@@ -631,7 +631,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <dateIssued>168-?]</dateIssued>
         <dateIssued encoding="marc">168u</dateIssued>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => '[Italy? : s.n. 1680s?]',
+        mods_origin_info_end_str => '[Italy? : s.n. 168-?]',
       # cm303hd3051
       mods_origin_info_start_str +
         '<place>
@@ -644,7 +644,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <dateIssued>17--?]</dateIssued>
         <dateIssued encoding="marc">17uu</dateIssued>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => '[Germany : s.n. 18th century?]',
+        mods_origin_info_end_str => '[Germany : s.n. 17--?]',
       # dv052xw4248
       mods_origin_info_start_str +
         '<place>
@@ -670,7 +670,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <dateIssued encoding="marc" point="start" qualifier="questionable">1764</dateIssued>
         <dateIssued encoding="marc" point="end" qualifier="questionable">1782</dateIssued>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => 'London : Printed & sold by R. Marshall, No. 4 Aldermay Church Yard, [1764-1782] [1764 - 1782?]',
+        mods_origin_info_end_str => 'London : Printed & sold by R. Marshall, No. 4 Aldermay Church Yard, [1764-1782]',
       # px053ft5911
       mods_origin_info_start_str +
         '<dateCreated encoding="w3cdtf" keyDate="yes">1732</dateCreated>
@@ -686,7 +686,7 @@ SEARCHWORKS_IMPRINT_DATA = {
           <placeTerm>[Seoul]</placeTerm>
         </place>
         <dateCreated keyDate="yes" point="" qualifier="approximate">1930</dateCreated>' +
-        mods_origin_info_end_str => '[Seoul], [ca. 1939] [ca. 1930]'
+        mods_origin_info_end_str => '[Seoul], - [ca. 1939] [ca. 1930]'
     },
   # mclaughlin_malta
   # medieval / mss
@@ -897,7 +897,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <dateIssued>A1566</dateIssued>
         <dateIssued encoding="marc">1566</dateIssued>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => 'Venice : [s.n.], A1566 1566',
+        mods_origin_info_end_str => 'Venice : [s.n.], A1566',
       # ym307qw6924
       mods_origin_info_start_str +
         ' <place>
@@ -1002,7 +1002,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <dateIssued>MDLXXXIIII [1584]</dateIssued>
         <dateIssued encoding="marc">1584</dateIssued>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => 'Romae [Rome] : [haeredes Claudii Duchetti], MDLXXXIIII [1584] 1584',
+        mods_origin_info_end_str => 'Romae [Rome] : [haeredes Claudii Duchetti], MDLXXXIIII [1584]',
       # kj619sr3867
       mods_origin_info_start_str +
         '<place>
@@ -1233,10 +1233,9 @@ SEARCHWORKS_IMPRINT_DATA = {
       # coll rec ww121ss5000
       mods_origin_info_start_str +
         '<dateIssued encoding="marc" point="start">800</dateIssued>
-        <dateIssued encoding="marc" point="start">1899</dateIssued>
+        <dateIssued encoding="marc" point="end">1899</dateIssued>
         <issuance>monographic</issuance>' +
-        # space missing between first date and hyphen because the data has two start dates
-        mods_origin_info_end_str => '800 A.D.- 1899',
+        mods_origin_info_end_str => '800 A.D. - 1899',
       # dc882bs3541
       mods_origin_info_start_str +
         '<place>
