@@ -1162,7 +1162,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         </place>
         <publisher>Stanford University Archives</publisher>
         <dateCreated encoding="w3cdtf" keyDate="yes" qualifier=" ">1869-00-00</dateCreated>' +
-        mods_origin_info_end_str => 'Stanford, CA : Stanford University Archives, 1869-00-00',
+        mods_origin_info_end_str => 'Stanford, CA : Stanford University Archives, 1869',
       # fp085hf5015
       mods_origin_info_start_str +
         '<dateOther encoding="w3cdtf" keyDate="no" qualifier="">1963-10-11</dateOther>
@@ -1171,7 +1171,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         </place>
         <publisher>Stanford University Archives</publisher>
         <dateCreated encoding="w3cdtf" keyDate="yes" qualifier=" ">1903-00-00</dateCreated>' +
-        mods_origin_info_end_str => 'Stanford, CA : Stanford University Archives, 1903-00-00',
+        mods_origin_info_end_str => 'Stanford, CA : Stanford University Archives, 1903',
       # ns466nn0465
       mods_origin_info_start_str +
         '<dateCreated encoding="w3cdtf" keyDate="no" qualifier="">1918-00-00</dateCreated>
@@ -1180,7 +1180,7 @@ SEARCHWORKS_IMPRINT_DATA = {
           <placeTerm type="text">Stanford, CA</placeTerm>
         </place>
         <publisher>Stanford University Archives</publisher>' +
-        mods_origin_info_end_str => 'Stanford, CA : Stanford University Archives, 1918-00-00'
+        mods_origin_info_end_str => 'Stanford, CA : Stanford University Archives, 1918'
     },
   # social_research_tech_reports ?
   # sounds?
