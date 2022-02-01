@@ -51,7 +51,7 @@ SPOTLIGHT_PUB_DATE_DATA = {
         mods_origin_info_end_str => ['2001', '2001'],
       # yt809jk3834, qb375hy6817
       mods_origin_info_start_str +
-        '<dateCreated encoding="w3cdtf" keyDate="yes">3/25/1998</dateCreated>' +
+        '<dateCreated encoding="w3cdtf" keyDate="yes">1998-03-25</dateCreated>' +
         mods_origin_info_end_str => ['1998', '1998'],
       # mg505sz9327, mx006md9511, sy619vt7106
       mods_origin_info_start_str +

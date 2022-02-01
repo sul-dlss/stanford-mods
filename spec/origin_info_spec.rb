@@ -55,8 +55,8 @@ describe "computations from /originInfo field" do
     it 'uses dateCaptured if no dateIssued or dateCreated' do
       # for web archive seed files
       mods_str = mods_origin_info_start_str +
-        '<dateCaptured encoding="w3cdtf" point="start" keyDate="yes">20151215121212</dateCaptured>' +
-        '<dateCaptured encoding="w3cdtf" point="end">20151218111111</dateCaptured>' +
+        '<dateCaptured encoding="iso8601" point="start" keyDate="yes">20151215121212</dateCaptured>' +
+        '<dateCaptured encoding="iso8601" point="end">20151218111111</dateCaptured>' +
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
       expect(smods_rec.send(method_sym)).to eq method_sym.to_s =~ /int/ ? 2015 : '2015'
