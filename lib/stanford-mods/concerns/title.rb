@@ -65,7 +65,7 @@ module Stanford
       # this includes all titles except
       # @return [Array<String>] values for title_variant_search
       def sw_addl_titles
-        (full_titles - first_title_info_node.full_title).reject(&:blank?)
+        (full_titles - Array(first_title_info_node&.full_title)).reject(&:blank?)
       end
 
       # Returns a sortable version of the main title
