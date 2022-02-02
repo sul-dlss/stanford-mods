@@ -25,7 +25,7 @@ module Stanford
 
       # @return [Array<String>] values for author_person_facet, author_person_display
       def sw_person_authors
-        mods_ng_xml.personal_names.map(&:display_value_w_date)
+        mods_ng_xml.personal_name.map(&:display_value_w_date)
       end
 
       # return the display_value_w_date for all <mods><name> elements that do not have type='personal'
