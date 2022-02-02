@@ -3,7 +3,7 @@ describe 'title fields (searchworks.rb)' do
   before(:all) do
     @smods_rec = Stanford::Mods::Record.new
     @ns_decl = "xmlns='#{Mods::MODS_NS}'"
-    m = "<mods #{@ns_decl}><titleInfo><title>Jerk</title><subTitle>A Tale of Tourettes</subTitle><nonSort>The</nonSort></titleInfo></mods>"
+    m = "<mods #{@ns_decl}><titleInfo><nonSort>The</nonSort><title>Jerk</title><subTitle>A Tale of Tourettes</subTitle></titleInfo></mods>"
     @smods_rec.from_str m
   end
 
@@ -19,7 +19,7 @@ describe 'title fields (searchworks.rb)' do
 
   context 'blank title node' do
     it 'should deal with a second blank titleInfo node' do
-      m = "<mods #{@ns_decl}><titleInfo> </titleInfo><otherStuff>goes here</otherStuff><titleInfo><title>Jerk</title><subTitle>A Tale of Tourettes</subTitle><nonSort>The</nonSort></titleInfo></mods>"
+      m = "<mods #{@ns_decl}><titleInfo> </titleInfo><otherStuff>goes here</otherStuff><titleInfo><nonSort>The</nonSort><title>Jerk</title><subTitle>A Tale of Tourettes</subTitle>></titleInfo></mods>"
       smods_rec_blank_node = Stanford::Mods::Record.new
       smods_rec_blank_node.from_str m
       expect(smods_rec_blank_node.sw_short_title).to eq 'The Jerk'
@@ -113,7 +113,7 @@ describe 'title fields (searchworks.rb)' do
               <subTitle>a history</subTitle>
             </titleInfo></mods>"
           @smods_rec.from_str(m)
-          expect(@smods_rec.sw_full_title).to eq 'The Olympics : a history.'
+          expect(@smods_rec.sw_full_title).to eq 'The Olympics: a history.'
         end #
         # "end subtitle with period" - see above
         it 'subtitle already ends with period' do
@@ -389,7 +389,7 @@ describe 'title fields (searchworks.rb)' do
             <subTitle>a history</subTitle>
           </titleInfo></mods>"
         @smods_rec.from_str(m)
-        expect(@smods_rec.sw_title_display).to eq 'The Olympics : a history'
+        expect(@smods_rec.sw_title_display).to eq 'The Olympics: a history'
       end #
       # "end subtitle with period" - see above
       it 'subtitle already ends with period' do
