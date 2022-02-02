@@ -9,41 +9,49 @@ module Stanford
       # Searchworks requires that the MODS has a '//titleInfo/title'
       # @return [String] value for title_245_search, title_full_display
       def sw_full_title(title_info = first_title_info_node, sortable: false)
-        return unless title_info
+        return unless title_info&.children&.any?
 
         title = title_info.title&.text&.strip
-
         return if title.nil? || title.empty?
 
-        nonSort_title = title_info.nonSort&.text&.strip
+        title = ''
+        previous_element = nil
 
-        preSubTitle = [(nonSort_title unless sortable), title].compact.join(' ')
+        title_info.children.select { |value| title_parts.include? value.name }.each do |value|
+          next if value.name == 'nonSort' && sortable
 
-        preSubTitle.sub!(/:$/, '')
+          str = value.text.strip
+          next if str.empty?
 
-        subTitle = title_info.subTitle.text.strip
-        preParts = subTitle.empty? ? preSubTitle : preSubTitle + " : " + subTitle
-        preParts.sub!(/\.$/, '') if preParts # remove trailing period
+          delimiter = if title.empty? || title.end_with?(' ')
+                        nil
+                      elsif previous_element&.name == 'nonSort' && title.end_with?('-', '\'')
+                        nil
+                      elsif title.end_with?('.', ',', ':', ';')
+                        ' '
+                      elsif value.name == 'subTitle'
+                        ' : '
+                      elsif value.name == 'partName' && previous_element.name == 'partNumber'
+                        ', '
+                      elsif value.name == 'partNumber' || value.name == 'partName'
+                        '. '
+                      else
+                        ' '
+                      end
 
-        partName   = title_info.partName.text.strip   unless title_info.partName.text.strip.empty?
-        partNumber = title_info.partNumber.text.strip unless title_info.partNumber.text.strip.empty?
-        partNumber.sub!(/,$/, '') if partNumber # remove trailing comma
-        if partNumber && partName
-          parts = partNumber + ", " + partName
-        elsif partNumber
-          parts = partNumber
-        elsif partName
-          parts = partName
+          title += delimiter if delimiter
+          title += str
+
+          previous_element = value
         end
-        parts.sub!(/\.$/, '') if parts
 
-        result = parts ? preParts + ". " + parts : preParts
-        return nil unless result
+        title += "." unless title =~ /\s*[[:punct:]]$/
 
-        result += "." unless result =~ /[[:punct:]]$/
-        result.strip!
-        result = nil if result.empty?
-        result
+        title.strip
+      end
+
+      def title_parts
+        %w[nonSort title subTitle partName partNumber]
       end
 
       # like sw_full_title without trailing \,/;:.
