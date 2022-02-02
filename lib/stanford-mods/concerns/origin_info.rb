@@ -72,6 +72,10 @@ module Stanford
         origin_info.map { |el| Stanford::Mods::Imprint.new(el) }
       end
 
+      def place
+        term_values([:origin_info, :place, :placeTerm])
+      end
+
       # @return [String] single String containing imprint information for display
       def imprint_display_str
         imprints.map(&:display_str).reject(&:empty?).join('; ')
