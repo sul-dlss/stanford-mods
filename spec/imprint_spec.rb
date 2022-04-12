@@ -189,6 +189,31 @@ describe Stanford::Mods::Imprint do
       expect(updated_element).to eq 'April  2, 1948'
     end
 
+    it 'handles very precise EDTF ranges' do
+      smods_rec.from_str <<-XML
+        #{mods_origin_info_start_str}
+          <dateIssued encoding="edtf">2014-01/2020-12-31</dateIssued>
+        #{mods_origin_info_end_str}
+      XML
+
+      imp = stanford_mods_imprint(smods_rec)
+      updated_element = imp.send(:date_str)
+      expect(updated_element).to eq 'January 2014 - December 31, 2020'
+    end
+
+    xit 'handles BC EDTF centuries' do
+      # ruby-edtf apparently can't handle this format
+      smods_rec.from_str <<-XML
+        #{mods_origin_info_start_str}
+          <dateIssued encoding="edtf">-09XX</dateIssued>
+        #{mods_origin_info_end_str}
+      XML
+
+      imp = stanford_mods_imprint(smods_rec)
+      updated_element = imp.send(:date_str)
+      expect(updated_element).to eq '10th century B.C.'
+    end
+
     it 'handles the approximate qualifier' do
       smods_rec.from_str <<-XML
         #{mods_origin_info_start_str}

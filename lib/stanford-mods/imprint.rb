@@ -166,8 +166,26 @@ module Stanford
             return text.strip unless text =~ /^-?\d+$/ || text =~ /^[\dXxu?-]{4}$/
           end
 
-          # Delegate to the appropriate decoding method, if any
-          case value.precision
+          if date.is_a?(EDTF::Interval)
+            if value.precision == :century || value.precision == :decade
+              return format_date(date, value.precision)
+            end
+
+            range = [
+              format_date(date.min, date.min.precision),
+              format_date(date.max, date.max.precision)
+            ].uniq.compact
+
+            return text.strip if range.empty?
+
+            range.join(' - ')
+          else
+            format_date(date, value.precision) || text.strip
+          end
+        end
+
+        def format_date(date, precision)
+          case precision
           when :day
             date.strftime('%B %e, %Y')
           when :month
@@ -183,24 +201,31 @@ module Stanford
               year.to_s
             end
           when :century
-            return "#{(date.to_s[0..1].to_i + 1).ordinalize} century"
+            if date.year.negative?
+              "#{((date.year / 100).abs + 1).ordinalize} century B.C."
+            else
+              "#{((date.year / 100) + 1).ordinalize} century"
+            end
           when :decade
-            return "#{date.year}s"
-          else
-            text.strip
+            "#{date.year}s"
           end
         end
 
         # Decoded date with "B.C." or "A.D." and qualifier markers. See (outdated):
         # https://consul.stanford.edu/display/chimera/MODS+display+rules#MODSdisplayrules-3b.%3CoriginInfo%3E
         def qualified_value
-          date = decoded_value
+          qualified_format = case qualifier
+          when 'approximate'
+            '[ca. %s]'
+          when 'questionable'
+            '[%s?]'
+          when 'inferred'
+            '[%s]'
+          else
+            '%s'
+          end
 
-          return "[ca. #{date}]" if qualifier == 'approximate'
-          return "[#{date}?]" if qualifier == 'questionable'
-          return "[#{date}]" if qualifier == 'inferred'
-
-          date
+          format(qualified_format, decoded_value)
         end
       end
 
