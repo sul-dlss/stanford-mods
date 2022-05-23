@@ -67,7 +67,7 @@ module Stanford
       def coord_to_decimal(point)
         regex = Regexp.union(
           /(?<dir>[NESW])\s*(?<deg>\d+)[°⁰º](?:(?<min>\d+)[ʹ'])?(?:(?<sec>\d+)[ʺ"])?/,
-          /^\s*(?<dir>[NESW])\s*(?<deg>[\d.]+)\s*$/
+          /^\s*(?<dir>[NESW])\s*(?<deg>\d+(?:[.]\d+)?)\s*$/
         )
         match = regex.match(point)
         return Float::INFINITY unless match
