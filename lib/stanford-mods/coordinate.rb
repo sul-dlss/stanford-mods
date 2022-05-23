@@ -65,11 +65,14 @@ module Stanford
       # @param [String] point coordinate point in degrees notation
       # @return [Float] converted value in decimal notation
       def coord_to_decimal(point)
-        regex = /(?<dir>[NESW])\s*(?<deg>\d+)[°⁰º](?:(?<min>\d+)[ʹ'])?(?:(?<sec>\d+)[ʺ"])?/
+        regex = Regexp.union(
+          /(?<dir>[NESW])\s*(?<deg>\d+)[°⁰º](?:(?<min>\d+)[ʹ'])?(?:(?<sec>\d+)[ʺ"])?/,
+          /^\s*(?<dir>[NESW])\s*(?<deg>\d+(?:[.]\d+)?)\s*$/
+        )
         match = regex.match(point)
         return Float::INFINITY unless match
 
-        dec = match['deg'].to_i
+        dec = match['deg'].to_f
         dec += match['min'].to_f / 60
         dec += match['sec'].to_f / 60 / 60
         dec = -1 * dec if match['dir'] == 'W' || match['dir'] == 'S'

@@ -9,10 +9,6 @@ describe Stanford::Mods::Coordinate do
       expect(described_class.new('W80°--E100°/N487°--S42°')).not_to be_valid
     end
 
-    it 'rejects coordinates without degree symbols' do
-      expect(described_class.new('W 650--W 100/N 700--N 550')).not_to be_valid
-    end
-
     it 'rejects malformed coordinates' do
       expect(described_class.new('(E29°--E35/°S12°--S16°).')).not_to be_valid
     end
@@ -43,7 +39,9 @@ describe Stanford::Mods::Coordinate do
       %((W 170⁰--E 55⁰/N 40⁰--S 36⁰).) =>
         '-170.0 -36.0 55.0 40.0', # superscript 0 is almost a degree character..
       %((W 0°-W 0°/S 90°---S 90°)) =>
-        '-0.0 -90.0 -0.0 -90.0' # one dash, two dashes, three dashes.. what's the difference?
+        '-0.0 -90.0 -0.0 -90.0', # one dash, two dashes, three dashes.. what's the difference?
+      %((W 030.6--E 068.1/N 041.7--S 042.4)) =>
+        '-30.6 -42.4 68.1 41.7'
     }.each do |value, expected|
       describe 'parsing' do
         let(:subject) { described_class.new(value) }
