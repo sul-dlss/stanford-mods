@@ -156,7 +156,7 @@ SPOTLIGHT_PUB_DATE_DATA = {
       mods_origin_info_start_str +
         '<dateIssued encoding="marc" point="start" keyDate="yes">0850</dateIssued>' +
         '<dateIssued encoding="marc" point="end">1499</dateIssued>' +
-        mods_origin_info_end_str => ['0850', '850 A.D.'],
+        mods_origin_info_end_str => ['0850', '850 CE'],
       # nc881qb8504
       mods_origin_info_start_str +
         '<dateCreated point="start" qualifier="approximate" keyDate="yes">1000</dateCreated>' +
@@ -236,12 +236,12 @@ SPOTLIGHT_PUB_DATE_DATA = {
       mods_origin_info_start_str +
         '<dateCreated keyDate="yes" point="start" qualifier="approximate">200 B.C.</dateCreated>' +
         '<dateCreated keyDate="yes" point="end" qualifier="approximate">180 B.C.</dateCreated>' +
-        mods_origin_info_end_str => ['-801', '200 B.C.'],
+        mods_origin_info_end_str => ['-801', '200 BCE'],
       # ww728rz0477
       mods_origin_info_start_str +
         '<dateCreated keyDate="yes" point="start" qualifier="approximate">211 B.C.</dateCreated>' +
         '<dateCreated keyDate="yes" point="end" qualifier="approximate">150 B.C.</dateCreated>' +
-        mods_origin_info_end_str => ['-790', '211 B.C.']
+        mods_origin_info_end_str => ['-790', '211 BCE']
     },
   'renaissance' =>
     { # key is mods_xml;  values = [pub date sortable facet value, pub date single string facet value]
