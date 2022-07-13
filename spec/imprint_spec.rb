@@ -108,7 +108,7 @@ describe Stanford::Mods::Imprint do
     it 'presents centuries' do
       smods_rec.from_str <<-XML
         #{mods_origin_info_start_str}
-          <dateIssued encoding="edtf">18XX</dateIssued>
+          <dateIssued encoding="edtf">18xx</dateIssued>
         #{mods_origin_info_end_str}
       XML
 
@@ -120,7 +120,7 @@ describe Stanford::Mods::Imprint do
     it 'presents decades' do
       smods_rec.from_str <<-XML
         #{mods_origin_info_start_str}
-          <dateIssued encoding="edtf">147X</dateIssued>
+          <dateIssued encoding="edtf">147x</dateIssued>
         #{mods_origin_info_end_str}
       XML
 
@@ -241,7 +241,7 @@ describe Stanford::Mods::Imprint do
     it 'handles the inferred qualifier' do
       smods_rec.from_str <<-XML
         #{mods_origin_info_start_str}
-          <dateIssued encoding="edtf" qualifier="inferred">190X</dateIssued>
+          <dateIssued encoding="edtf" qualifier="inferred">190x</dateIssued>
         #{mods_origin_info_end_str}
       XML
 
