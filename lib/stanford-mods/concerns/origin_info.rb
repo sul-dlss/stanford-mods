@@ -15,7 +15,7 @@ module Stanford
       #  look for a keyDate and use it if there is one;  otherwise pick earliest date
       # @param [Boolean] ignore_approximate true if approximate dates (per qualifier attribute) should be ignored; false if approximate dates should be included
       # @return [Integer] publication year as an Integer
-      # @note for sorting:  5 B.C. => -5;  666 B.C. => -666
+      # @note for sorting:  5 BCE => -5;  666 BCE => -666
       def pub_year_int(fields = [:dateIssued, :dateCreated, :dateCaptured], ignore_approximate: false)
         fields.each do |date_key|
           values = mods_ng_xml.origin_info.send(date_key)
@@ -31,7 +31,7 @@ module Stanford
       #  look for a keyDate and use it if there is one;  otherwise pick earliest date
       # @param [Boolean] ignore_approximate true if approximate dates (per qualifier attribute) should be ignored; false if approximate dates should be included
       # @return [String] single String containing publication year for lexical sorting
-      # @note for string sorting  5 B.C. = -5  => -995;  6 B.C. => -994, so 6 B.C. sorts before 5 B.C.
+      # @note for string sorting  5 BCE = -5  => -995;  6 BCE => -994, so 6 BCE sorts before 5 BCE
       # @deprecated use pub_year_int
       def pub_year_sort_str(fields = [:dateIssued, :dateCreated, :dateCaptured], ignore_approximate: false)
         fields.each do |date_key|
@@ -44,12 +44,12 @@ module Stanford
       end
 
       # return a single string intended for display of pub year
-      # 0 < year < 1000:  add A.D. suffix
-      # year < 0:  add B.C. suffix.  ('-5'  =>  '5 B.C.', '700 B.C.'  => '700 B.C.')
+      # 0 < year < 1000:  add CE suffix
+      # year < 0:  add BCE suffix.  ('-5'  =>  '5 BCE', '700 BCE'  => '700 BCE')
       # 195u =>  195x
       # 19uu => 19xx
-      #   '-5'  =>  '5 B.C.'
-      #   '700 B.C.'  => '700 B.C.'
+      #   '-5'  =>  '5 BCE'
+      #   '700 BCE'  => '700 BCE'
       #   '7th century' => '7th century'
       # date ranges?
       # prefer dateIssued (any) before dateCreated (any) before dateCaptured (any)

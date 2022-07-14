@@ -89,7 +89,7 @@ describe "computations from /originInfo field" do
   context '#pub_year_int' do
     it_behaves_like "single pub date value", :pub_year_int, 0
     # papyri - the only Spotlight data with BC dates
-    it '-200 for 200 B.C.' do
+    it '-199 for 200 B.C.' do
       # hd778hw9236
       mods_str = mods_origin_info_start_str +
         '<dateCreated keyDate="yes" point="start" qualifier="approximate">200 B.C.</dateCreated>' +
@@ -98,7 +98,7 @@ describe "computations from /originInfo field" do
       smods_rec.from_str(mods_str)
       expect(smods_rec.pub_year_int).to eq(-199)
     end
-    it '-211 for 211 B.C.' do
+    it '-210 for 211 B.C.' do
       # ww728rz0477
       mods_str = mods_origin_info_start_str +
         '<dateCreated keyDate="yes" point="start" qualifier="approximate">211 B.C.</dateCreated>' +

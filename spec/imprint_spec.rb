@@ -129,7 +129,7 @@ describe Stanford::Mods::Imprint do
       expect(updated_element).to eq '1470s'
     end
 
-    it 'adds A.D. to early years' do
+    it 'adds CE to early years' do
       smods_rec.from_str <<-XML
         #{mods_origin_info_start_str}
           <dateIssued encoding="edtf">988</dateIssued>
@@ -138,10 +138,10 @@ describe Stanford::Mods::Imprint do
 
       imp = stanford_mods_imprint(smods_rec)
       updated_element = imp.send(:date_str)
-      expect(updated_element).to eq '988 A.D.'
+      expect(updated_element).to eq '988 CE'
     end
 
-    it 'adds B.C. to B.C. years' do
+    it 'adds BCE to BCE years' do
       smods_rec.from_str <<-XML
         #{mods_origin_info_start_str}
           <dateIssued encoding="edtf">-5</dateIssued>
@@ -150,10 +150,10 @@ describe Stanford::Mods::Imprint do
 
       imp = stanford_mods_imprint(smods_rec)
       updated_element = imp.send(:date_str)
-      expect(updated_element).to eq '6 B.C.'
+      expect(updated_element).to eq '6 BCE'
     end
 
-    it 'has special handling for the year 0 (1 B.C.)' do
+    it 'has special handling for the year 0 (1 BCE)' do
       smods_rec.from_str <<-XML
         #{mods_origin_info_start_str}
           <dateIssued>0</dateIssued>
@@ -162,7 +162,7 @@ describe Stanford::Mods::Imprint do
 
       imp = stanford_mods_imprint(smods_rec)
       updated_element = imp.send(:date_str)
-      expect(updated_element).to eq '1 B.C.'
+      expect(updated_element).to eq '1 BCE'
     end
 
     it 'presents years + months' do
@@ -211,7 +211,7 @@ describe Stanford::Mods::Imprint do
 
       imp = stanford_mods_imprint(smods_rec)
       updated_element = imp.send(:date_str)
-      expect(updated_element).to eq '10th century B.C.'
+      expect(updated_element).to eq '10th century BCE'
     end
 
     it 'handles the approximate qualifier' do
@@ -235,7 +235,7 @@ describe Stanford::Mods::Imprint do
 
       imp = stanford_mods_imprint(smods_rec)
       updated_element = imp.send(:date_str)
-      expect(updated_element).to eq '[322 A.D.?]'
+      expect(updated_element).to eq '[322 CE?]'
     end
 
     it 'handles the inferred qualifier' do

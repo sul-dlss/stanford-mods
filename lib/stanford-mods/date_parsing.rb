@@ -15,7 +15,7 @@ module Stanford
         @xml = xml
       end
 
-      # get display value for year, generally an explicit year or "17th century" or "5 B.C." or "1950s" or '845 A.D.'
+      # get display value for year, generally an explicit year or "17th century" or "5 BCE" or "1950s" or '845 CE'
       # @return [String, nil] String value for year if we could parse one, nil otherwise
       def date_str_for_display
         date = xml&.as_object&.date
@@ -32,9 +32,9 @@ module Stanford
           if !self.class.year_int_valid? date.year
             xml.text
           elsif date.year < 1
-            "#{date.year.abs + 1} B.C."
+            "#{date.year.abs + 1} BCE"
           elsif date.year < 1000
-            "#{date.year} A.D."
+            "#{date.year} CE"
           else
             date.year.to_s
           end
@@ -49,7 +49,7 @@ module Stanford
 
       # get String sortable value year if we can parse date_str to get a year.
       #   SearchWorks currently uses a string field for pub date sorting; thus so does Spotlight.
-      #   The values returned must *lexically* sort in chronological order, so the B.C. dates are tricky
+      #   The values returned must *lexically* sort in chronological order, so the BCE dates are tricky
       # @return [String, nil] String sortable year if we could parse one, nil otherwise
       #  note that these values must *lexically* sort to create a chronological sort.
       def sortable_year_string_from_date_str

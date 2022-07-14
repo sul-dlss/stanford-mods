@@ -607,7 +607,7 @@ SEARCHWORKS_PUB_DATE_DATA = {
       mods_origin_info_start_str +
         '<dateIssued encoding="marc" point="start" keyDate="yes">0850</dateIssued>' +
         '<dateIssued encoding="marc" point="end">1499</dateIssued>' +
-        mods_origin_info_end_str => [850, '850 A.D. - 1499'],
+        mods_origin_info_end_str => [850, '850 CE - 1499'],
       # coll rec  bd001pp3337
       mods_origin_info_start_str +
         '<dateIssued encoding="marc" keyDate="yes" point="start">1000</dateIssued>' +
@@ -637,7 +637,7 @@ SEARCHWORKS_PUB_DATE_DATA = {
       mods_origin_info_start_str +
         '<dateCreated point="start" qualifier="approximate" keyDate="yes">850</dateCreated>' +
         '<dateCreated point="end" qualifier="approximate">1499</dateCreated>' +
-        mods_origin_info_end_str => [850, '850 A.D. - 1499'],
+        mods_origin_info_end_str => [850, '850 CE - 1499'],
       # sc582cv9633
       mods_origin_info_start_str +
         '<dateCreated keydate="yes">1314</dateCreated>' +
@@ -722,12 +722,12 @@ SEARCHWORKS_PUB_DATE_DATA = {
       mods_origin_info_start_str +
         '<dateCreated keyDate="yes" point="start" qualifier="approximate">199 B.C.</dateCreated>' +
         '<dateCreated keyDate="yes" point="end" qualifier="approximate">100 B.C.</dateCreated>' +
-        mods_origin_info_end_str => [-198, '199 B.C. - 100 B.C.'],
+        mods_origin_info_end_str => [-198, '199 BCE - 100 BCE'],
       # ww728rz0477
       mods_origin_info_start_str +
         '<dateCreated keyDate="yes" point="start" qualifier="approximate">211 B.C.</dateCreated>' +
         '<dateCreated keyDate="yes" point="end" qualifier="approximate">150 B.C.</dateCreated>' +
-        mods_origin_info_end_str => [-210, '211 B.C. - 150 B.C.']
+        mods_origin_info_end_str => [-210, '211 BCE - 150 BCE']
     },
   # pcc
   # peace
@@ -796,27 +796,27 @@ SEARCHWORKS_PUB_DATE_DATA = {
       mods_origin_info_start_str +
         '<dateCreated encoding="edtf" point="start" keyDate="yes">-18</dateCreated>' +
         '<dateCreated encoding="edtf" point="end">-17</dateCreated>' +
-        mods_origin_info_end_str => [-18, '19 B.C. - 17 B.C.'],
+        mods_origin_info_end_str => [-18, '19 BCE - 17 BCE'],
       # bb408km1389
       mods_origin_info_start_str +
         '<dateCreated encoding="edtf" point="start" keyDate="yes">-1</dateCreated>' +
         '<dateCreated encoding="edtf" point="end">11</dateCreated>' +
-        mods_origin_info_end_str => [-1, '2 B.C. - 11 A.D.'],
+        mods_origin_info_end_str => [-1, '2 BCE - 11 CE'],
       # cs470ng8064
       mods_origin_info_start_str +
         '<dateCreated encoding="edtf" point="start" keyDate="yes">-1</dateCreated>' +
         '<dateCreated encoding="edtf" point="end">0</dateCreated>' +
-        mods_origin_info_end_str => [-1, '2 B.C. - 0 A.D.'],
+        mods_origin_info_end_str => [-1, '2 BCE - 0 CE'],
       # vh834jh5059
       mods_origin_info_start_str +
         '<dateCreated encoding="edtf" point="start" keyDate="yes">13</dateCreated>' +
         '<dateCreated encoding="edtf" point="end">14</dateCreated>' +
-        mods_origin_info_end_str => [13, '13 A.D. - 14 A.D.'],
+        mods_origin_info_end_str => [13, '13 CE - 14 CE'],
       # sk424bh9379
       mods_origin_info_start_str +
         '<dateCreated encoding="edtf" point="start" keyDate="yes">34</dateCreated>' +
         '<dateCreated encoding="edtf" point="end">35</dateCreated>' +
-        mods_origin_info_end_str => [34, '34 A.D. - 35 A.D.']
+        mods_origin_info_end_str => [34, '34 CE - 35 CE']
     },
   # rigler
   # rumsey
@@ -931,23 +931,23 @@ SEARCHWORKS_PUB_DATE_DATA = {
       mods_origin_info_start_str +
         '<dateIssued encoding="marc" point="start">800</dateIssued>' +
         '<dateIssued encoding="marc" point="start">1899</dateIssued>' +
-        mods_origin_info_end_str => [800, '800 A.D.'],
+        mods_origin_info_end_str => [800, '800 CE'],
       # dc882bs3541
       mods_origin_info_start_str +
         '<dateCreated encoding="w3cdtf" point="start" qualifier="approximate" keyDate="yes">0700</dateCreated>' +
         '<dateCreated encoding="w3cdtf" point="end" qualifier="approximate">0799</dateCreated>' +
         '<dateCreated encoding="w3cdtf" keyDate="yes"/>' +
-        mods_origin_info_end_str => [700, '700 A.D. - 799 A.D.'],
+        mods_origin_info_end_str => [700, '700 CE - 799 CE'],
       # hg026ds6978
       mods_origin_info_start_str +
         '<dateCreated encoding="w3cdtf" keyDate="yes">0816</dateCreated>' +
-        mods_origin_info_end_str => [816, '816 A.D.'],
+        mods_origin_info_end_str => [816, '816 CE'],
       # ct437ht0445
       mods_origin_info_start_str +
         '<dateCreated encoding="w3cdtf" keyDate="yes" point="start" qualifier="approximate">0900</dateCreated>' +
         '<dateCreated encoding="w3cdtf" point="end" qualifier="approximate">0999</dateCreated>' +
         '<dateCreated encoding="w3cdtf" keyDate="yes"/>' +
-        mods_origin_info_end_str => [900, '900 A.D. - 999 A.D.'],
+        mods_origin_info_end_str => [900, '900 CE - 999 CE'],
       # ch617yk2621
       mods_origin_info_start_str +
         '<dateCreated encoding="w3cdtf" keyDate="yes" point="start" qualifier="approximate">1000</dateCreated>' +
@@ -959,7 +959,7 @@ SEARCHWORKS_PUB_DATE_DATA = {
         '<dateCreated encoding="w3cdtf" keyDate="yes" point="start" qualifier="approximate">0950</dateCreated>' +
         '<dateCreated encoding="w3cdtf" point="end" qualifier="approximate">1000</dateCreated>' +
         '<dateCreated encoding="w3cdtf" keyDate="yes"/>' +
-        mods_origin_info_end_str => [950, '950 A.D. - 1000'],
+        mods_origin_info_end_str => [950, '950 CE - 1000'],
       # hj537kj5737
       mods_origin_info_start_str +
         '<dateIssued>15th century CE</dateIssued>' +

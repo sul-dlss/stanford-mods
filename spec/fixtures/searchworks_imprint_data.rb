@@ -700,7 +700,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <dateIssued encoding="marc" point="start" keyDate="yes">0850</dateIssued>
         <dateIssued encoding="marc" point="end">1499</dateIssued>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => 'California, 850 A.D. - 1499',
+        mods_origin_info_end_str => 'California, 850 CE - 1499',
       # coll rec  bd001pp3337
       # coll rec fn508pj9953
       mods_origin_info_start_str +
@@ -728,7 +728,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <dateCreated point="start" qualifier="approximate" keyDate="yes">850</dateCreated>
         <dateCreated point="end" qualifier="approximate">1499</dateCreated>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => 'England, [ca. 850 A.D. - 1499]',
+        mods_origin_info_end_str => 'England, [ca. 850 CE - 1499]',
       # sc582cv9633
       mods_origin_info_start_str +
         '<dateCreated keydate="yes">1314</dateCreated>
@@ -1055,7 +1055,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <originInfo>
           <dateCreated encoding="edtf" point="start" keyDate="yes">-18</dateCreated>
           <dateCreated encoding="edtf" point="end">-17</dateCreated>' +
-        mods_origin_info_end_str => 'Spain; 19 B.C. - 18 B.C.',
+        mods_origin_info_end_str => 'Spain; 19 BCE - 18 BCE',
       # bb408km1389
       mods_origin_info_start_str +
         ' <place supplied="yes">
@@ -1065,7 +1065,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <originInfo>
           <dateCreated encoding="edtf" point="start" keyDate="yes">-1</dateCreated>
           <dateCreated encoding="edtf" point="end">11</dateCreated>' +
-        mods_origin_info_end_str => 'Lyon (France); 2 B.C. - 11 A.D.',
+        mods_origin_info_end_str => 'Lyon (France); 2 BCE - 11 CE',
       # cs470ng8064
       mods_origin_info_start_str +
         ' <place supplied="yes">
@@ -1075,7 +1075,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <originInfo>
           <dateCreated encoding="edtf" point="start" keyDate="yes">-1</dateCreated>
           <dateCreated encoding="edtf" point="end">0</dateCreated>' +
-        mods_origin_info_end_str => 'Antioch (Turkey) (?); 2 B.C. - 1 B.C.',
+        mods_origin_info_end_str => 'Antioch (Turkey) (?); 2 BCE - 1 BCE',
       # vh834jh5059
       mods_origin_info_start_str +
         ' <place supplied="yes">
@@ -1085,7 +1085,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <originInfo>
           <dateCreated encoding="edtf" point="start" keyDate="yes">13</dateCreated>
           <dateCreated encoding="edtf" point="end">14</dateCreated>' +
-        mods_origin_info_end_str => 'Lyon (France); 13 A.D. - 14 A.D.',
+        mods_origin_info_end_str => 'Lyon (France); 13 CE - 14 CE',
       # sk424bh9379
       mods_origin_info_start_str +
         ' <place supplied="yes">
@@ -1095,7 +1095,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <originInfo>
           <dateCreated encoding="edtf" point="start" keyDate="yes">34</dateCreated>
           <dateCreated encoding="edtf" point="end">35</dateCreated>' +
-        mods_origin_info_end_str => 'Alexandria (Egypt); 34 A.D. - 35 A.D.'
+        mods_origin_info_end_str => 'Alexandria (Egypt); 34 CE - 35 CE'
     },
   # rigler
   'rumsey' =>
@@ -1235,7 +1235,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         '<dateIssued encoding="marc" point="start">800</dateIssued>
         <dateIssued encoding="marc" point="end">1899</dateIssued>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => '800 A.D. - 1899',
+        mods_origin_info_end_str => '800 CE - 1899',
       # dc882bs3541
       mods_origin_info_start_str +
         '<place>
@@ -1245,7 +1245,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <dateCreated encoding="w3cdtf" point="end" qualifier="approximate">0799</dateCreated>
         <dateCreated encoding="w3cdtf" keyDate="yes"/>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => 'Egypt, [ca. 700 A.D. - 799 A.D.]',
+        mods_origin_info_end_str => 'Egypt, [ca. 700 CE - 799 CE]',
       # hg026ds6978
       mods_origin_info_start_str +
         '<place>
@@ -1253,7 +1253,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         </place>
         <dateCreated encoding="w3cdtf" keyDate="yes">0816</dateCreated>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => 'Central Arab lands, 816 A.D.',
+        mods_origin_info_end_str => 'Central Arab lands, 816 CE',
       # ch617yk2621
       mods_origin_info_start_str +
         '<place>
@@ -1273,7 +1273,7 @@ SEARCHWORKS_IMPRINT_DATA = {
         <dateCreated encoding="w3cdtf" point="end" qualifier="approximate">1000</dateCreated>
         <dateCreated encoding="w3cdtf" keyDate="yes"/>
         <issuance>monographic</issuance>' +
-        mods_origin_info_end_str => 'Byzantine Empire, [ca. 950 A.D. - 1000]',
+        mods_origin_info_end_str => 'Byzantine Empire, [ca. 950 CE - 1000]',
       # hj537kj5737
       mods_origin_info_start_str +
         '<dateIssued>15th century CE</dateIssued>
