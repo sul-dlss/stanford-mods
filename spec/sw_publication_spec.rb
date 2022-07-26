@@ -6,8 +6,6 @@ describe "SearchWorks Publication methods" do
       SEARCHWORKS_PUB_DATE_DATA.each_pair.each do |coll_name, coll_data|
         coll_data.each_pair do |mods_str, exp_vals|
           expected = exp_vals[exp_val_position]
-          # TODO:  pub_year_display_str doesn't cope with date ranges yet
-          expected = expected.split(' - ')[0] if method_sym == :pub_year_display_str && expected
           it "#{expected} for rec in #{coll_name}" do
             smods_rec.from_str(mods_str)
             expect(smods_rec.send(method_sym)).to eq expected

@@ -3,7 +3,7 @@ mods_origin_info_end_str = '</originInfo></mods>'
 
 SPOTLIGHT_PUB_DATE_DATA = {
   'batchelor' =>
-    { # key is mods_xml;  values = [pub date sortable facet value, pub date single string facet value]
+    { # key is mods_xml;  values = [sortable value, display value]
       # ct961sj2730 coll rec:  no originInfo dates)
       # dr330jt7122
       mods_origin_info_start_str +
@@ -24,27 +24,27 @@ SPOTLIGHT_PUB_DATE_DATA = {
         '<dateIssued>1758]</dateIssued>' +
         '<dateIssued encoding="marc" point="start" qualifier="questionable">1758</dateIssued>' +
         '<dateIssued encoding="marc" point="end" qualifier="questionable">uuuu</dateIssued>' +
-        mods_origin_info_end_str => ['1758', '1758'],
+        mods_origin_info_end_str => ['1758', '1758 - '],
       # gw369sx8109
       mods_origin_info_start_str +
         '<dateIssued>179-?]</dateIssued>' +
         '<dateIssued encoding="marc" point="start" qualifier="questionable">1790</dateIssued>' +
         '<dateIssued encoding="marc" point="end" qualifier="questionable">1799</dateIssued>' +
-        mods_origin_info_end_str => ['1790', '1790'],
+        mods_origin_info_end_str => ['1790', '1790 - 1799'],
       # ty320hx2831
       mods_origin_info_start_str +
         '<dateIssued>[1860-1869?]</dateIssued>' +
         '<dateIssued encoding="marc" point="start" qualifier="questionable">1860</dateIssued>' +
         '<dateIssued encoding="marc" point="end" qualifier="questionable">1890</dateIssued>' +
-        mods_origin_info_end_str => ['1860', '1860']
+        mods_origin_info_end_str => ['1860', '1860 - 1890']
     },
   'feigenbaum' =>
-    { # key is mods_xml;  values = [pub date sortable facet value, pub date single string facet value]
+    { # key is mods_xml;  values = [sortable value, display value]
       # coll rec
       mods_origin_info_start_str +
         '<dateIssued encoding="marc" point="start">1950</dateIssued>' +
         '<dateIssued encoding="marc" point="end">2007</dateIssued>' +
-        mods_origin_info_end_str => ['1950', '1950'],
+        mods_origin_info_end_str => ['1950', '1950 - 2007'],
       # py696hw1646, jc364jw8333
         mods_origin_info_start_str +
         '<dateCreated encoding="w3cdtf" keyDate="yes">2001-11-19</dateCreated>' +
@@ -57,14 +57,14 @@ SPOTLIGHT_PUB_DATE_DATA = {
       mods_origin_info_start_str +
         '<dateCreated encoding="w3cdtf" keyDate="yes" point="start" qualifier="approximate">1950</dateCreated>' +
         '<dateCreated encoding="w3cdtf" point="end" qualifier="approximate">2007</dateCreated>' +
-        mods_origin_info_end_str => ['1950', '1950'],
+        mods_origin_info_end_str => ['1950', '1950 - 2007'],
       # wb033rz4421, rg190zp1039
       mods_origin_info_start_str +
         '<dateCreated encoding="w3cdtf" keyDate="yes">1960</dateCreated>' +
         mods_origin_info_end_str => ['1960', '1960']
     },
   'fitch' =>
-    { # key is mods_xml;  values = [pub date sortable facet value, pub date single string facet value]
+    { # key is mods_xml;  values = [sortable value, display value]
       # tv206kh7995
       mods_origin_info_start_str +
           '<dateIssued encoding="w3cdtf" keyDate="yes">2003</dateIssued>' +
@@ -76,50 +76,50 @@ SPOTLIGHT_PUB_DATE_DATA = {
       mods_origin_info_start_str +
         '<dateCreated keyDate="yes" encoding="w3cdtf" point="start" qualifier="approximate">1968</dateCreated>' +
         '<dateCreated encoding="w3cdtf" point="end" qualifier="approximate">1975</dateCreated>' +
-        mods_origin_info_end_str => ['1968', '1968'],
+        mods_origin_info_end_str => ['1968', '1968 - 1975'],
       # jc865hw9993
         mods_origin_info_start_str +
         '<dateCreated keyDate="yes" encoding="w3cdtf">1970</dateCreated>' +
         mods_origin_info_end_str => ['1970', '1970']
     },
   'hanna_house' =>
-    { # key is mods_xml;  values = [pub date sortable facet value, pub date single string facet value]
+    { # key is mods_xml;  values = [sortable value, display value]
       # gb597yd7556 coll rec
       mods_origin_info_start_str +
         '<dateIssued encoding="marc" point="start">1935</dateIssued>' +
         '<dateIssued encoding="marc" point="end">1995</dateIssued>' +
-        mods_origin_info_end_str => ['1935', '1935'],
+        mods_origin_info_end_str => ['1935', '1935 - 1995'],
       # gb597yd7556
       mods_origin_info_start_str +
         '<dateIssued encoding="marc" point="start">1935</dateIssued>' +
         '<dateIssued encoding="marc" point="end">1995</dateIssued>' +
-        mods_origin_info_end_str => ['1935', '1935'],
+        mods_origin_info_end_str => ['1935', '1935 - 1995'],
       # zr891kq4418
       mods_origin_info_start_str +
         '<dateCreated point="start" keyDate="yes" encoding="w3cdtf">1914</dateCreated>' +
         '<dateCreated point="end" encoding="w3cdtf">1985</dateCreated>' +
-        mods_origin_info_end_str => ['1914', '1914'],
+        mods_origin_info_end_str => ['1914', '1914 - 1985'],
       # dx393nr2700
       mods_origin_info_start_str +
         '<dateCreated point="start" keyDate="yes" encoding="w3cdtf">1937</dateCreated>' +
         '<dateCreated point="end" qualifier="approximate" encoding="w3cdtf">1986</dateCreated>' +
-        mods_origin_info_end_str => ['1937', '1937']
+        mods_origin_info_end_str => ['1937', '1937 - 1986']
     },
   'harrison' =>
-    { # key is mods_xml;  values = [pub date sortable facet value, pub date single string facet value]
+    { # key is mods_xml;  values = [sortable value, display value]
       # yb643gf8754
       mods_origin_info_start_str +
         '<dateCreated keyDate="yes" encoding="w3cdtf" point="start">2004</dateCreated>' +
         '<dateCreated encoding="w3cdtf" point="end">2005</dateCreated>' +
-        mods_origin_info_end_str => ['2004', '2004'],
+        mods_origin_info_end_str => ['2004', '2004 - 2005'],
       # qj294cd5539
       mods_origin_info_start_str +
         '<dateCreated keyDate="yes" encoding="w3cdtf" point="start" qualifier="approximate">1982</dateCreated>' +
         '<dateCreated encoding="w3cdtf" point="end" qualifier="approximate">1983</dateCreated>' +
-        mods_origin_info_end_str => ['1982', '1982']
+        mods_origin_info_end_str => ['1982', '1982 - 1983']
     },
   'heckrotte' =>
-    { # key is mods_xml;  values = [pub date sortable facet value, pub date single string facet value]
+    { # key is mods_xml;  values = [sortable value, display value]
       # rx637sx4870
       mods_origin_info_start_str +
         '<dateIssued encoding="marc">1914</dateIssued>' +
@@ -130,12 +130,12 @@ SPOTLIGHT_PUB_DATE_DATA = {
         mods_origin_info_end_str => [nil, nil]
     },
   'matter' =>
-    { # key is mods_xml;  values = [pub date sortable facet value, pub date single string facet value]
+    { # key is mods_xml;  values = [sortable value, display value]
       # pj169kw1971 coll rec
       mods_origin_info_start_str +
         '<dateIssued encoding="marc" point="start">1937</dateIssued>' +
         '<dateIssued encoding="marc" point="end">1984</dateIssued>' +
-        mods_origin_info_end_str => ['1937', '1937'],
+        mods_origin_info_end_str => ['1937', '1937 - 1984'],
       # vx584zf3939
       mods_origin_info_start_str +
         '<dateCreated encoding="w3cdtf" keyDate="yes" qualifier="questionable">1954</dateCreated>' +
@@ -144,24 +144,24 @@ SPOTLIGHT_PUB_DATE_DATA = {
       mods_origin_info_start_str +
         '<dateCreated encoding="w3cdtf" keyDate="yes" qualifier="approximate" point="start">1937</dateCreated>' +
         '<dateCreated encoding="w3cdtf" qualifier="approximate" point="end">1984</dateCreated>' +
-        mods_origin_info_end_str => ['1937', '1937'],
+        mods_origin_info_end_str => ['1937', '1937 - 1984'],
       # hr768nf5908
       mods_origin_info_start_str +
         '<dateCreated encoding="w3cdtf" keyDate="yes">1948-02-05</dateCreated>' +
         mods_origin_info_end_str => ['1948', '1948']
     },
   'mss' =>
-    { # key is mods_xml;  values = [pub date sortable facet value, pub date single string facet value]
+    { # key is mods_xml;  values = [sortable value, display value]
       # dt056jp2574 coll rec
       mods_origin_info_start_str +
         '<dateIssued encoding="marc" point="start" keyDate="yes">0850</dateIssued>' +
         '<dateIssued encoding="marc" point="end">1499</dateIssued>' +
-        mods_origin_info_end_str => ['0850', '850 CE'],
+        mods_origin_info_end_str => ['0850', '850 CE - 1499'],
       # nc881qb8504
       mods_origin_info_start_str +
         '<dateCreated point="start" qualifier="approximate" keyDate="yes">1000</dateCreated>' +
         '<dateCreated point="end" qualifier="approximate">1599</dateCreated>' +
-        mods_origin_info_end_str => ['1000', '1000'],
+        mods_origin_info_end_str => ['1000', '1000 - 1599'],
       # gq464qc3817
       mods_origin_info_start_str +
         '<dateCreated keydate="yes">1371</dateCreated>' +
@@ -170,15 +170,15 @@ SPOTLIGHT_PUB_DATE_DATA = {
       mods_origin_info_start_str +
         '<dateIssued encoding="marc" point="start">1310</dateIssued>' +
         '<dateIssued encoding="marc" point="end">1500</dateIssued>' +
-        mods_origin_info_end_str => ['1310', '1310'],
+        mods_origin_info_end_str => ['1310', '1310 - 1500'],
       # zv022sd1415 (a coll rec)
       mods_origin_info_start_str +
         '<dateIssued encoding="marc" keyDate="yes" point="start" qualifier="questionable">1100</dateIssued>' +
         '<dateIssued encoding="marc" point="end" qualifier="questionable">1499</dateIssued>' +
-        mods_origin_info_end_str => ['1100', '1100']
+        mods_origin_info_end_str => ['1100', '1100 - 1499']
     },
   'muybridge_date_issued' =>
-    { # key is mods_xml;  values = [pub date sortable facet value, pub date single string facet value]
+    { # key is mods_xml;  values = [sortable value, display value]
       # rs028yq2265
       mods_origin_info_start_str +
         '<dateIssued>1876</dateIssued>' +
@@ -193,20 +193,20 @@ SPOTLIGHT_PUB_DATE_DATA = {
       mods_origin_info_start_str +
         '<dateIssued encoding="marc" point="start" keyDate="yes">1868</dateIssued>' +
         '<dateIssued encoding="marc" point="end">1929</dateIssued>' +
-        mods_origin_info_end_str => ['1868', '1868']
+        mods_origin_info_end_str => ['1868', '1868 - 1929']
     },
   'norwich' =>
-    { # key is mods_xml;  values = [pub date sortable facet value, pub date single string facet value]
+    { # key is mods_xml;  values = [sortable value, display value]
       # qb438pg7646 - coll record
       mods_origin_info_start_str +
         '<dateIssued encoding="marc" point="start" qualifier="questionable">1486</dateIssued>' +
         '<dateIssued encoding="marc" point="end" qualifier="questionable">1865</dateIssued>' +
-        mods_origin_info_end_str => ['1486', '1486'],
+        mods_origin_info_end_str => ['1486', '1486 - 1865'],
       # zv656kg5843 - dateIssued item record
       mods_origin_info_start_str +
         '<dateIssued qualifier="questionable" point="start" keyDate="yes">1486</dateIssued>' +
         '<dateIssued qualifier="questionable" point="end">1865</dateIssued>' +
-        mods_origin_info_end_str => ['1486', '1486'],
+        mods_origin_info_end_str => ['1486', '1486 - 1865'],
       # vv001qm0627
       mods_origin_info_start_str +
         '<dateCreated encoding="w3cdtf" keyDate="yes" qualifier="">1792</dateCreated>' +
@@ -219,32 +219,32 @@ SPOTLIGHT_PUB_DATE_DATA = {
       mods_origin_info_start_str +
         '<dateCreated encoding="w3cdtf" keyDate="yes" qualifier="approximate" point="start">1646</dateCreated>' +
         '<dateCreated encoding="w3cdtf" keyDate="no" qualifier="approximate" point="end">1647</dateCreated>' +
-        mods_origin_info_end_str => ['1646', '1646'],
+        mods_origin_info_end_str => ['1646', '1646 - 1647'],
       # rw174jv7999
       mods_origin_info_start_str +
         '<dateCreated encoding="w3cdtf" keyDate="yes" qualifier="approximate" point="start">1836</dateCreated>' +
         '<dateCreated encoding="w3cdtf" keyDate="no" qualifier="approximate" point="end">1839</dateCreated>' +
-        mods_origin_info_end_str => ['1836', '1836'],
+        mods_origin_info_end_str => ['1836', '1836 - 1839'],
       # kw395pq8862
       mods_origin_info_start_str +
         '<dateCreated encoding="w3cdtf" keyDate="yes" qualifier="questionable">1737</dateCreated>' +
         mods_origin_info_end_str => ['1737', '1737']
     },
   'papyri' =>
-    { # key is mods_xml;  values = [pub date sortable facet value, pub date single string facet value]
+    { # key is mods_xml;  values = [sortable value, display value]
       # hd778hw9236
       mods_origin_info_start_str +
         '<dateCreated keyDate="yes" point="start" qualifier="approximate">200 B.C.</dateCreated>' +
         '<dateCreated keyDate="yes" point="end" qualifier="approximate">180 B.C.</dateCreated>' +
-        mods_origin_info_end_str => ['-801', '200 BCE'],
+        mods_origin_info_end_str => ['-801', '200 BCE - 180 BCE'],
       # ww728rz0477
       mods_origin_info_start_str +
         '<dateCreated keyDate="yes" point="start" qualifier="approximate">211 B.C.</dateCreated>' +
         '<dateCreated keyDate="yes" point="end" qualifier="approximate">150 B.C.</dateCreated>' +
-        mods_origin_info_end_str => ['-790', '211 BCE']
+        mods_origin_info_end_str => ['-790', '211 BCE - 150 BCE'],
     },
   'renaissance' =>
-    { # key is mods_xml;  values = [pub date sortable facet value, pub date single string facet value]
+    { # key is mods_xml;  values = [sortable value, display value]
       # qm115qm4767
       mods_origin_info_start_str +
         '<dateIssued>1621</dateIssued>' +
@@ -255,7 +255,7 @@ SPOTLIGHT_PUB_DATE_DATA = {
         '</originInfo>
         <originInfo>
           <dateIssued>approximately 1600-1700.</dateIssued>' +
-        mods_origin_info_end_str => ['1600', '1600'],
+        mods_origin_info_end_str => ['1600', '17th century'],
       # vm330vk8699
       mods_origin_info_start_str +
           '<dateIssued encoding="marc" point="start">1552</dateIssued>' +
@@ -263,7 +263,7 @@ SPOTLIGHT_PUB_DATE_DATA = {
         '</originInfo>
         <originInfo>
           <dateIssued>1544-1628]</dateIssued>' +
-        mods_origin_info_end_str => ['1544', '1544'],
+        mods_origin_info_end_str => ['1552', '1552 - 1575'],
       # fs844yc9264
       mods_origin_info_start_str +
         '<dateIssued>1486]</dateIssued>' +

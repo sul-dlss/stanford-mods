@@ -75,7 +75,7 @@ SEARCHWORKS_PUB_DATE_DATA = {
       mods_origin_info_start_str +
         '<dateIssued>1860, [1862]</dateIssued>' +
         '<dateIssued encoding="marc">1862</dateIssued>' +
-        mods_origin_info_end_str => [1860, '1860'],
+        mods_origin_info_end_str => [1862, '1862'],
       # nq311rg5326
       mods_origin_info_start_str +
         '<dateIssued>1860?]</dateIssued>' +
@@ -131,7 +131,7 @@ SEARCHWORKS_PUB_DATE_DATA = {
         '<dateIssued>1758]</dateIssued>' +
         '<dateIssued encoding="marc" point="start" qualifier="questionable">1758</dateIssued>' +
         '<dateIssued encoding="marc" point="end" qualifier="questionable">uuuu</dateIssued>' +
-        mods_origin_info_end_str => [1758, '1758']
+        mods_origin_info_end_str => [1758, '1758 - ']
     },
   # afro_am_music
   # ai
@@ -187,7 +187,7 @@ SEARCHWORKS_PUB_DATE_DATA = {
       # rc301fn5504
       mods_origin_info_start_str +
         '<dateIssued>circa 1851-1852</dateIssued>' +
-        mods_origin_info_end_str => [1851, '1851'],
+        mods_origin_info_end_str => [1851, '1851 - 1852'],
       # zz400gd3785
       mods_origin_info_start_str +
         '<dateIssued>copyright 1906</dateIssued>' +
@@ -270,12 +270,12 @@ SEARCHWORKS_PUB_DATE_DATA = {
       mods_origin_info_start_str +
         '<dateCaptured encoding="iso8601" point="start" keyDate="yes">20090511065738</dateCaptured>' +
         '<dateCaptured encoding="edtf" point="end">open</dateCaptured>' +
-        mods_origin_info_end_str => [2009, '2009'],
+        mods_origin_info_end_str => [2009, '2009 - '],
       # gb089bd2251
       mods_origin_info_start_str +
         '<dateCaptured encoding="iso8601" point="start" keyDate="yes">20121129060351</dateCaptured>' +
         '<dateCaptured encoding="edtf" point="end">open</dateCaptured>' +
-        mods_origin_info_end_str => [2012, '2012']
+        mods_origin_info_end_str => [2012, '2012 - ']
     },
   # fuller
   'fuller' =>
@@ -349,7 +349,7 @@ SEARCHWORKS_PUB_DATE_DATA = {
         '<dateIssued>1846-</dateIssued>' +
         '<dateIssued encoding="marc" keyDate="yes" point="start">1846</dateIssued>' +
         '<dateIssued encoding="marc" point="end">9999</dateIssued>' +
-        mods_origin_info_end_str => [1846, '1846'],
+        mods_origin_info_end_str => [1846, '1846 - '],
       # zp382js2355
       mods_origin_info_start_str +
         '<dateIssued>[184-]</dateIssued>' +
@@ -446,13 +446,13 @@ SEARCHWORKS_PUB_DATE_DATA = {
         '<dateIssued>[1968?-</dateIssued>' +
         '<dateIssued encoding="marc" point="start" keyDate="yes">1968</dateIssued>' +
         '<dateIssued encoding="marc" point="end">9999</dateIssued>' +
-        mods_origin_info_end_str => [1968, '1968'],
+        mods_origin_info_end_str => [1968, '1968 - '],
       # tw488bz3281
       mods_origin_info_start_str +
         '<dateIssued>[1968?-</dateIssued>' +
         '<dateIssued encoding="marc" point="start" keyDate="yes">1968</dateIssued>' +
         '<dateIssued encoding="marc" point="end">9999</dateIssued>' +
-        mods_origin_info_end_str => [1968, '1968']
+        mods_origin_info_end_str => [1968, '1968 - ']
     },
   # kolb has no originInfo elements
   'labor' =>
@@ -461,7 +461,7 @@ SEARCHWORKS_PUB_DATE_DATA = {
       mods_origin_info_start_str +
         '<dateIssued encoding="marc" point="start">1948</dateIssued>' +
         '<dateIssued encoding="marc" point="end">9999</dateIssued>' +
-        mods_origin_info_end_str => [1948, '1948'],
+        mods_origin_info_end_str => [1948, '1948 - '],
       # vh590xb4582
       mods_origin_info_start_str +
         '<dateIssued encoding="w3cdtf" keyDate="yes" qualifier="approximate" point="start">1948</dateIssued>' +
@@ -503,7 +503,7 @@ SEARCHWORKS_PUB_DATE_DATA = {
         '<dateIssued>1640-1665?]</dateIssued>' +
         '<dateIssued encoding="marc" point="start" qualifier="questionable">1640</dateIssued>' +
         '<dateIssued encoding="marc" point="end" qualifier="questionable">1665</dateIssued>' +
-        mods_origin_info_end_str => [1640, '1640 - 1655'],
+        mods_origin_info_end_str => [1640, '1640 - 1665'],
       # rk097dw1744
       mods_origin_info_start_str +
         '<dateIssued>1640]</dateIssued>' +
@@ -513,7 +513,7 @@ SEARCHWORKS_PUB_DATE_DATA = {
       mods_origin_info_start_str +
         '<dateIssued>1598 or 1599]</dateIssued>' +
         '<dateIssued encoding="marc">1599</dateIssued>' +
-        mods_origin_info_end_str => [1598, '1598'],
+        mods_origin_info_end_str => [1599, '1599'],
       # nc111sz1016
       mods_origin_info_start_str +
         '<dateIssued>1643?]</dateIssued>' +
@@ -796,7 +796,7 @@ SEARCHWORKS_PUB_DATE_DATA = {
       mods_origin_info_start_str +
         '<dateCreated encoding="edtf" point="start" keyDate="yes">-18</dateCreated>' +
         '<dateCreated encoding="edtf" point="end">-17</dateCreated>' +
-        mods_origin_info_end_str => [-18, '19 BCE - 17 BCE'],
+        mods_origin_info_end_str => [-18, '19 BCE - 18 BCE'],
       # bb408km1389
       mods_origin_info_start_str +
         '<dateCreated encoding="edtf" point="start" keyDate="yes">-1</dateCreated>' +
@@ -806,7 +806,7 @@ SEARCHWORKS_PUB_DATE_DATA = {
       mods_origin_info_start_str +
         '<dateCreated encoding="edtf" point="start" keyDate="yes">-1</dateCreated>' +
         '<dateCreated encoding="edtf" point="end">0</dateCreated>' +
-        mods_origin_info_end_str => [-1, '2 BCE - 0 CE'],
+        mods_origin_info_end_str => [-1, '2 BCE - 1 BCE'],
       # vh834jh5059
       mods_origin_info_start_str +
         '<dateCreated encoding="edtf" point="start" keyDate="yes">13</dateCreated>' +
@@ -931,7 +931,7 @@ SEARCHWORKS_PUB_DATE_DATA = {
       mods_origin_info_start_str +
         '<dateIssued encoding="marc" point="start">800</dateIssued>' +
         '<dateIssued encoding="marc" point="start">1899</dateIssued>' +
-        mods_origin_info_end_str => [800, '800 CE'],
+        mods_origin_info_end_str => [800, '800 CE - '],
       # dc882bs3541
       mods_origin_info_start_str +
         '<dateCreated encoding="w3cdtf" point="start" qualifier="approximate" keyDate="yes">0700</dateCreated>' +
