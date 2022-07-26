@@ -35,6 +35,17 @@ module Stanford
         ed_place_pub_dates
       end
 
+      # array of parsed but unformattted date values, for a given list of
+      # elements to pull data from
+      def dates(date_field_keys = [:dateIssued, :dateCreated, :dateCaptured, :copyrightDate])
+        date_field_keys.map do |date_field|
+          next unless element.respond_to?(date_field)
+
+          date_elements = element.send(date_field)
+          parse_dates(date_elements) if date_elements.present?
+        end.compact.flatten
+      end
+
       private
 
       def compact_and_join_with_delimiter(values, delimiter)
@@ -117,22 +128,10 @@ module Stanford
       # DATE processing methods ------
 
       def date_str
-        date_vals = origin_info_date_vals
+        date_vals = unique_dates_for_display(dates).map(&:qualified_value)
         return if date_vals.empty?
+
         date_vals.map(&:strip).join(' ')
-      end
-
-      def origin_info_date_vals
-        date_field_keys.map do |date_field|
-          next unless element.respond_to?(date_field)
-
-          date_elements = element.send(date_field)
-          parse_dates(date_elements) if date_elements.present?
-        end.compact.flatten
-      end
-
-      def date_field_keys
-        [:dateIssued, :dateCreated, :dateCaptured, :copyrightDate]
       end
 
       class DateValue
@@ -148,6 +147,18 @@ module Stanford
           text.present? && !['9999', '0000-00-00', 'uuuu'].include?(text.strip)
         end
 
+        def key_date?
+          value.key?
+        end
+
+        def qualified?
+          qualifier.present?
+        end
+
+        def parsed_date?
+          date.present?
+        end
+
         # Element text reduced to digits and hyphen. Captures date ranges and
         # negative (BCE) dates. Used for comparison/deduping.
         def base_value
@@ -155,36 +166,44 @@ module Stanford
             return text.sub(/(\d{2})(\d{2})-(\d{2})/, '\1\2-\1\3')
           end
 
-          text.gsub(/(?<![\d])(\d{1,3})([xu-]{1,3})/i) { "#{$1}#{'0' * $2.length}"}.scan(/[\d-]/).join
+          text.gsub(/(?<![\d])(\d{1,3})([xu-]{1,3})/i) { "#{Regexp.last_match(1)}#{'0' * Regexp.last_match(2).length}" }.scan(/[\d-]/).join
         end
 
         # Decoded version of the date, if it was encoded. Strips leading zeroes.
-        def decoded_value
+        def decoded_value(allowed_precisions: [:day, :month, :year, :decade, :century], ignore_unparseable: false, display_original_text: true)
+          return if ignore_unparseable && !date
           return text.strip unless date
 
-          unless encoding.present?
-            return text.strip unless text =~ /^-?\d+$/ || text =~ /^[\dXxu?-]{4}$/
+          if display_original_text
+            unless encoding.present?
+              return text.strip unless text =~ /^-?\d+$/ || text =~ /^[\dXxu?-]{4}$/
+            end
           end
 
           if date.is_a?(EDTF::Interval)
             if value.precision == :century || value.precision == :decade
-              return format_date(date, value.precision)
+              return format_date(date, value.precision, allowed_precisions)
             end
 
             range = [
-              format_date(date.min, date.min.precision),
-              format_date(date.max, date.max.precision)
+              format_date(date.min, date.min.precision, allowed_precisions),
+              format_date(date.max, date.max.precision, allowed_precisions)
             ].uniq.compact
 
             return text.strip if range.empty?
 
             range.join(' - ')
           else
-            format_date(date, value.precision) || text.strip
+            format_date(date, value.precision, allowed_precisions) || text.strip
           end
         end
 
-        def format_date(date, precision)
+        # Returns the date in the format specified by the precision.
+        # Allowed_precisions should be ordered by granularity and supports e.g.
+        # getting a year precision when the actual date is more precise.
+        def format_date(date, precision, allowed_precisions)
+          precision = allowed_precisions.first unless allowed_precisions.include?(precision)
+
           case precision
           when :day
             date.strftime('%B %e, %Y')
@@ -200,14 +219,14 @@ module Stanford
             else
               year.to_s
             end
+          when :decade
+            "#{date.year}s"
           when :century
             if date.year.negative?
               "#{((date.year / 100).abs + 1).ordinalize} century BCE"
             else
               "#{((date.year / 100) + 1).ordinalize} century"
             end
-          when :decade
-            "#{date.year}s"
           end
         end
 
@@ -215,21 +234,23 @@ module Stanford
         # https://consul.stanford.edu/display/chimera/MODS+display+rules#MODSdisplayrules-3b.%3CoriginInfo%3E
         def qualified_value
           qualified_format = case qualifier
-          when 'approximate'
-            '[ca. %s]'
-          when 'questionable'
-            '[%s?]'
-          when 'inferred'
-            '[%s]'
-          else
-            '%s'
-          end
+                             when 'approximate'
+                               '[ca. %s]'
+                             when 'questionable'
+                               '[%s?]'
+                             when 'inferred'
+                               '[%s]'
+                             else
+                               '%s'
+                             end
 
           format(qualified_format, decoded_value)
         end
       end
 
       class DateRange
+        attr_reader :start, :stop
+
         def initialize(start: nil, stop: nil)
           @start = start
           @stop = stop
@@ -250,12 +271,34 @@ module Stanford
           @start&.encoding || @stop&.encoding
         end
 
+        # If either date in the range is qualified in any way
+        def qualified?
+          @start&.qualified? || @stop&.qualified?
+        end
+
+        # If either date in the range is a key date
+        def key_date?
+          @start&.key_date? || @stop&.key_date?
+        end
+
+        # If either date in the range was successfully parsed
+        def parsed_date?
+          @start&.parsed_date? || @stop&.parsed_date?
+        end
+
+        def decoded_value(**kwargs)
+          [
+            @start&.decoded_value(**kwargs),
+            @stop&.decoded_value(**kwargs)
+          ].uniq.join(' - ')
+        end
+
         # Decoded dates with "BCE" or "CE" and qualifier markers applied to
         # the entire range, or individually if dates differ.
         def qualified_value
           if @start&.qualifier == @stop&.qualifier
             qualifier = @start&.qualifier || @stop&.qualifier
-            date = "#{@start&.decoded_value} - #{@stop&.decoded_value}"
+            date = decoded_value
             return "[ca. #{date}]" if qualifier == 'approximate'
             return "[#{date}?]" if qualifier == 'questionable'
             return "[#{date}]" if qualifier == 'inferred'
@@ -270,15 +313,19 @@ module Stanford
       def parse_dates(elements)
         # convert to DateValue objects and keep only valid ones
         dates = elements.map(&:as_object).flatten.map { |element| DateValue.new(element) }.select(&:valid?)
-        # join any date ranges into DateRange objects
-        point, nonpoint = dates.partition(&:point)
-        if point.any?
-          range = DateRange.new(start: point.find { |date| date.point == 'start' },
-                                stop: point.find { |date| date.point == 'end' })
-          nonpoint.unshift(range)
-        end
-        dates = nonpoint
 
+        # join any date ranges into DateRange objects
+        point_dates, dates = dates.partition(&:point)
+        if point_dates.any?
+          range = DateRange.new(start: point_dates.find { |date| date.point == 'start' },
+                                stop: point_dates.find { |date| date.point == 'end' })
+          dates.unshift(range)
+        else
+          dates
+        end
+      end
+
+      def unique_dates_for_display(dates)
         # ensure dates are unique with respect to their base values
         dates = dates.group_by(&:base_value).map do |_value, group|
           next group.first if group.one?
@@ -304,10 +351,7 @@ module Stanford
           date_ranges.select { |r| r.base_values.include?(date.base_value) }
         end
 
-        dates = dates - duplicated_ranges
-
-        # output formatted dates with qualifiers, CE/BCE, etc.
-        dates.map(&:qualified_value)
+        dates - duplicated_ranges
       end
     end
   end
