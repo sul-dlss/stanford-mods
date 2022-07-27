@@ -32,7 +32,23 @@ describe "computations from /originInfo field" do
     end
   end
 
+  RSpec.shared_examples "pub year" do |method_sym, exp_val_position|
+    context 'searchworks actual data' do
+      require 'fixtures/searchworks_pub_date_data'
+      SEARCHWORKS_PUB_DATE_DATA.each_pair.each do |coll_name, coll_data|
+        coll_data.each_pair do |mods_str, exp_vals|
+          expected = exp_vals[exp_val_position]
+          it "#{expected} for rec in #{coll_name}" do
+            smods_rec.from_str(mods_str)
+            expect(smods_rec.send(method_sym)).to eq expected
+          end
+        end
+      end
+    end
+  end
+
   context '#pub_year_display_str' do
+    it_behaves_like "pub year", :pub_year_display_str, 1
     it_behaves_like "single pub date value", :pub_year_display_str, 1
 
     it 'prefers dateIssued to dateCreated' do
@@ -80,6 +96,41 @@ describe "computations from /originInfo field" do
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
       expect(smods_rec.pub_year_display_str).to eq '2015'
+    end
+
+    context '*best_or_earliest_year' do
+      it 'selects earliest (valid) parseable date from multiple options' do
+        mods_str = mods_origin_info_start_str +
+          '<dateIssued point="start" qualifier="questionable">1758</dateIssued>' +
+          '<dateIssued point="end" qualifier="questionable">uuuu</dateIssued>' +
+          '<dateIssued>1753]</dateIssued>' +
+          mods_origin_info_end_str
+        smods_rec.from_str(mods_str)
+        expect(smods_rec.pub_year_display_str).to eq '1753'
+      end
+      it 'prefers the earliest encoded date' do
+        mods_str = mods_origin_info_start_str +
+          '<dateIssued>1100</dateIssued>' +
+          '<dateIssued encoding="marc">1200</dateIssued>' +
+          '<dateIssued encoding="w3cdtf">1300</dateIssued>' +
+          mods_origin_info_end_str
+        smods_rec.from_str(mods_str)
+        expect(smods_rec.pub_year_display_str).to eq '1200'
+        mods_str = mods_origin_info_start_str +
+          '<dateIssued>1200</dateIssued>' +
+          '<dateIssued encoding="marc">1300</dateIssued>' +
+          '<dateIssued encoding="w3cdtf">1100</dateIssued>' +
+          mods_origin_info_end_str
+        smods_rec.from_str(mods_str)
+        expect(smods_rec.pub_year_display_str).to eq '1100'
+        mods_str = mods_origin_info_start_str +
+          '<dateIssued>1300</dateIssued>' +
+          '<dateIssued encoding="marc">1100</dateIssued>' +
+          '<dateIssued encoding="w3cdtf">1200</dateIssued>' +
+          mods_origin_info_end_str
+        smods_rec.from_str(mods_str)
+        expect(smods_rec.pub_year_display_str).to eq '1100'
+      end
     end
   end
 
@@ -135,6 +186,7 @@ describe "computations from /originInfo field" do
   end
 
   context '#pub_year_int' do
+    it_behaves_like "pub year", :pub_year_int, 0
     it_behaves_like "single pub date value", :pub_year_int, 0
 
     it 'prefers dateIssued to dateCreated' do
@@ -201,41 +253,6 @@ describe "computations from /originInfo field" do
         mods_origin_info_end_str
       smods_rec.from_str(mods_str)
       expect(smods_rec.pub_year_int).to eq(-210)
-    end
-  end
-
-  context '*best_or_earliest_year' do
-    it 'selects earliest (valid) parseable date from multiple options' do
-      mods_str = mods_origin_info_start_str +
-        '<dateIssued point="start" qualifier="questionable">1758</dateIssued>' +
-        '<dateIssued point="end" qualifier="questionable">uuuu</dateIssued>' +
-        '<dateIssued>1753]</dateIssued>' +
-        mods_origin_info_end_str
-      smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_year_display_str).to eq '1753'
-    end
-    it 'prefers the earliest encoded date' do
-      mods_str = mods_origin_info_start_str +
-        '<dateIssued>1100</dateIssued>' +
-        '<dateIssued encoding="marc">1200</dateIssued>' +
-        '<dateIssued encoding="w3cdtf">1300</dateIssued>' +
-        mods_origin_info_end_str
-      smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_year_display_str).to eq '1200'
-      mods_str = mods_origin_info_start_str +
-        '<dateIssued>1200</dateIssued>' +
-        '<dateIssued encoding="marc">1300</dateIssued>' +
-        '<dateIssued encoding="w3cdtf">1100</dateIssued>' +
-        mods_origin_info_end_str
-      smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_year_display_str).to eq '1100'
-      mods_str = mods_origin_info_start_str +
-        '<dateIssued>1300</dateIssued>' +
-        '<dateIssued encoding="marc">1100</dateIssued>' +
-        '<dateIssued encoding="w3cdtf">1200</dateIssued>' +
-        mods_origin_info_end_str
-      smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_year_display_str).to eq '1100'
     end
   end
 end
