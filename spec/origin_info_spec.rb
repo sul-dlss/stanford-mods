@@ -1,258 +1,581 @@
 describe "computations from /originInfo field" do
-  let(:smods_rec) { Stanford::Mods::Record.new }
-
-  # used for single examples
-  let(:mods_origin_info_start_str) { "<mods xmlns=\"#{Mods::MODS_NS}\"><originInfo>" }
-  let(:mods_origin_info_end_str) { '</originInfo></mods>' }
-
-  # used for hashes/arrays of examples
-  let(:mods_origin_info) do
-    <<-EOF
-    #{mods_origin_info_start_str}
-        #{example}
-     #{mods_origin_info_end_str}
-    EOF
-  end
-
-  RSpec.shared_examples "single pub date value" do |method_sym, exp_val_position|
-    context 'spotlight actual data' do
-      require 'fixtures/spotlight_pub_date_data'
-      SPOTLIGHT_PUB_DATE_DATA.each_pair.each do |coll_name, coll_data|
-        # papyri - the only Spotlight data with BC dates
-        next if coll_name == 'papyri' && method_sym == :pub_year_int
-
-        coll_data.each_pair do |mods_str, exp_vals|
-          expected = exp_vals[exp_val_position]
-          it "#{expected} for rec in #{coll_name}" do
-            smods_rec.from_str(mods_str)
-            expect(smods_rec.send(method_sym)).to eq((method_sym.to_s =~ /int/ ? expected.to_i : expected)) if expected
-          end
-        end
-      end
-    end
-  end
-
-  RSpec.shared_examples "pub year" do |method_sym, exp_val_position|
-    context 'searchworks actual data' do
-      require 'fixtures/searchworks_pub_date_data'
-      SEARCHWORKS_PUB_DATE_DATA.each_pair.each do |coll_name, coll_data|
-        coll_data.each_pair do |mods_str, exp_vals|
-          expected = exp_vals[exp_val_position]
-          it "#{expected} for rec in #{coll_name}" do
-            smods_rec.from_str(mods_str)
-            expect(smods_rec.send(method_sym)).to eq expected
-          end
-        end
-      end
-    end
-  end
+  let(:record) { Stanford::Mods::Record.new.from_str(modsxml) }
 
   context '#pub_year_display_str' do
-    it_behaves_like "pub year", :pub_year_display_str, 1
-    it_behaves_like "single pub date value", :pub_year_display_str, 1
-
-    it 'prefers dateIssued to dateCreated' do
-      mods_str = mods_origin_info_start_str +
-          '<dateIssued>2005</dateIssued>' +
-        '</originInfo>' +
-        '<originInfo>
-          <dateCreated>1999</dateCreated>' +
-        mods_origin_info_end_str
-      smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_year_display_str).to eq '2005'
-    end
-    it 'respects ignore_approximate param' do
-      mods_str = mods_origin_info_start_str +
-        '<dateCreated point="start" qualifier="approximate">1000</dateCreated>' +
-        '<dateCreated point="end">1599</dateCreated>' +
-        mods_origin_info_end_str
-      smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_year_display_str(ignore_approximate: true)).to eq nil
-      expect(smods_rec.pub_year_display_str(ignore_approximate: false)).to eq '1000 - 1599'
-    end
-    it 'nil if ignore_approximate and all dates are approximate' do
-      mods_str = mods_origin_info_start_str +
-        '<dateCreated point="start" qualifier="approximate">1000</dateCreated>' +
-        '<dateCreated point="end" qualifier="questionable">1599</dateCreated>' +
-        mods_origin_info_end_str
-      smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_year_display_str(ignore_approximate: true)).to eq nil
-      expect(smods_rec.pub_year_display_str(ignore_approximate: false)).to eq '1000 - 1599'
-    end
-    it 'respects ignore_approximate even for keyDate' do
-      mods_str = mods_origin_info_start_str +
-        '<dateCreated point="start" qualifier="approximate" keyDate="yes">1000</dateCreated>' +
-        '<dateCreated point="end">1599</dateCreated>' +
-        mods_origin_info_end_str
-      smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_year_display_str(ignore_approximate: true)).to eq nil
-      expect(smods_rec.pub_year_display_str(ignore_approximate: false)).to eq '1000 - 1599'
-    end
-    it 'uses dateCaptured if no dateIssued or dateCreated' do
-      # for web archive seed files
-      mods_str = mods_origin_info_start_str +
-        '<dateCaptured encoding="iso8601" point="start" keyDate="yes">20151215121212</dateCaptured>' +
-        '<dateCaptured encoding="iso8601" point="end">20151218111111</dateCaptured>' +
-        mods_origin_info_end_str
-      smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_year_display_str).to eq '2015'
-    end
-
-    context '*best_or_earliest_year' do
-      it 'selects earliest (valid) parseable date from multiple options' do
-        mods_str = mods_origin_info_start_str +
-          '<dateIssued point="start" qualifier="questionable">1758</dateIssued>' +
-          '<dateIssued point="end" qualifier="questionable">uuuu</dateIssued>' +
-          '<dateIssued>1753]</dateIssued>' +
-          mods_origin_info_end_str
-        smods_rec.from_str(mods_str)
-        expect(smods_rec.pub_year_display_str).to eq '1753'
+    context 'when it has a dateIssued date' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued>1900</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
       end
-      it 'prefers the earliest encoded date' do
-        mods_str = mods_origin_info_start_str +
-          '<dateIssued>1100</dateIssued>' +
-          '<dateIssued encoding="marc">1200</dateIssued>' +
-          '<dateIssued encoding="w3cdtf">1300</dateIssued>' +
-          mods_origin_info_end_str
-        smods_rec.from_str(mods_str)
-        expect(smods_rec.pub_year_display_str).to eq '1200'
-        mods_str = mods_origin_info_start_str +
-          '<dateIssued>1200</dateIssued>' +
-          '<dateIssued encoding="marc">1300</dateIssued>' +
-          '<dateIssued encoding="w3cdtf">1100</dateIssued>' +
-          mods_origin_info_end_str
-        smods_rec.from_str(mods_str)
-        expect(smods_rec.pub_year_display_str).to eq '1100'
-        mods_str = mods_origin_info_start_str +
-          '<dateIssued>1300</dateIssued>' +
-          '<dateIssued encoding="marc">1100</dateIssued>' +
-          '<dateIssued encoding="w3cdtf">1200</dateIssued>' +
-          mods_origin_info_end_str
-        smods_rec.from_str(mods_str)
-        expect(smods_rec.pub_year_display_str).to eq '1100'
+
+      it 'returns the year from the dateIssued field' do
+        expect(record.pub_year_display_str).to eq '1900'
+      end
+    end
+
+    context 'when it has a dateCreated date' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateCreated>1800</dateCreated>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns the year from the dateCreated field' do
+        expect(record.pub_year_display_str).to eq '1800'
+      end
+    end
+
+    context 'when it has a dateCaptured date' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateCaptured>1700</dateCaptured>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns the year from the dateCaptured field' do
+        expect(record.pub_year_display_str).to eq '1700'
+      end
+    end
+
+    context 'when it has multiple types of date fields' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued>1900</dateIssued>
+              <dateCreated>1800</dateCreated>
+              <dateCaptured>1700</dateCaptured>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns the year from the dateIssued field' do
+        expect(record.pub_year_display_str).to eq '1900'
+      end
+    end
+
+    context 'when it has a key date of the same type' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued keyDate="yes">1900</dateIssued>
+              <dateIssued>1800</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns the year from the keyDate field' do
+        expect(record.pub_year_display_str).to eq '1900'
+      end
+    end
+
+    context 'when it has a key date of a different type' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateCreated keyDate="yes">1900</dateCreated>
+              <dateIssued>1800</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns the year from the preferred field type regardless of the keyDate' do
+        expect(record.pub_year_display_str).to eq '1800'
+      end
+    end
+
+    context 'when it has multiple dates' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued>1900</dateIssued>
+              <dateIssued>1800</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns the earliest year' do
+        expect(record.pub_year_display_str).to eq '1800'
+      end
+    end
+
+    context 'when it has multiple originInfo elements' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued>1900</dateIssued>
+            </originInfo>
+            <originInfo>
+              <dateIssued>1800</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns the earliest year across all the dates' do
+        expect(record.pub_year_display_str).to eq '1800'
+      end
+    end
+
+    context 'when it has a date range' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued point="start">1800</dateIssued>
+              <dateIssued point="end">1900</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns the date range' do
+        expect(record.pub_year_display_str).to eq '1800 - 1900'
+      end
+    end
+
+    context 'when it has an open-ended date range' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued point="start">uuuu</dateIssued>
+              <dateIssued point="end">1900</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns the date range' do
+        expect(record.pub_year_display_str).to eq ' - 1900'
+      end
+    end
+
+    context 'when it has an encoded date' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued>1800</dateIssued>
+              <dateIssued encoding="marc">1900</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns the encoded date' do
+        expect(record.pub_year_display_str).to eq '1900'
+      end
+    end
+
+    context 'when it has a date range and an earlier single date' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued>1799</dateIssued>
+              <dateIssued point="start">1800</dateIssued>
+              <dateIssued point="end">1900</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns the earliest date' do
+        expect(record.pub_year_display_str).to eq '1799'
+      end
+    end
+
+    context 'when it has a date range and a later single date' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued>1850</dateIssued>
+              <dateIssued point="start">1800</dateIssued>
+              <dateIssued point="end">1900</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns the date range' do
+        expect(record.pub_year_display_str).to eq '1800 - 1900'
+      end
+    end
+
+    context 'with BCE dates' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued encoding="edtf">-0249</dateIssued>
+              <dateIssued encoding="edtf">-0149</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns the earliest date' do
+        expect(record.pub_year_display_str).to eq '250 BCE'
+      end
+    end
+
+    context 'with a BCE date range' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued encoding="edtf" point="start">-0249</dateIssued>
+              <dateIssued encoding="edtf" point="end">-0149</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns the date range' do
+        expect(record.pub_year_display_str).to eq '250 BCE - 150 BCE'
+      end
+    end
+
+    context 'with a qualified date' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued qualifier="approximate">249</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns the date without any qualifiers' do
+        expect(record.pub_year_display_str).to eq '249 CE'
+      end
+
+      context 'with ignore_approximate: true' do
+        it 'returns nothing' do
+          expect(record.pub_year_display_str(ignore_approximate: true)).to eq nil
+        end
+      end
+    end
+
+    context 'with non-year data in the field' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued>12th May 1800</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns only the year part of the date' do
+        expect(record.pub_year_display_str).to eq '1800'
+      end
+    end
+
+    context 'with a placeholder dates' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued qualifier="approximate">9999</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'ignores the date' do
+        expect(record.pub_year_display_str).to eq nil
       end
     end
   end
 
   context '#pub_year_sort_str' do
-    it_behaves_like "single pub date value", :pub_year_sort_str, 0
+    context 'when it has a dateIssued date' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued>1900</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
 
-    it 'prefers dateIssued to dateCreated' do
-      mods_str = mods_origin_info_start_str +
-          '<dateIssued>2005</dateIssued>' +
-        '</originInfo>' +
-        '<originInfo>
-          <dateCreated>1999</dateCreated>' +
-        mods_origin_info_end_str
-      smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_year_sort_str).to eq '2005'
+      it 'returns the year from the field' do
+        expect(record.pub_year_sort_str).to eq '1900'
+      end
     end
-    it 'respects ignore_approximate param' do
-      mods_str = mods_origin_info_start_str +
-        '<dateCreated point="start" qualifier="approximate">1000</dateCreated>' +
-        '<dateCreated point="end">1599</dateCreated>' +
-        mods_origin_info_end_str
-      smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_year_sort_str(ignore_approximate: true)).to eq nil
-      expect(smods_rec.pub_year_sort_str(ignore_approximate: false)).to eq '1000'
+
+    context 'when it has a date range' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued point="start">1800</dateIssued>
+              <dateIssued point="end">1900</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns just the earliest date in the range' do
+        expect(record.pub_year_sort_str).to eq '1800'
+      end
     end
-    it 'nil if ignore_approximate and all dates are approximate' do
-      mods_str = mods_origin_info_start_str +
-        '<dateCreated point="start" qualifier="approximate">1000</dateCreated>' +
-        '<dateCreated point="end" qualifier="questionable">1599</dateCreated>' +
-        mods_origin_info_end_str
-      smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_year_sort_str(ignore_approximate: true)).to eq nil
-      expect(smods_rec.pub_year_sort_str(ignore_approximate: false)).to eq '1000'
+
+    context 'with BCE dates' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued encoding="edtf">-0249</dateIssued>
+              <dateIssued encoding="edtf">-0149</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns the earliest date with the funky lexical sort encoding' do
+        expect(record.pub_year_sort_str).to eq '-751'
+      end
     end
-    it 'respects ignore_approximate even for keyDate' do
-      mods_str = mods_origin_info_start_str +
-        '<dateCreated point="start" qualifier="approximate" keyDate="yes">1000</dateCreated>' +
-        '<dateCreated point="end">1599</dateCreated>' +
-        mods_origin_info_end_str
-      smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_year_sort_str(ignore_approximate: true)).to eq nil
-      expect(smods_rec.pub_year_sort_str(ignore_approximate: false)).to eq '1000'
+
+    context 'with a BCE date range' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued encoding="edtf" point="start">-0249</dateIssued>
+              <dateIssued encoding="edtf" point="end">-0149</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns the earliest date of the range with the funky lexical sort encoding' do
+        expect(record.pub_year_sort_str).to eq '-751'
+      end
     end
-    it 'uses dateCaptured if no dateIssued or dateCreated' do
-      # for web archive seed files
-      mods_str = mods_origin_info_start_str +
-        '<dateCaptured encoding="iso8601" point="start" keyDate="yes">20151215121212</dateCaptured>' +
-        '<dateCaptured encoding="iso8601" point="end">20151218111111</dateCaptured>' +
-        mods_origin_info_end_str
-      smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_year_sort_str).to eq '2015'
+
+    context 'with a qualified date' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued qualifier="approximate">249</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns the date without any qualifiers' do
+        expect(record.pub_year_sort_str).to eq '0249'
+      end
+
+      context 'with ignore_approximate: true' do
+        it 'returns nothing' do
+          expect(record.pub_year_sort_str(ignore_approximate: true)).to eq nil
+        end
+      end
+    end
+
+    context 'with a placeholder dates' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued qualifier="approximate">9999</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'ignores the date' do
+        expect(record.pub_year_sort_str).to eq nil
+      end
+    end
+
+    context 'when it has an open-ended date range' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued point="start">uuuu</dateIssued>
+              <dateIssued point="end">1900</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns the known part of the date range' do
+        expect(record.pub_year_sort_str).to eq '1900'
+      end
     end
   end
 
   context '#pub_year_int' do
-    it_behaves_like "pub year", :pub_year_int, 0
-    it_behaves_like "single pub date value", :pub_year_int, 0
+    context 'when it has a dateIssued date' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued>1900</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
 
-    it 'prefers dateIssued to dateCreated' do
-      mods_str = mods_origin_info_start_str +
-          '<dateIssued>2005</dateIssued>' +
-        '</originInfo>' +
-        '<originInfo>
-          <dateCreated>1999</dateCreated>' +
-        mods_origin_info_end_str
-      smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_year_int).to eq 2005
+      it 'returns the year from the dateIssued field' do
+        expect(record.pub_year_int).to eq 1900
+      end
     end
-    it 'respects ignore_approximate param' do
-      mods_str = mods_origin_info_start_str +
-        '<dateCreated point="start" qualifier="approximate">1000</dateCreated>' +
-        '<dateCreated point="end">1599</dateCreated>' +
-        mods_origin_info_end_str
-      smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_year_int(ignore_approximate: true)).to eq nil
-      expect(smods_rec.pub_year_int(ignore_approximate: false)).to eq 1000
+
+    context 'when it has multiple dates' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued>1900</dateIssued>
+              <dateIssued>1800</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns the earliest year' do
+        expect(record.pub_year_int).to eq 1800
+      end
     end
-    it 'nil if ignore_approximate and all dates are approximate' do
-      mods_str = mods_origin_info_start_str +
-        '<dateCreated point="start" qualifier="approximate">1000</dateCreated>' +
-        '<dateCreated point="end" qualifier="questionable">1599</dateCreated>' +
-        mods_origin_info_end_str
-      smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_year_int(ignore_approximate: true)).to eq nil
-      expect(smods_rec.pub_year_int(ignore_approximate: false)).to eq 1000
+
+    context 'when it has a date range' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued point="start">1800</dateIssued>
+              <dateIssued point="end">1900</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns the earliest year from the date range' do
+        expect(record.pub_year_int).to eq 1800
+      end
     end
-    it 'respects ignore_approximate even for keyDate' do
-      mods_str = mods_origin_info_start_str +
-        '<dateCreated point="start" qualifier="approximate" keyDate="yes">1000</dateCreated>' +
-        '<dateCreated point="end">1599</dateCreated>' +
-        mods_origin_info_end_str
-      smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_year_int(ignore_approximate: true)).to eq nil
-      expect(smods_rec.pub_year_int(ignore_approximate: false)).to eq 1000
+
+    context 'when it has an open-ended date range' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued point="start">uuuu</dateIssued>
+              <dateIssued point="end">1900</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns the known part of the date range' do
+        expect(record.pub_year_int).to eq 1900
+      end
     end
-    it 'uses dateCaptured if no dateIssued or dateCreated' do
-      # for web archive seed files
-      mods_str = mods_origin_info_start_str +
-        '<dateCaptured encoding="iso8601" point="start" keyDate="yes">20151215121212</dateCaptured>' +
-        '<dateCaptured encoding="iso8601" point="end">20151218111111</dateCaptured>' +
-        mods_origin_info_end_str
-      smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_year_int).to eq 2015
+
+    context 'with BCE dates' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued encoding="edtf">-0249</dateIssued>
+              <dateIssued encoding="edtf">-0149</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns the earliest date' do
+        expect(record.pub_year_int).to eq(-249)
+      end
     end
-    # papyri - the only Spotlight data with BC dates
-    it '-199 for 200 B.C.' do
-      # hd778hw9236
-      mods_str = mods_origin_info_start_str +
-        '<dateCreated keyDate="yes" point="start" qualifier="approximate">200 B.C.</dateCreated>' +
-        '<dateCreated keyDate="yes" point="end" qualifier="approximate">180 B.C.</dateCreated>' +
-        mods_origin_info_end_str
-      smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_year_int).to eq(-199)
+
+    context 'with a BCE date range' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued encoding="edtf" point="start">-0249</dateIssued>
+              <dateIssued encoding="edtf" point="end">-0149</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns the year of the earliest date in the range' do
+        expect(record.pub_year_int).to eq(-249)
+      end
     end
-    it '-210 for 211 B.C.' do
-      # ww728rz0477
-      mods_str = mods_origin_info_start_str +
-        '<dateCreated keyDate="yes" point="start" qualifier="approximate">211 B.C.</dateCreated>' +
-        '<dateCreated keyDate="yes" point="end" qualifier="approximate">150 B.C.</dateCreated>' +
-        mods_origin_info_end_str
-      smods_rec.from_str(mods_str)
-      expect(smods_rec.pub_year_int).to eq(-210)
+
+    context 'with a qualified date' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued qualifier="approximate">249</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns the date without any qualifiers' do
+        expect(record.pub_year_int).to eq 249
+      end
+
+      context 'with ignore_approximate: true' do
+        it 'returns nothing' do
+          expect(record.pub_year_int(ignore_approximate: true)).to eq nil
+        end
+      end
+    end
+
+    context 'with a placeholder dates' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued qualifier="approximate">9999</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'ignores the date' do
+        expect(record.pub_year_int).to eq nil
+      end
     end
   end
 end
