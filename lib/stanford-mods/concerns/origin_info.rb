@@ -42,36 +42,7 @@ module Stanford
       # @note for string sorting  5 BCE = -5  => -995;  6 BCE => -994, so 6 BCE sorts before 5 BCE
       # @deprecated use pub_year_int
       def pub_year_sort_str(ignore_approximate: false)
-        date = earliest_preferred_date(ignore_approximate: ignore_approximate)
-
-        return unless date
-
-        if date.is_a? Stanford::Mods::Imprint::DateRange
-          date = date.start || date.stop
-        end
-
-        edtf_date = date.date
-
-        year = if edtf_date.is_a?(EDTF::Interval)
-          edtf_date.from.year
-        else
-          edtf_date.year
-        end
-
-        str = if year < 1
-          (-1 * year - 1000).to_s
-        else
-          year.to_s
-        end
-
-        case edtf_date.precision
-        when :decade
-          str[0..2] + "-"
-        when :century
-          str[0..1] + "--"
-        else
-          str.rjust(4, "0")
-        end
+        earliest_preferred_date(ignore_approximate: ignore_approximate)&.sort_key
       end
 
       # return a single string intended for display of pub year (or year range)
@@ -125,13 +96,7 @@ module Stanford
           preferred_dates = potential_dates.select(&:key_date?).presence || potential_dates
           best_dates = (preferred_dates.select { |x| x.encoding.present? }.presence || preferred_dates)
 
-          earliest_date = best_dates.min_by do |date|
-            if date.is_a? Stanford::Mods::Imprint::DateRange
-              date.start.base_value
-            else
-              date.base_value
-            end
-          end
+          earliest_date = best_dates.min_by(&:sort_key)
 
           return earliest_date if earliest_date
         end

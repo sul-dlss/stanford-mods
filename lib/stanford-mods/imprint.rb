@@ -159,6 +159,29 @@ module Stanford
           date.present?
         end
 
+        def sort_key
+          year = if date.is_a?(EDTF::Interval)
+            date.from.year
+          else
+            date.year
+          end
+
+          str = if year < 1
+            (-1 * year - 1000).to_s
+          else
+            year.to_s
+          end
+
+          case value.precision
+          when :decade
+            str[0..2] + "-"
+          when :century
+            str[0..1] + "--"
+          else
+            str.rjust(4, "0")
+          end
+        end
+
         # Element text reduced to digits and hyphen. Captures date ranges and
         # negative (BCE) dates. Used for comparison/deduping.
         def base_value
@@ -254,6 +277,10 @@ module Stanford
         def initialize(start: nil, stop: nil)
           @start = start
           @stop = stop
+        end
+
+        def sort_key
+          @start&.sort_key || @stop&.sort_key
         end
 
         # Base value as hyphen-joined string. Used for comparison/deduping.
