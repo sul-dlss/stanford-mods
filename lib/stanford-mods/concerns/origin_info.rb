@@ -16,8 +16,8 @@ module Stanford
       # @param [Boolean] ignore_approximate true if approximate dates (per qualifier attribute) should be ignored; false if approximate dates should be included
       # @return [Integer] publication year as an Integer
       # @note for sorting:  5 BCE => -5;  666 BCE => -666
-      def pub_year_int(ignore_approximate: false)
-        date = earliest_preferred_date(ignore_approximate: ignore_approximate)
+      def pub_year_int(fields = [:dateIssued, :dateCreated, :dateCaptured], ignore_approximate: false)
+        date = earliest_preferred_date(fields: fields, ignore_approximate: ignore_approximate)
 
         return unless date
 
@@ -41,8 +41,8 @@ module Stanford
       # @return [String] single String containing publication year for lexical sorting
       # @note for string sorting  5 BCE = -5  => -995;  6 BCE => -994, so 6 BCE sorts before 5 BCE
       # @deprecated use pub_year_int
-      def pub_year_sort_str(ignore_approximate: false)
-        earliest_preferred_date(ignore_approximate: ignore_approximate)&.sort_key
+      def pub_year_sort_str(fields = [:dateIssued, :dateCreated, :dateCaptured], ignore_approximate: false)
+        earliest_preferred_date(fields: fields, ignore_approximate: ignore_approximate)&.sort_key
       end
 
       # return a single string intended for display of pub year (or year range)
@@ -50,8 +50,8 @@ module Stanford
       # @param [Array<Symbol>] fields array of field types to use to look for dates.
       # @param [Boolean] ignore_approximate true if approximate dates (per qualifier attribute)
       #   should be ignored; false if approximate dates should be included
-      def pub_year_display_str(ignore_approximate: false)
-        earliest_preferred_date(ignore_approximate: ignore_approximate)&.decoded_value(allowed_precisions: [:year, :decade, :century], ignore_unparseable: true, display_original_text: false)
+      def pub_year_display_str(fields = [:dateIssued, :dateCreated, :dateCaptured], ignore_approximate: false)
+        earliest_preferred_date(fields: fields, ignore_approximate: ignore_approximate)&.decoded_value(allowed_precisions: [:year, :decade, :century], ignore_unparseable: true, display_original_text: false)
       end
 
       # @return [Array<Stanford::Mods::Imprint>] array of imprint objects
