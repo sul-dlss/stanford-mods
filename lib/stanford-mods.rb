@@ -1,7 +1,6 @@
 require 'active_support'
 require 'active_support/core_ext/integer/inflections'
 require 'mods'
-require 'stanford-mods/date_parsing'
 require 'stanford-mods/coordinate'
 require 'stanford-mods/imprint'
 require 'stanford-mods/vocabularies/searchworks_languages'
