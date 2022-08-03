@@ -100,6 +100,12 @@ describe "computations from /originInfo field" do
       it 'returns the year from the preferred field type regardless of the keyDate' do
         expect(record.pub_year_display_str).to eq '1800'
       end
+
+      context 'with field filters' do
+        it 'returns the year from the requested field' do
+          expect(record.pub_year_display_str([:dateCreated])).to eq '1900'
+        end
+      end
     end
 
     context 'when it has multiple dates' do
