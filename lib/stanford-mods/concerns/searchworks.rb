@@ -114,11 +114,11 @@ module Stanford
         val.uniq
       end
 
-      # @return [String] value with the numeric catkey in it, or nil if none exists
+      # @return [String] value with the catkey in it, or nil if none exists
       def catkey
         catkey = term_values([:record_info, :recordIdentifier])
 
-        catkey.first&.tr('a', '') # ensure catkey is numeric only
+        catkey.first&.tr('a', '') # remove prefix from SUL catkeys
       end
     end # class Record
   end # Module Mods
