@@ -9,7 +9,7 @@ module Stanford
         mods_ng_xml.language.flat_map do |n|
           # get languageTerm codes and add their translations to the result
           result = n.code_term.flat_map do |ct|
-            if ct.authority =~ /^iso639/
+            if ct.authority.to_s =~ /^iso639/
               vals = ct.text.split(/[,|\ ]/).reject { |x| x.strip.empty? }
               vals.select { |v| ISO_639.find(v.strip) }.map do |v|
                 iso639_val = ISO_639.find(v.strip).english_name
