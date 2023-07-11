@@ -13,7 +13,7 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
       expect(langs.size).to eq(3)
       expect(langs).to include("Persian", "Arabic", "Dutch")
       expect(langs).not_to include("Dutch; Flemish")
-    end 
+    end
     it "should return a language string from lookup for a valid language code that has a type=code specified but no authority" do
       m = "<mods #{@ns_decl}> <language><languageTerm type='code'>eng</languageTerm></language></mods>"
       @smods_rec.from_str m
@@ -58,6 +58,13 @@ describe "Searchworks mixin for Stanford::Mods::Record" do
     end        
     it "should not have duplicates" do
       m = "<mods #{@ns_decl}><language><languageTerm type='code' authority='iso639-2b'>eng</languageTerm><languageTerm type='text'>English</languageTerm></language></mods>"
+      @smods_rec.from_str m
+      langs = @smods_rec.sw_language_facet
+      expect(langs.size).to eq 1
+      expect(langs).to include "English"
+    end
+    it "handles codes without authority elements" do
+      m = "<mods #{@ns_decl}><language><languageTerm type='code'>eng</languageTerm></language></mods>"
       @smods_rec.from_str m
       langs = @smods_rec.sw_language_facet
       expect(langs.size).to eq 1
