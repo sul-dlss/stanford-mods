@@ -21,6 +21,9 @@ describe Stanford::Mods::Imprint do
             uuuu
           </dateIssued>
           <dateIssued>
+            1uuu
+          </dateIssued>          
+          <dateIssued>
             0000-00-00
           </dateIssued>' +
         mods_origin_info_end_str)

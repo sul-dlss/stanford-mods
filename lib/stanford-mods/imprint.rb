@@ -144,7 +144,7 @@ module Stanford
 
         # True if the element text isn't blank or the placeholder "9999".
         def valid?
-          text.present? && !['9999', '0000-00-00', 'uuuu'].include?(text.strip)
+          text.present? && !['9999', '0000-00-00', 'uuuu', '1uuu'].include?(text.strip)
         end
 
         def key_date?
