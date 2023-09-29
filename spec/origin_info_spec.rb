@@ -318,6 +318,22 @@ describe "computations from /originInfo field" do
         expect(record.pub_year_display_str).to eq nil
       end
     end
+
+    context 'with a date not handled by EDTF' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued encoding="marc">1uuu</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'ignores the date' do
+        expect(record.pub_year_display_str).to eq nil
+      end
+    end
   end
 
   context '#pub_year_sort_str' do

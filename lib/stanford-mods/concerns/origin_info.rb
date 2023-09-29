@@ -27,6 +27,9 @@ module Stanford
 
         edtf_date = date.date
 
+        # Protect against cases in which Date.edtf returns nil (e.g., 1uuu)
+        return unless edtf_date
+
         if edtf_date.is_a?(EDTF::Interval)
           edtf_date.from.year
         else
