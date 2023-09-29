@@ -160,6 +160,8 @@ module Stanford
         end
 
         def sort_key
+          return unless date
+          
           year = if date.is_a?(EDTF::Interval)
             date.from.year
           else
