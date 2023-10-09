@@ -142,8 +142,8 @@ module Stanford
           @value = value
         end
 
-        # True if the element text isn't blank or the placeholder "9999".
-        def valid?
+        # True if the element text isn't blank or one of a set of unparseable values.
+        def parseable?
           text.present? && !['9999', '0000-00-00', 'uuuu', '[uuuu]'].include?(text.strip)
         end
 
@@ -341,7 +341,7 @@ module Stanford
 
       def parse_dates(elements)
         # convert to DateValue objects and keep only valid ones
-        dates = elements.map(&:as_object).flatten.map { |element| DateValue.new(element) }.select(&:valid?)
+        dates = elements.map(&:as_object).flatten.map { |element| DateValue.new(element) }.select(&:parseable?)
 
         # join any date ranges into DateRange objects
         point_dates, dates = dates.partition(&:point)
