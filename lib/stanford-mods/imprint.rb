@@ -144,7 +144,7 @@ module Stanford
 
         # True if the element text isn't blank or the placeholder "9999".
         def valid?
-          text.present? && !['9999', '0000-00-00', 'uuuu'].include?(text.strip)
+          text.present? && !['9999', '0000-00-00', 'uuuu', '[uuuu]'].include?(text.strip)
         end
 
         def key_date?
@@ -161,7 +161,7 @@ module Stanford
 
         def sort_key
           return unless date
-          
+
           year = if date.is_a?(EDTF::Interval)
             date.from.year
           else

@@ -1,5 +1,6 @@
 require 'active_support'
 require 'active_support/core_ext/integer/inflections'
+require 'active_support/core_ext/object/blank'
 require 'mods'
 require 'stanford-mods/coordinate'
 require 'stanford-mods/imprint'
