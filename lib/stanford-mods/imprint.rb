@@ -46,6 +46,16 @@ module Stanford
         end.compact.flatten
       end
 
+      # called by mods_display gem, so made public
+      def publisher_vals_str
+        return if element.publisher.text.strip.empty?
+
+        publishers = element.publisher.reject do |p|
+          p.text.strip.empty?
+        end.map(&:text)
+        compact_and_join_with_delimiter(publishers, ' : ')
+      end
+
       private
 
       def compact_and_join_with_delimiter(values, delimiter)
@@ -71,15 +81,6 @@ module Stanford
         element.edition.reject do |e|
           e.text.strip.empty?
         end.map(&:text).join(' ').strip
-      end
-
-      def publisher_vals_str
-        return if element.publisher.text.strip.empty?
-
-        publishers = element.publisher.reject do |p|
-          p.text.strip.empty?
-        end.map(&:text)
-        compact_and_join_with_delimiter(publishers, ' : ')
       end
 
       # PLACE processing methods ------
