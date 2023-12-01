@@ -46,7 +46,7 @@ module Stanford
         end.compact.flatten
       end
 
-      # called by mods_display gem, so made public
+      # called by mods_display gem
       def publisher_vals_str
         return if element.publisher.text.strip.empty?
 
@@ -54,6 +54,13 @@ module Stanford
           p.text.strip.empty?
         end.map(&:text)
         compact_and_join_with_delimiter(publishers, ' : ')
+      end
+
+      # called by mods_display gem
+      def edition_vals_str
+        element.edition.reject do |e|
+          e.text.strip.empty?
+        end.map(&:text).join(' ').strip
       end
 
       private
@@ -75,12 +82,6 @@ module Stanford
 
       def ends_in_terminating_punctuation?(value)
         value.strip.end_with?('.', ',', ':', ';')
-      end
-
-      def edition_vals_str
-        element.edition.reject do |e|
-          e.text.strip.empty?
-        end.map(&:text).join(' ').strip
       end
 
       # PLACE processing methods ------
