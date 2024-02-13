@@ -171,7 +171,7 @@ module Stanford
           end
 
           str = if year < 1
-            (-1 * year - 1000).to_s
+            (year.abs - 10000).to_s
           else
             year.to_s
           end

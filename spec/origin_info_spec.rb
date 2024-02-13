@@ -383,7 +383,7 @@ describe "computations from /originInfo field" do
       end
 
       it 'returns the earliest date with the funky lexical sort encoding' do
-        expect(record.pub_year_sort_str).to eq '-751'
+        expect(record.pub_year_sort_str).to eq '-9751'
       end
     end
 
@@ -400,7 +400,7 @@ describe "computations from /originInfo field" do
       end
 
       it 'returns the earliest date of the range with the funky lexical sort encoding' do
-        expect(record.pub_year_sort_str).to eq '-751'
+        expect(record.pub_year_sort_str).to eq '-9751'
       end
     end
 
