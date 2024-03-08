@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'stanford/geo'
+
 module Stanford
   module Mods
     # NON-SearchWorks specific wranglings of MODS cartographics metadata
@@ -46,9 +48,9 @@ module Stanford
                    end
       end
 
-      # @return [Array{Stanford::Mods::Coordinate}] valid coordinates as objects
+      # @return [Array{Stanford::Geo::Coordinate}] valid coordinates as objects
       def coordinates_objects
-        coordinates.map { |n| Stanford::Mods::Coordinate.new(n) }.select(&:valid?)
+        coordinates.map { |n| Stanford::Geo::Coordinate.new(n) }.select(&:valid?)
       end
 
       # @return [Array{String}] values suitable for solr SRPT fields, like "ENVELOPE(-16.0, 28.0, 13.0, -15.0)"
