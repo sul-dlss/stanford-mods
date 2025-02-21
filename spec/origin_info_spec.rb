@@ -383,7 +383,7 @@ describe "computations from /originInfo field" do
       end
 
       it 'returns the earliest date with the funky lexical sort encoding' do
-        expect(record.pub_year_sort_str).to eq '-751'
+        expect(record.pub_year_sort_str).to eq '-6750'
       end
     end
 
@@ -400,7 +400,23 @@ describe "computations from /originInfo field" do
       end
 
       it 'returns the earliest date of the range with the funky lexical sort encoding' do
-        expect(record.pub_year_sort_str).to eq '-751'
+        expect(record.pub_year_sort_str).to eq '-6750'
+      end
+    end
+
+    context 'with a really old BCE date (e.g. ky899rv1161)' do
+      let(:modsxml) do
+        <<-EOF
+          <mods xmlns="http://www.loc.gov/mods/v3">
+            <originInfo>
+              <dateIssued encoding="edtf">Y-12345</dateIssued>
+            </originInfo>
+          </mods>
+        EOF
+      end
+
+      it 'returns the earliest date of the range with the funky lexical sort encoding' do
+        expect(record.pub_year_sort_str).to eq '-487654'
       end
     end
 

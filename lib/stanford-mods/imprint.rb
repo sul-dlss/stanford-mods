@@ -10,6 +10,8 @@ module Stanford
     # however, the date_parsing class only does years, and this does finer tuned dates and also
     # reformats them according to the encoding.
     class Imprint
+      BCE_CHAR_SORT_MAP = { '0' => '9', '1' => '8', '2' => '7', '3' => '6', '4' => '5', '5' => '4', '6' => '3', '7' => '2', '8' => '1', '9' => '0' }.freeze
+
       attr_reader :element
 
       # @param [Nokogiri::XML::Node] an originInfo node
@@ -170,19 +172,25 @@ module Stanford
             date.year
           end
 
-          str = if year < 1
-            (-1 * year - 1000).to_s
+          str = if year > 0
+            # for CE dates, we can just pad them out to 4 digits and sort normally...
+            year.to_s.rjust(4, "0")
           else
-            year.to_s
+            #  ... but for BCE, because we're sorting lexically, we need to invert the digits (replacing 0 with 9, 1 with 8, etc.),
+            #  we prefix it with a hyphen (which will sort before any digit) and the number of digits (also inverted) to get
+            # it to sort correctly.
+            inverted_year = year.abs.to_s.chars.map { |c| BCE_CHAR_SORT_MAP[c] }.join
+            length_prefix = BCE_CHAR_SORT_MAP[inverted_year.to_s.length.to_s]
+            "-#{length_prefix}#{inverted_year}"
           end
 
           case value.precision
           when :decade
-            str[0..2] + "-"
+            str[0...-1] + "-"
           when :century
-            str[0..1] + "--"
+            str[0...-2] + "--"
           else
-            str.rjust(4, "0")
+            str
           end
         end
 
