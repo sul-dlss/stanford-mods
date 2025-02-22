@@ -17,6 +17,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
 
   gem.add_dependency 'mods', '~> 3.0', '>= 3.0.4'
+  gem.add_dependency 'stanford-geo', '~> 0.1.0'
   # active_support for .ordinalize, eg. 1 -> 1st, 2 -> 2nd for centuries
   gem.add_dependency 'activesupport'
 
